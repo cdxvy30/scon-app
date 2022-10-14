@@ -1,1 +1,1 @@
-# ntu-smart-construction
+# ntu-SCon-frontend
