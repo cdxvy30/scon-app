@@ -128,6 +128,7 @@ const IssueListScreen = ({ navigation, route }) => {
 
         switch (buttonIndex) {
           case 0:
+            console.log("HI")
             break; // cancel action
           case 1:
             await fs.writeFile(
