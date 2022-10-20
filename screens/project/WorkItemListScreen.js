@@ -38,7 +38,7 @@ const WorkItemListScreen = ({navigation, route}) => {
   }, [isFocused]);
 
   const workItemAddHandler = async () => {
-    navigation.navigate('WorkItemAdd', { name: 'Create new workitem' });
+    navigation.navigate('WorkItemAdd', { name: 'Create new workitem'});
   };
 
   
@@ -63,35 +63,39 @@ const WorkItemListScreen = ({navigation, route}) => {
     );
   };
 
-  const workItemSelectHandler = item => {
+  const workItemEditHandler = item => {
     setSelectedWorkItemId(item.id);
     navigation.navigate('WorkItemAdd', { 
       action: 'update existing workitem',
       item, });
   };
 
-  const issueSelectHandler = item => {
-    setSelectedIssueId(item.id);
-    navigation.navigate('Issue', {
-      projectId: projectId,
-      action: 'update existing issue',
-      item,
-    });
+
+
+  const workItemSelectHandler = item => {
+    route.params.setIssueTaskText(item.name);
+    route.params.setIssueAssigneeText(`${item.company}-${item.manager}`);
+    route.params.setIssueAssigneePhoneNumberText(item.phone_number);
+    navigation.goBack();
   };
 
-  const swipeBtns = [
-    {
-      text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
-      backgroundColor: 'red',
-      underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-      onPress: () => workItemDeleteHandler(),
-    }
-  ];
-  
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <Swipeout
       key={item.id}
-      right={swipeBtns}
+      right={[
+        {
+          text: <Ionicons name={'create-outline'} size={24} color={'white'} />,
+          backgroundColor: 'orange',
+          underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
+          onPress: () =>{workItemEditHandler(item)}
+        },
+        {
+          text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
+          backgroundColor: 'red',
+          underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
+          onPress: () => workItemDeleteHandler(),
+        }
+      ]}
       onOpen={() => setSelectedWorkItemId(item.id)}>
       <TouchableOpacity
         onPress={onPress}
@@ -106,7 +110,6 @@ const WorkItemListScreen = ({navigation, route}) => {
   const renderItem = ({ item }) => {
     const backgroundColor = item.id === selectedWorkItemId ? 'white' : 'white'; //"darkgrey" : "white";
     const color = item.id === selectedWorkItemId ? 'black' : 'black'; //'white' : 'black';
-
     return (
       <React.Fragment>
         <Item

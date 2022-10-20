@@ -51,11 +51,12 @@ const IssueScreen = ({ navigation, route }) => {
   const [issueLocationText, setIssueLocationText] = useState(item.location);
   const [issueTaskText, setIssueTaskText] = useState(item.activity);
   const [issueAssigneeText, setIssueAssigneeText] = useState(item.assignee);
+  const [issueAssigneePhoneNumberText, setIssueAssigneePhoneNumberText] = useState(item.assignee_phone_number);
   const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(item.safetyManager,);
   const [issueAttachments, setIssueAttachments] = useState(item.attachments);
   const [issueLabels, setIssueLabels] = useState(transformLabels(item.labels));
   const [issueStatus, setIssueStatus] = useState(item.status);
-
+ 
 
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const keyboardDidShowListener = useRef();
@@ -68,6 +69,15 @@ const IssueScreen = ({ navigation, route }) => {
   const issueTrackToggleHandler = () => {
     setIssueTrack(previousState => !previousState);
   };
+
+  const WorkItemListHandler = async () => {
+    navigation.navigate('WorkItemList', { 
+      name: 'Create new workItem' ,
+      setIssueTaskText, 
+      setIssueAssigneeText, 
+      setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
+    })};
+
 
   const attachmentAddHandler = async image => {
     const imageUri = image.uri;
@@ -255,6 +265,7 @@ const IssueScreen = ({ navigation, route }) => {
       location: item.location,
       activity: item.activity,
       assignee: item.assignee,
+      assignee_phone_number: item.assignee_phone_number,
       safety_manager: item.safetyManager,
       type: item.type,
       status: item.status,
@@ -283,6 +294,7 @@ const IssueScreen = ({ navigation, route }) => {
       location: issueLocationText,
       activity: issueTaskText,
       assignee: issueAssigneeText,
+      assignee_phone_number: issueAssigneePhoneNumberText,
       safety_manager: issueSafetyManagerText,
       type: issueType,
       type_remark: issueTypeRemark,
@@ -292,6 +304,7 @@ const IssueScreen = ({ navigation, route }) => {
     await SqliteManager.updateIssue(issueId, transformedIssue);
   }, [
     issueAssigneeText,
+    issueAssigneePhoneNumberText,
     issueId,
     issueLocationText,
     issueSafetyManagerText,
@@ -342,6 +355,7 @@ const IssueScreen = ({ navigation, route }) => {
     issueLocationText,
     issueTaskText,
     issueAssigneeText,
+    issueAssigneePhoneNumberText,
     issueSafetyManagerText,
     issueType,
     issueTypeRemark,
@@ -447,13 +461,17 @@ const IssueScreen = ({ navigation, route }) => {
             <Separator />
             <View style={styles.item}>
               <Text style={styles.title}>工項</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={setIssueTaskText}
-                  defaultValue={issueTaskText}
-                />
-              </View>
+              <TouchableOpacity onPress={WorkItemListHandler}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={styles.textInput}>
+                    {!!issueTaskText? issueTaskText:undefined}
+                  </Text>
+                  <Ionicons
+                    style={styles.description}
+                    name={'ios-chevron-forward'}
+                  />
+                </View>
+              </TouchableOpacity>
             </View>
             <Separator />
             <View style={styles.item}>
@@ -463,6 +481,17 @@ const IssueScreen = ({ navigation, route }) => {
                   style={styles.textInput}
                   onChangeText={setIssueAssigneeText}
                   defaultValue={issueAssigneeText}
+                />
+              </View>
+            </View>
+            <Separator />
+            <View style={styles.item}>
+              <Text style={styles.title}>工項負責人電話</Text>
+              <View style={{ flexDirection: 'row' }}>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={setIssueAssigneePhoneNumberText}
+                  defaultValue={issueAssigneePhoneNumberText}
                 />
               </View>
             </View>

@@ -82,6 +82,7 @@ const IssueListScreen = ({ navigation, route }) => {
       action: 'update existing issue',
       item,
     });
+
   };
 
   const issueSortHandler = () => {
@@ -95,6 +96,7 @@ const IssueListScreen = ({ navigation, route }) => {
       buttonIndex => {
         switch (buttonIndex) {
           case 0:
+            console.log("trytry")
             break; // cancel action
           case 1:
             issueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -351,6 +353,7 @@ const IssueListScreen = ({ navigation, route }) => {
       location: project.name,
       activity: '',
       assignee: '',
+      assignee_phone_number: '',
       safetyManager: project.inspector,
       attachments: [],
       labels: [],
@@ -412,6 +415,8 @@ const IssueListScreen = ({ navigation, route }) => {
   const renderItem = ({ item }) => {
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
+
+    
     return (
       <React.Fragment>
         <Item

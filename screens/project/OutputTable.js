@@ -18,7 +18,7 @@ export function IssueRowsGenerator (issueList,fs) {
             new TableCell({
             children: [new Paragraph({children:[new TextRun({text: "缺失照片", size: 30, })], alignment:AlignmentType.CENTER}), ],
             verticalAlign:VerticalAlign.CENTER,
-            width:{size:4800, type:WidthType.DXA}
+            width:{size:4600, type:WidthType.DXA}
             }),
             new TableCell({
             children: [new Paragraph({children:[new TextRun({text: "缺失地點、內容", size: 30, })], alignment:AlignmentType.CENTER}), ],
@@ -26,7 +26,7 @@ export function IssueRowsGenerator (issueList,fs) {
             width:{size:1600, type:WidthType.DXA}
             }),
             new TableCell({
-            children: [new Paragraph({children:[new TextRun({text: "改善方式、時間、追蹤", size: 30, })], alignment:AlignmentType.CENTER}), ],
+            children: [new Paragraph({children:[new TextRun({text: "風險狀態、時間、追蹤", size: 30, })], alignment:AlignmentType.CENTER}), ],
             verticalAlign:VerticalAlign.CENTER,
             width:{size:2000, type:WidthType.DXA}
             }),

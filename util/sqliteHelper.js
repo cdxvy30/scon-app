@@ -92,6 +92,7 @@ export const transformIssue = issue => {
     location: issue.location,
     activity: issue.activity,
     assignee: issue.assignee,
+    assignee_phone_number: issue.assignee_phone_number,
     safetyManager: issue.safety_manager,
     objects: [...new Set(objects)],
     attachments: issue.issue_attachment,

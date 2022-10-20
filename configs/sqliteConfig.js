@@ -31,6 +31,7 @@ const SYSTEM_CONFIG = {
     location: 'TEXT NOT NULL',
     activity: 'TEXT NOT NULL',
     activity_person_in_charge: 'TEXT NOT NULL',
+    assignee_phone_number:'TEXT NOT NULL',
     she_person_in_charge: 'TEXT NOT NULL',
     project_id: 'TEXT NOT NULL',
     created_at: 'INTEGER NOT NULL',

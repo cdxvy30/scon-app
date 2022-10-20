@@ -15,11 +15,7 @@ import {OBJECT_TYPE} from '../../configs/objectTypeConfig';
 
 
 
-const ProfileSettingScreen = ({navigation, route}) => {
-  
-  const WorkItemAddHandler = async () => {
-    navigation.navigate('WorkItemList', { name: 'Create new workItem' });
-  };
+const ProfileSettingScreen = () => {
  
   return (
     <React.Fragment>
@@ -49,30 +45,6 @@ const ProfileSettingScreen = ({navigation, route}) => {
                 </Text>
               </React.Fragment>
             ) : undefined}
-          </View>
-          <View style={styles.group}>
-            <TouchableOpacity onPress={WorkItemAddHandler}>
-              <View style={styles.item}>
-                <Text style={styles.title}>
-                  <Ionicons style={styles.titleIcon} name={'ios-pricetags'} />{' '}
-                  工項
-                </Text>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.description}>
-                    {' '}
-                    0個{' '}
-                  </Text>
-                </View>
-              </View>
-            {OBJECT_TYPE.length > 0 ? (
-              <React.Fragment>
-                <Separator />
-                <Text style={[styles.description, {marginVertical: 12}]}>
-                  {}
-                </Text>
-              </React.Fragment>
-            ) : undefined}
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
