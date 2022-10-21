@@ -1,16 +1,11 @@
 import React, {useState} from 'react';
-import {launchImageLibrary} from 'react-native-image-picker';
-
 import {
-  ActionSheetIOS,
   Button,
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   Alert,
   // Dimensions,
@@ -23,8 +18,7 @@ import {
   // useColorScheme,
 } from 'react-native';
 import SqliteManager from '../../services/SqliteManager';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { PROJECT_STATUS } from './ProjectEnum';
+
 
 // name: {type: types.TEXT, not_null: true},
 // manager: {type: types.TEXT, not_null: true},
@@ -32,17 +26,15 @@ import { PROJECT_STATUS } from './ProjectEnum';
 // company: {type: types.TEXT, not_null: true},
 
 const WorkItemAddScreen = ({navigation, route}) => {
-  let workitem = route.params.item;
+  let workitem = route.params.workitem;
   const [name, setName] = useState(workitem? workitem.name:'');
   const [manager, setManager] = useState(workitem? workitem.manager:'');
   const [phone_number, setPhone_Number] = useState(workitem? workitem.phone_number:'');
   const [company, setCompany] = useState(workitem? workitem.company:'');
 
-
   const workitemAddHandler = React.useCallback(async () => {
     if (!name) {
       Alert.alert('請填入工項');
-      console.log(workitem)
       return;
     }
 
@@ -55,12 +47,13 @@ const WorkItemAddScreen = ({navigation, route}) => {
     };
     await SqliteManager.createWorkItem(newWorkItem);
     navigation.goBack();
-  }, [
+  }, 
+  [
     name,
-    manager,
-    phone_number,
     company,
-    navigation,
+    manager,
+    company,
+    navigation
   ]);
 
   const workitemUpdateHandler = React.useCallback(async () => {
@@ -75,16 +68,16 @@ const WorkItemAddScreen = ({navigation, route}) => {
       phone_number,
       company,
     };
-    console.log(newWorkItem);
-    await SqliteManager.updateWorkItem(workitem.id, newWorkItem);
+    await SqliteManager.updateWorkItem(route.params.workitem.id, newWorkItem);
     navigation.goBack();
-  }, [
+  },
+  [
     name,
-    manager,
-    phone_number,
     company,
-    navigation,
-  ]);
+    manager,
+    company,
+    navigation
+  ] );
 
   React.useLayoutEffect(() => {
     navigation.setOptions({

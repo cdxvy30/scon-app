@@ -61,7 +61,7 @@ const ProjectListScreen = ({ navigation }) => {
       [
         {
           text: "取消",
-          onPress: () => {console.log("Cancel delete project")},
+          onPress: () => {console.log(projectList)},
           style: "cancel"
         },
         {

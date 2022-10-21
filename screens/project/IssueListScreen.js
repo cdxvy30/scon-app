@@ -96,7 +96,6 @@ const IssueListScreen = ({ navigation, route }) => {
       buttonIndex => {
         switch (buttonIndex) {
           case 0:
-            console.log("hihi")
             break; // cancel action
           case 1:
             issueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

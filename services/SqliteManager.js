@@ -88,13 +88,11 @@ export default class SqliteManager {
       // Work Item
       const workitems = sampleData.workitem;
       const workitemPromises = workitems.map(workitem =>
-        this.createProject({
+        this.createWorkItem({
           ...workitem,
         }),
       );
       await Promise.all(workitemPromises);
-      const allWorkItem = await this.getAllWorkItem();
-
 
       console.log('[Sqlite] Sample data import succeeded.');
     } catch (error) {
@@ -299,9 +297,9 @@ export default class SqliteManager {
   static deleteWorkItem = async id => {
     await this.deleteInstance(WorkItem, id);
 
-    const workitems = await this.getWorkItemByName(id);
+    const workitems = await this.getWorkitem(id);
     const workitemDeletePromises = workitems.map(workitem =>
-      this.deleteInstance(WorkItem, workitem.name),
+      this.deleteInstance(WorkItem, workitem.id),
     );
     await Promise.all(workitemDeletePromises);
   };
@@ -311,13 +309,14 @@ export default class SqliteManager {
   static getIssue = id => this.getInstanceById(Issue, id);
   static getIssueAttachment = id => this.getInstanceById(IssueAttachment, id);
   static getIssueLabel = id => this.getInstanceById(IssueLabel, id);
+  static getWorkitem = id => this.getInstanceById(WorkItem, id);
 
   static getAllUsers = () => this.getInstances(User);
   static getAllProjects = () => this.getInstances(Project);
   static getAllIssues = () => this.getInstances(Issue);
   static getAllIssueAttachments = () => this.getInstances(IssueAttachment);
   static getAllIssueLabels = () => this.getInstances(IssueLabel);
-  static getAllWorkItem = () => this.getInstances(WorkItem);
+  static getAllWorkItems = () => this.getInstances(WorkItem);
   /* ********************** */
 
   /* Advanced Entity Functions */
@@ -340,7 +339,5 @@ export default class SqliteManager {
     this.getInstancesByProp(IssueAttachment, 'issue_id', issueId);
   static getIssueLabelsByIssueId = issueId =>
     this.getInstancesByProp(IssueLabel, 'issue_id', issueId);
-  static getWorkItemByName = name =>
-    this.getInstancesByProp(WorkItem, 'name', name);
   /* ************************* */
 }

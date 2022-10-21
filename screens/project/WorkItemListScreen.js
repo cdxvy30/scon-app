@@ -26,10 +26,12 @@ const WorkItemListScreen = ({navigation, route}) => {
 
   useEffect(() => {
     const fetchWorkItems = async () => {
-      const workitems = await SqliteManager.getAllWorkItem();
+      const workitems = await SqliteManager.getAllWorkItems();
       const transformedWorkItems = transformWorkItems(workitems);
-      
-      setWorkItemList(transformedWorkItems);
+      const sortedWorkItems = transformedWorkItems.sort(
+        (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+      );
+      setWorkItemList(sortedWorkItems);
     };
 
     if (isFocused) {
@@ -41,8 +43,6 @@ const WorkItemListScreen = ({navigation, route}) => {
     navigation.navigate('WorkItemAdd', { name: 'Create new workitem'});
   };
 
-  
-
   const workItemDeleteHandler = async () => {
     Alert.alert(
       "刪除工項",
@@ -50,6 +50,7 @@ const WorkItemListScreen = ({navigation, route}) => {
       [
         {
           text: "取消",
+          onPress: () => {console.log('Cancel Delete Workitem')},
           style: "cancel"
         },
         {
@@ -63,11 +64,11 @@ const WorkItemListScreen = ({navigation, route}) => {
     );
   };
 
-  const workItemEditHandler = item => {
-    setSelectedWorkItemId(item.id);
+  const workItemEditHandler = async() => {
+    let workitem = await SqliteManager.getWorkitem(selectedWorkItemId);
     navigation.navigate('WorkItemAdd', { 
-      action: 'update existing workitem',
-      item, });
+      name: 'update existing workitem',
+      workitem:workitem, });
   };
 
 
@@ -87,7 +88,7 @@ const WorkItemListScreen = ({navigation, route}) => {
           text: <Ionicons name={'create-outline'} size={24} color={'white'} />,
           backgroundColor: 'orange',
           underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-          onPress: () =>{workItemEditHandler(item)}
+          onPress: () =>{workItemEditHandler()}
         },
         {
           text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
@@ -101,7 +102,7 @@ const WorkItemListScreen = ({navigation, route}) => {
         onPress={onPress}
         style={[styles.item, backgroundColor]}>
         <View style={{ flex: 1, flexDirection: 'row' }}>
-          <Text style={[styles.title, textColor]}>{`${item.name}-${item.company}`}</Text>
+          <Text style={[styles.title, textColor]}>{`${item.name}--${item.company}`}</Text>
         </View>
       </TouchableOpacity>
     </Swipeout>
@@ -123,8 +124,7 @@ const WorkItemListScreen = ({navigation, route}) => {
       </React.Fragment>
     );
   };
-  //issueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  //setIssueList([...issueList]);
+
   return (
     <React.Fragment>
       <SafeAreaView style={styles.container}>
