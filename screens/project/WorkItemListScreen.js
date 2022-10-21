@@ -123,7 +123,8 @@ const WorkItemListScreen = ({navigation, route}) => {
       </React.Fragment>
     );
   };
-
+  //issueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  //setIssueList([...issueList]);
   return (
     <React.Fragment>
       <SafeAreaView style={styles.container}>
