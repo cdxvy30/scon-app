@@ -269,6 +269,7 @@ const IssueListScreen = ({ navigation, route }) => {
               if (!res.didCancel) {
                 const image = res.assets[0];
                 navigation.navigate('Issue', {
+                  project: project,
                   projectId: projectId,
                   action: 'create new issue',
                   item: CreateItemByImage(image),
@@ -287,6 +288,7 @@ const IssueListScreen = ({ navigation, route }) => {
                 const image = res.assets[0];
                 navigation.navigate('Issue', {
                   projectId: projectId,
+                  project: project,
                   action: 'create new issue',
                   item: CreateItemByImage(image),
                 });

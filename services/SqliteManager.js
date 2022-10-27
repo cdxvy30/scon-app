@@ -90,9 +90,6 @@ export default class SqliteManager {
       const workitemPromises = workitems.map(workitem =>
         this.createWorkItem({
           ...workitem,
-          project_id: allProjects.find(
-            p => p.name === projects[workitem.project_id].name,
-          ).id,
         }),
       );
       await Promise.all(workitemPromises);

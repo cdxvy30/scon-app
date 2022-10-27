@@ -72,6 +72,7 @@ const WorkItemListScreen = ({navigation, route}) => {
     setSelectedWorkItemId(item.id);
     navigation.navigate('WorkItemAdd', { 
       action: 'update existing workitem',
+      projectId: projectId,
       item, });
   };
 
