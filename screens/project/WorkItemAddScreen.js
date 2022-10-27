@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+
 import {
   Button,
   SafeAreaView,
@@ -19,18 +20,18 @@ import {
 } from 'react-native';
 import SqliteManager from '../../services/SqliteManager';
 
-
 // name: {type: types.TEXT, not_null: true},
 // manager: {type: types.TEXT, not_null: true},
 // phone_number: {type: types.TEXT, not_null: true},
 // company: {type: types.TEXT, not_null: true},
 
 const WorkItemAddScreen = ({navigation, route}) => {
-  let workitem = route.params.workitem;
+  let workitem = route.params.item;
   const [name, setName] = useState(workitem? workitem.name:'');
   const [manager, setManager] = useState(workitem? workitem.manager:'');
   const [phone_number, setPhone_Number] = useState(workitem? workitem.phone_number:'');
   const [company, setCompany] = useState(workitem? workitem.company:'');
+  const projectId = route.params.projectId; 
 
   const workitemAddHandler = React.useCallback(async () => {
     if (!name) {
@@ -44,16 +45,16 @@ const WorkItemAddScreen = ({navigation, route}) => {
       manager,
       phone_number,
       company,
+      project_id: projectId
     };
     await SqliteManager.createWorkItem(newWorkItem);
-    navigation.goBack();
-  }, 
-  [
+    navigation.goBack()
+  }, [
     name,
-    company,
     manager,
+    phone_number,
     company,
-    navigation
+    projectId
   ]);
 
   const workitemUpdateHandler = React.useCallback(async () => {
@@ -67,17 +68,18 @@ const WorkItemAddScreen = ({navigation, route}) => {
       manager,
       phone_number,
       company,
+      project_id: projectId
     };
-    await SqliteManager.updateWorkItem(route.params.workitem.id, newWorkItem);
+
+    await SqliteManager.updateWorkItem(workitem.id, newWorkItem);
     navigation.goBack();
-  },
-  [
+  }, [
     name,
-    company,
     manager,
+    phone_number,
     company,
-    navigation
-  ] );
+    projectId
+  ]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({

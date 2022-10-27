@@ -85,9 +85,10 @@ const SYSTEM_CONFIG = {
     manager: 'TEXT NOT NULL',
     phone_number: 'TEXT NOT NULL',
     company: 'TEXT NOT NULL',
+    project_id: 'TEXT NOT NULL',
     created_at: 'INTEGER NOT NULL',
     updated_at: 'INTEGER NOT NULL',
-  },
+  }
 };
 
 export default SYSTEM_CONFIG;

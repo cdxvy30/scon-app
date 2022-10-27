@@ -20,10 +20,9 @@ export default class WorkItem extends BaseModel { //entends 繼承父類別
       id: {type: types.TEXT, primary_key: true},
       name: {type: types.TEXT, not_null: true},
       manager: {type: types.TEXT, not_null: true},
+      project_id: {type: types.TEXT, not_null: true},
       phone_number: {type: types.TEXT, not_null: true},
       company: {type: types.TEXT, not_null: true},
-      created_at: {type: types.INTEGER, default: () => Date.now()},
-      updated_at: {type: types.INTEGER, default: () => Date.now()},
     };
   }
 }

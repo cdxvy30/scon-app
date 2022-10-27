@@ -22,16 +22,17 @@ import {
 const WorkItemListScreen = ({navigation, route}) => {
   const [WorkItemList, setWorkItemList] = useState(null);
   const [selectedWorkItemId, setSelectedWorkItemId] = useState(null);
+  const [projectId, setProjectId] = useState(route.params.projectId);
+  const [project, setProject] = useState(route.params.project);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     const fetchWorkItems = async () => {
-      const workitems = await SqliteManager.getAllWorkItems();
+      const workitems = await SqliteManager.getWorkItemsByProjectId(project.id);
       const transformedWorkItems = transformWorkItems(workitems);
-      const sortedWorkItems = transformedWorkItems.sort(
-        (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
-      );
-      setWorkItemList(sortedWorkItems);
+      setWorkItemList(transformedWorkItems);
+      setProjectId(project.id);
+      setProject(project)
     };
 
     if (isFocused) {
@@ -40,8 +41,12 @@ const WorkItemListScreen = ({navigation, route}) => {
   }, [isFocused]);
 
   const workItemAddHandler = async () => {
-    navigation.navigate('WorkItemAdd', { name: 'Create new workitem'});
-  };
+    navigation.navigate('WorkItemAdd', { 
+      name: 'Create new workitem' ,
+      projectId: projectId
+    })};
+
+  
 
   const workItemDeleteHandler = async () => {
     Alert.alert(
@@ -50,7 +55,6 @@ const WorkItemListScreen = ({navigation, route}) => {
       [
         {
           text: "取消",
-          onPress: () => {console.log('Cancel Delete Workitem')},
           style: "cancel"
         },
         {
@@ -64,11 +68,11 @@ const WorkItemListScreen = ({navigation, route}) => {
     );
   };
 
-  const workItemEditHandler = async() => {
-    let workitem = await SqliteManager.getWorkitem(selectedWorkItemId);
+  const workItemEditHandler = item => {
+    setSelectedWorkItemId(item.id);
     navigation.navigate('WorkItemAdd', { 
-      name: 'update existing workitem',
-      workitem:workitem, });
+      action: 'update existing workitem',
+      item, });
   };
 
 
@@ -88,7 +92,7 @@ const WorkItemListScreen = ({navigation, route}) => {
           text: <Ionicons name={'create-outline'} size={24} color={'white'} />,
           backgroundColor: 'orange',
           underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-          onPress: () =>{workItemEditHandler()}
+          onPress: () =>{workItemEditHandler(item)}
         },
         {
           text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
@@ -102,7 +106,7 @@ const WorkItemListScreen = ({navigation, route}) => {
         onPress={onPress}
         style={[styles.item, backgroundColor]}>
         <View style={{ flex: 1, flexDirection: 'row' }}>
-          <Text style={[styles.title, textColor]}>{`${item.name}--${item.company}`}</Text>
+          <Text style={[styles.title, textColor]}>{`${item.name}-${item.company}`}</Text>
         </View>
       </TouchableOpacity>
     </Swipeout>

@@ -90,9 +90,14 @@ export default class SqliteManager {
       const workitemPromises = workitems.map(workitem =>
         this.createWorkItem({
           ...workitem,
+          project_id: allProjects.find(
+            p => p.name === projects[workitem.project_id].name,
+          ).id,
         }),
       );
       await Promise.all(workitemPromises);
+      const allWorkItem = await this.getAllWorkItems();
+
 
       console.log('[Sqlite] Sample data import succeeded.');
     } catch (error) {
@@ -261,6 +266,13 @@ export default class SqliteManager {
       this.deleteInstance(Issue, issue.id),
     );
     await Promise.all(issueDeletePromises);
+
+    const workitems = await this.getWorkItemsByProjectId(id);
+    const workitemDeletePromises = workitems.map(workitem =>
+      this.deleteInstance(WorkItem, workitem.id),
+    );
+    await Promise.all(workitemDeletePromises);
+
   };
   static deleteIssue = async id => {
     await this.deleteInstance(Issue, id);
@@ -277,6 +289,9 @@ export default class SqliteManager {
     );
     await Promise.all(labelDeletePromises);
   };
+
+  static deleteWorkItem = id => this.deleteInstance(WorkItem, id);
+
   static deleteIssueAttachment = id => this.deleteInstance(IssueAttachment, id);
   static deleteIssueLabel = id => this.deleteInstance(IssueLabel, id);
 
@@ -294,22 +309,13 @@ export default class SqliteManager {
     this.deleteAllInstances(IssueAttachment);
   static deleteAllIssueLabels = () => this.deleteAllInstances(IssueLabel);
 
-  static deleteWorkItem = async id => {
-    await this.deleteInstance(WorkItem, id);
-
-    const workitems = await this.getWorkitem(id);
-    const workitemDeletePromises = workitems.map(workitem =>
-      this.deleteInstance(WorkItem, workitem.id),
-    );
-    await Promise.all(workitemDeletePromises);
-  };
 
   static getUser = id => this.getInstanceById(User, id);
   static getProject = id => this.getInstanceById(Project, id);
   static getIssue = id => this.getInstanceById(Issue, id);
   static getIssueAttachment = id => this.getInstanceById(IssueAttachment, id);
   static getIssueLabel = id => this.getInstanceById(IssueLabel, id);
-  static getWorkitem = id => this.getInstanceById(WorkItem, id);
+  static getWorkItem = id => this.getInstancesById(WorkItem, id);
 
   static getAllUsers = () => this.getInstances(User);
   static getAllProjects = () => this.getInstances(Project);
@@ -339,5 +345,7 @@ export default class SqliteManager {
     this.getInstancesByProp(IssueAttachment, 'issue_id', issueId);
   static getIssueLabelsByIssueId = issueId =>
     this.getInstancesByProp(IssueLabel, 'issue_id', issueId);
+  static getWorkItemsByProjectId = projectId =>
+    this.getInstancesByProp(WorkItem, 'project_id', projectId);
   /* ************************* */
 }

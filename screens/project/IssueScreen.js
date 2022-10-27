@@ -72,10 +72,12 @@ const IssueScreen = ({ navigation, route }) => {
 
   const WorkItemListHandler = async () => {
     navigation.navigate('WorkItemList', { 
-      name: 'Create new workItem' ,
+      project: route.params.project,
+      projectId: route.params.projectId,
       setIssueTaskText, 
       setIssueAssigneeText, 
       setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
+      
     })};
 
 

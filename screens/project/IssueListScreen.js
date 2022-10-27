@@ -79,6 +79,7 @@ const IssueListScreen = ({ navigation, route }) => {
     setSelectedIssueId(item.id);
     navigation.navigate('Issue', {
       projectId: projectId,
+      project: project,
       action: 'update existing issue',
       item,
     });

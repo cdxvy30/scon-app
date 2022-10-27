@@ -5,12 +5,14 @@ export const WORKITEM = [
       manager: '蔡常義',
       phone_number:'0905021042',
       company: '春原營造股份有限公司',
+      project_id: '02'
     },
     {
       name: '電梯井',
       manager: '蔡常義',
       phone_number:'0905021042',
       company: '春原營造股份有限公司',
+      project_id: '01'
     },
   ];
   

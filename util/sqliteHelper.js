@@ -61,19 +61,19 @@ export const transformProject = project => {
 export const transformProjects = projects =>
   projects.map(project => transformProject(project));
 
-export const transformWorkItem = workitem => {
-  return {
-    id: workitem.id,
-    name: workitem.name,
-    manager: workitem.manager,
-    phone_number: workitem.phone_number,
-    company: workitem.company,
-    timestamp: workitem.created_at,
+  export const transformWorkItem = workitem => {
+    return {
+      id: workitem.id,
+      name: workitem.name,
+      manager: workitem.manager,
+      phone_number: workitem.phone_number,
+      company: workitem.company,
+      project_id: workitem.project_id
+    };
   };
-};
-
-export const transformWorkItems = workitems =>
-  workitems.map(workitem => transformWorkItem(workitem));
+  
+  export const transformWorkItems = workitems =>
+    workitems.map(workitem => transformWorkItem(workitem));
 
 export const transformIssue = issue => {
   const objects = issue.issue_label.map(label => label.object);
