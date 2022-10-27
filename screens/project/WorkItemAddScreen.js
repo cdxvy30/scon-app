@@ -68,7 +68,8 @@ const WorkItemAddScreen = ({navigation, route}) => {
       manager,
       phone_number,
       company,
-      project_id: projectId
+      project_id: projectId,
+      timestamp: new Date().toISOString()
     };
 
     await SqliteManager.updateWorkItem(workitem.id, newWorkItem);

@@ -30,9 +30,14 @@ const WorkItemListScreen = ({navigation, route}) => {
     const fetchWorkItems = async () => {
       const workitems = await SqliteManager.getWorkItemsByProjectId(project.id);
       const transformedWorkItems = transformWorkItems(workitems);
-      setWorkItemList(transformedWorkItems);
+      const sortedWorkItems = transformedWorkItems.sort(
+        (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+      );
+
+      setWorkItemList(sortedWorkItems);
       setProjectId(project.id);
       setProject(project)
+      console.log(workitems)
     };
 
     if (isFocused) {

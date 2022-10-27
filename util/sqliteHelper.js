@@ -68,7 +68,8 @@ export const transformProjects = projects =>
       manager: workitem.manager,
       phone_number: workitem.phone_number,
       company: workitem.company,
-      project_id: workitem.project_id
+      project_id: workitem.project_id,
+      timestamp: new Date(workitem.created_at).toISOString(),
     };
   };
   
