@@ -104,7 +104,7 @@ const PhotoScreen = ({ navigation, route }) => {
     let labels = boxObjects;
     axios({
       method: "post",
-      url: "http://52.26.150.47:5000/predict",
+      url: "http://34.80.209.101:8000/predict",
       data: bodyFormData,
       headers: { "Content-Type": "multipart/form-data" },
     })

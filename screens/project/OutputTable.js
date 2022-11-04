@@ -1,5 +1,6 @@
 import { AlignmentType, HeightRule, ImageRun, Paragraph, Table, TableCell, TableRow, TextRun, UnderlineType, VerticalAlign, WidthType } from "docx";
 import { getIssueStatusById } from './IssueEnum';
+import { ISSUE_TYPE } from '../../configs/issueTypeConfig';
 
 export function IssueRowsGenerator (issueList,fs) {
     let rows = [
@@ -80,7 +81,7 @@ export function IssueRowsGenerator (issueList,fs) {
                 ], 
                     alignment:AlignmentType.CENTER}), 
                 new Paragraph({children:[
-                    new TextRun({text: `時間: ${issueList[i].timestamp[0]}${issueList[i].timestamp[1]}${issueList[i].timestamp[2]}${issueList[i].timestamp[3]}/${issueList[i].timestamp[5]}${issueList[i].timestamp[6]}/${issueList[i].timestamp[8]}${issueList[i].timestamp[9]}`, size: 30, }),
+                    new TextRun({text: `時間: ${new Date(issueList[i].timestamp).getFullYear()}/${new Date(issueList[i].timestamp).getMonth()+1}/${new Date(issueList[i].timestamp).getDate()}`, size: 30, }),
                 ], 
                     alignment:AlignmentType.CENTER}),
                 new Paragraph({children:[
@@ -102,8 +103,10 @@ export function IssueRowsGenerator (issueList,fs) {
 }
 
 export function ImprovePagesGenerator (issueList,fs,project,projectName) {
+    console.log(project)
     let pages = [];
     for (let i = issueList.length - 1; i >= 0; i--){
+
       //判斷是否追蹤，如否則跳過此缺失
       if (issueList[i].tracking === false){  
         continue
@@ -124,6 +127,15 @@ export function ImprovePagesGenerator (issueList,fs,project,projectName) {
       var issue_item = issueList[i].type;
       if (issue_item === '其他'){
         issue_item = issueList[i].type_remark
+      }
+
+      var issue_title = issueList[i].type;
+      for (let j=0; j <ISSUE_TYPE.length; j++){
+        for (let k=0; k<ISSUE_TYPE[j].type.length; k++){
+          if (issue_item === ISSUE_TYPE[j].type[k]){
+            issue_title = ISSUE_TYPE[j].title
+          }
+        }
       }
       
       pages.push(
@@ -191,7 +203,7 @@ export function ImprovePagesGenerator (issueList,fs,project,projectName) {
                           width:{size:1500, type:WidthType.DXA}
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: `${issueList[i].timestamp[0]}${issueList[i].timestamp[1]}${issueList[i].timestamp[2]}${issueList[i].timestamp[3]}/${issueList[i].timestamp[5]}${issueList[i].timestamp[6]}/${issueList[i].timestamp[8]}${issueList[i].timestamp[9]}`, size: 30, })], alignment:AlignmentType.LEFT}), ],
+                          children: [new Paragraph({children:[new TextRun({text: `${new Date(issueList[i].timestamp).getFullYear()}/${new Date(issueList[i].timestamp).getMonth()+1}/${new Date(issueList[i].timestamp).getDate()}`, size: 30, })], alignment:AlignmentType.LEFT}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:3200, type:WidthType.DXA}
                         }),
@@ -214,8 +226,10 @@ export function ImprovePagesGenerator (issueList,fs,project,projectName) {
                         columnSpan: 2,
                       }),
                       new TableCell({
-                        children: [new Paragraph({children:[new TextRun({text: '缺失概述: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}), 
-                                   new Paragraph({children:[new TextRun({text: issue_item, size: 30, })], alignment:AlignmentType.LEFT}),],
+                        children: [new Paragraph({children:[new TextRun({text: '缺失種類: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}), 
+                                   new Paragraph({children:[new TextRun({text: issue_title, size: 30, })], alignment:AlignmentType.LEFT}),
+                                   new Paragraph({children:[new TextRun({text: '缺失概述: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}),
+                                   new Paragraph({children:[new TextRun({text: issue_item, size: 30, })], alignment:AlignmentType.LEFT})],
                         width:{size:3200, type:WidthType.DXA},
                       }),
                     ],

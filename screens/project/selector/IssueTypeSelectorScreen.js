@@ -60,7 +60,7 @@ const IssueTypeSelectorScreen = ({ navigation, route }) => {
     let item = data.item;
     let section = data.section;
     let index = data.index;
-
+    console.log(data)
     return (
       <React.Fragment>
         <TouchableOpacity

@@ -50,9 +50,21 @@ const IssueListScreen = ({ navigation, route }) => {
   const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState({});
   const [issueList, setIssueList] = useState([]);
+  const [selectedIssueList, setSelectedIssueList] = useState(issueList);
   const [selectedIssueId, setSelectedIssueId] = useState(null);
+  const [ selectedStartDate, setSelectedStartDate ] = useState(null);
+  const [ selectedEndDate , setSelectedEndDate ] = useState(null)
   const isFocused = useIsFocused();
 
+  function issuesFiller (sortedIssues) {
+    var a = []
+    for (i=0; i<sortedIssues.length; i++){
+      if (new Date(selectedEndDate).getTime()+43200000>=new Date(sortedIssues[i].timestamp).getTime() && new Date(selectedStartDate).getTime()-43200000<=new Date(sortedIssues[i].timestamp).getTime()){
+        a.push(sortedIssues[i])
+      }
+    }
+    return a
+  }
 
   const issueDeleteHandler = async () => {
     Alert.alert(
@@ -67,7 +79,7 @@ const IssueListScreen = ({ navigation, route }) => {
         {
           text: "確定", onPress: async () => {
             await SqliteManager.deleteIssue(selectedIssueId);
-            setIssueList(issueList.filter(i => i.id !== selectedIssueId));
+            (selectedEndDate?setSelectedIssueList(issueList.filter(i => i.id !== selectedIssueId)):setIssueList(issueList.filter(i => i.id !== selectedIssueId)));
           },
           style: "destructive"
         }
@@ -99,12 +111,12 @@ const IssueListScreen = ({ navigation, route }) => {
           case 0:
             break; // cancel action
           case 1:
-            issueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            setIssueList([...issueList]);
+            (selectedEndDate? selectedIssueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)):issueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
+            (selectedEndDate?setSelectedIssueList([...selectedIssueList]):setIssueList([...issueList]));
             break;
           case 2:
-            issueList.sort((a, b) => b.attachments.length - a.attachments.length);
-            setIssueList([...issueList]);
+            (selectedEndDate? selectedIssueList.sort((a, b) => b.attachments.length - a.attachments.length):issueList.sort((a, b) => b.attachments.length - a.attachments.length));
+            (selectedEndDate?setSelectedIssueList([...selectedIssueList]):setIssueList([...issueList]));
             break;
         }
       },
@@ -114,7 +126,7 @@ const IssueListScreen = ({ navigation, route }) => {
   const issueOptionHandler = React.useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '匯出專案資訊', '匯出專案圖片', '匯出完整缺失記錄表', '匯出缺失改善前後記錄表'],
+        options: ['取消', '匯出專案資訊', '匯出專案圖片', '匯出缺失記錄表', '匯出缺失改善前後記錄表','篩選(按日期)'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
@@ -128,12 +140,11 @@ const IssueListScreen = ({ navigation, route }) => {
 
         switch (buttonIndex) {
           case 0:
-            console.log("YOYO")
             break; // cancel action
           case 1:
             await fs.writeFile(
               `${docPath}/${projectName}-data.json`,
-              JSON.stringify(transformExportIssues(issueList)),
+              JSON.stringify(transformExportIssues(selectedEndDate?selectedIssueList:issueList)),
               'utf8',
             );
 
@@ -148,8 +159,8 @@ const IssueListScreen = ({ navigation, route }) => {
             await Share.open(shareDataOption); // ...after the file is saved, send it to a system share intent
             break;
           case 2:
-            let urls = issueList.map(issue => 'file://' + issue.image.uri);
-            issueList.map(issue =>
+            let urls = (selectedEndDate?selectediIssueList:issueList).map(issue => 'file://' + issue.image.uri);
+            (selectedEndDate?selectedIssueList:issueList).map(issue =>
               issue.attachments.map(
                 att => (urls = urls.concat('file://' + att.image)),
               ),
@@ -187,7 +198,7 @@ const IssueListScreen = ({ navigation, route }) => {
                             ], alignment:AlignmentType.CENTER
                           }),
                           table = new Table({
-                            rows: IssueRowsGenerator(issueList,fs),
+                            rows: IssueRowsGenerator((selectedEndDate?selectedIssueList:issueList),fs),
                             alignment:AlignmentType.CENTER,
                           }),
 
@@ -197,7 +208,7 @@ const IssueListScreen = ({ navigation, route }) => {
           });
 
             await Packer.toBase64String(doc).then((base64) => {
-              fs.writeFile(`${docPath}/${projectName}-完整缺失記錄表.docx`, 
+              fs.writeFile(`${docPath}/${projectName}-缺失記錄表.docx`, 
               base64,
               'base64'
               );
@@ -205,21 +216,22 @@ const IssueListScreen = ({ navigation, route }) => {
 
             const shareDataTableOption = {
               title: 'MyApp',
-              message: `${projectName}-完整缺失記錄表`,
-              url: `file://${docPath}/${projectName}-完整缺失記錄表.docx`,
+              message: `${projectName}-缺失記錄表`,
+              url: `file://${docPath}/${projectName}-缺失記錄表.docx`,
               type: 'application/docx',
-              subject: `${projectName}-完整缺失記錄表`, // for email
+              subject: `${projectName}-缺失記錄表`, // for email
             };
 
             await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
             break;
         
           case 4:
+            console.log(project)
             const doc_2 = new Document({
               sections: [
                   {
                       properties: {},
-                      children: ImprovePagesGenerator(issueList,fs,project,projectName),
+                      children: ImprovePagesGenerator((selectedEndDate?selectedIssueList:issueList),fs,project,projectName),
                   },
               ],
           });
@@ -241,10 +253,17 @@ const IssueListScreen = ({ navigation, route }) => {
 
             await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
             break;
+
+          case 5:
+            await navigation.navigate('DateSelector',{
+              setSelectedStartDate,
+              setSelectedEndDate,
+            })
+
         }
       },
     );
-  }, [issueList, route.params.name]);
+  }, [(selectedEndDate? selectedIssueList:issueList), route.params.name]);
 
   const imageSelectHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
@@ -312,10 +331,13 @@ const IssueListScreen = ({ navigation, route }) => {
       const sortedIssues = transformedIssues.sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
       );
-
+      
+      sortedIssues[0].timestamp = new Date(new Date(sortedIssues[0].timestamp).getTime()-100000000)
+      sortedIssues[1].timestamp = new Date(new Date(sortedIssues[1].timestamp).getTime()-200000000)
       setIssueList(sortedIssues);
       setProjectId(project.id);
       setProject(project);
+      setSelectedIssueList(issuesFiller(sortedIssues))
     };
 
     if (isFocused) {
@@ -439,7 +461,7 @@ const IssueListScreen = ({ navigation, route }) => {
       <SafeAreaView style={styles.container}>
         <FlatList
           ListHeaderComponent={<Separator />}
-          data={issueList}
+          data={selectedEndDate? selectedIssueList:issueList}
           renderItem={renderItem}
           keyExtractor={item => item.id}
           extraData={selectedIssueId}

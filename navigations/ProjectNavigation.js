@@ -10,7 +10,7 @@ import ObjectTypeSelectorScreen from '../screens/project/selector/ObjectTypeSele
 import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelectorScreen';
 import WorkItemListScreen from '../screens/project/WorkItemListScreen';
 import WorkItemAddScreen from '../screens/project/WorkItemAddScreen'
-
+import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -64,6 +64,11 @@ const ProjectNavigation = ({navigation}) => {
           name="WorkItemAdd"
           component={WorkItemAddScreen}
           options={{title: '工項資訊'}}
+        />
+        <Stack.Screen
+          name="DateSelector"
+          component={DateSelectorScreen}
+          options={{title: '選取日期範圍'}}
         />
 
       </Stack.Navigator>
