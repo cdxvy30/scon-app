@@ -331,9 +331,6 @@ const IssueListScreen = ({ navigation, route }) => {
       const sortedIssues = transformedIssues.sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
       );
-      
-      sortedIssues[0].timestamp = new Date(new Date(sortedIssues[0].timestamp).getTime()-100000000)
-      sortedIssues[1].timestamp = new Date(new Date(sortedIssues[1].timestamp).getTime()-200000000)
       setIssueList(sortedIssues);
       setProjectId(project.id);
       setProject(project);
