@@ -23,7 +23,7 @@ import {
 //   LearnMoreLinks,
 //   ReloadInstructions,
 // } from 'react-native/Libraries/NewAppScreen';
-// import {Icon} from 'react-native-elements';
+// import { Icon } from 'react-native-elements';
 // import Draggable from 'react-native-draggable';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Orientation from 'react-native-orientation';
