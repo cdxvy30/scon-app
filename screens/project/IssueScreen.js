@@ -45,6 +45,7 @@ const IssueScreen = ({ navigation, route }) => {
   const projectId = route.params.projectId;
   const [action, setAction] = useState(route.params.action);
   const [issueId, setIssueId] = useState(item.id);
+  const [violationType, setViolationType] = useState(item.violation_type);
   const [issueType, setIssueType] = useState(item.type);
   const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);
   const [issueTrack, setIssueTrack] = useState(item.tracking);
@@ -246,7 +247,7 @@ const IssueScreen = ({ navigation, route }) => {
       setIssueLabels: labels => {
         setIssueLabels(labels);
       },
-    });
+    })
   };
 
   const issueTypeClickHandler = () => {
@@ -256,6 +257,41 @@ const IssueScreen = ({ navigation, route }) => {
         setIssueType(type);
       },
     });
+  };
+
+  const violationTypeClickHandler = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['取消', '墜落', '倒塌崩塌', '感電', '火災爆炸', '中毒缺氧', '其他'],
+        // destructiveButtonIndex: [1,2],
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'light', //'dark'
+      },
+      buttonIndex => {
+        switch (buttonIndex) {
+          case 0: // cancel action
+            break;
+          case 1:
+            setViolationType('墜落')
+            break;
+          case 2:
+            setViolationType('倒塌崩塌')
+            break;
+          case 3:
+            setViolationType('感電')
+            break;
+          case 4:
+            setViolationType('火災爆炸')
+            break;
+          case 5:
+            setViolationType('中毒缺氧')
+            break;
+          case 6:
+            setViolationType('其他')
+            break;
+        }
+      },
+    );
   };
 
   const issueCreateHandler = React.useCallback(async () => {
@@ -269,6 +305,7 @@ const IssueScreen = ({ navigation, route }) => {
       assignee: item.assignee,
       assignee_phone_number: item.assignee_phone_number,
       safety_manager: item.safetyManager,
+      violation_type: item.violation_type,
       type: item.type,
       status: item.status,
       type_remark: item.typeRemark,
@@ -298,6 +335,7 @@ const IssueScreen = ({ navigation, route }) => {
       assignee: issueAssigneeText,
       assignee_phone_number: issueAssigneePhoneNumberText,
       safety_manager: issueSafetyManagerText,
+      violation_type: violationType,
       type: issueType,
       type_remark: issueTypeRemark,
       project_id: projectId,
@@ -311,6 +349,7 @@ const IssueScreen = ({ navigation, route }) => {
     issueLocationText,
     issueSafetyManagerText,
     issueTaskText,
+    violationType,
     issueType,
     issueTypeRemark,
     issueTrack,
@@ -360,6 +399,7 @@ const IssueScreen = ({ navigation, route }) => {
     issueAssigneePhoneNumberText,
     issueSafetyManagerText,
     issueType,
+    violationType,
     issueTypeRemark,
     issueTrack,
     issueStatus,
@@ -407,12 +447,12 @@ const IssueScreen = ({ navigation, route }) => {
             />
           </View>
           <View style={styles.group}>
-            <TouchableOpacity onPress={() => issueTypeClickHandler()}>
+          <TouchableOpacity onPress={() => violationTypeClickHandler()}>
               <View style={styles.item}>
-                <Text style={styles.title}>缺失項目</Text>
+                <Text style={styles.title}>缺失種類</Text>
                 <View style={{ flexDirection: 'row' }}>
                   <Text style={styles.description}>
-                    {issueType ? issueType : '選取缺失項目'}
+                    {violationType ? violationType : '選取缺失種類'}
                   </Text>
                   <Ionicons
                     style={styles.description}
@@ -422,7 +462,27 @@ const IssueScreen = ({ navigation, route }) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            {issueType == "其他" ?
+            {violationType != "其他" ?
+              (<React.Fragment>
+                <TouchableOpacity onPress={() => issueTypeClickHandler()}>
+                  <View style={styles.item}>
+                    <Text style={styles.title}>缺失項目</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={styles.description}>
+                        {issueType ? issueType : '選取缺失項目'}
+                      </Text>
+                      <Ionicons
+                        style={styles.description}
+                        name={'ios-chevron-forward'}
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <Separator />
+              </React.Fragment>
+              ) : undefined
+            }
+            {violationType == "其他" ?
               (<React.Fragment>
                 <View style={styles.item}>
                   <Text style={styles.title}></Text>
@@ -448,7 +508,6 @@ const IssueScreen = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-
           <View style={styles.group}>
             <View style={styles.item}>
               <Text style={styles.title}>缺失地點</Text>
@@ -461,9 +520,9 @@ const IssueScreen = ({ navigation, route }) => {
               </View>
             </View>
             <Separator />
+            <TouchableOpacity onPress={WorkItemListHandler}>
             <View style={styles.item}>
               <Text style={styles.title}>工項</Text>
-              <TouchableOpacity onPress={WorkItemListHandler}>
                 <View style={{ flexDirection: 'row' }}>
                   <Text style={styles.textInput}>
                     {!!issueTaskText? issueTaskText:undefined}
@@ -473,8 +532,8 @@ const IssueScreen = ({ navigation, route }) => {
                     name={'ios-chevron-forward'}
                   />
                 </View>
-              </TouchableOpacity>
             </View>
+            </TouchableOpacity>
             <Separator />
             <View style={styles.item}>
               <Text style={styles.title}>工項負責人</Text>

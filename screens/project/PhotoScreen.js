@@ -116,17 +116,20 @@ const PhotoScreen = ({ navigation, route }) => {
           let name = predictions.labels[i];
           let box = predictions.boxes[i];
           let score = predictions.scores[i];
+          let violation_type = predictions.violation_type
           console.log(box);
           console.log(name);
           console.log(score);
+          console.log(violation_type)
           if(score>=DETECTION_THRESHOLD){
             let label = {
               box: {maxX: box[2]*imageScaleRatio, maxY: box[3]*imageScaleRatio, minX: box[0]*imageScaleRatio, minY: box[1]*imageScaleRatio},
               mode: "box",
               name: name,
+              type: violation_type,
               path: {"drawer": null, "path": null, "size": null}
             }
-            const newBoxObj = await labelAddHandler(label.box, label.name, label.mode, label.path);
+            const newBoxObj = await labelAddHandler(label.box, label.name, label.mode, label.path, label.type);
             labels.push(newBoxObj);
           } 
         }

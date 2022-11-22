@@ -82,6 +82,7 @@ export const transformIssue = issue => {
   return {
     id: issue.id,
     title: issue.type,
+    violation_type:issue.violation_type,
     type: issue.type,
     type_remark: issue.type_remark,
     image: {

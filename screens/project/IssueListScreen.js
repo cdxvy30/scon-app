@@ -369,6 +369,7 @@ const IssueListScreen = ({ navigation, route }) => {
       id: '',
       title: '',
       type: '',
+      violation_type: '',
       image,
       status: ISSUE_STATUS.lowRisk.id,
       tracking: false,
@@ -413,7 +414,7 @@ const IssueListScreen = ({ navigation, route }) => {
               {new Date(item.timestamp).toISOString()}
             </Text>
           </View>
-          <Text style={[styles.descriptionText, textColor]}>{item.title}</Text>
+          <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:`[${item.violation_type}]\n${item.title}`}</Text>
           <View style={styles.objLabelAreaContainer}>
             {Array.isArray(item.labels) ? (
               item.labels.map((label, i) => {

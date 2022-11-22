@@ -27,6 +27,7 @@ export default class Issue extends BaseModel {
       assignee: {type: types.TEXT, not_null: true},
       assignee_phone_number: {type: types.TEXT, not_null: true},
       safety_manager: {type: types.TEXT, not_null: true},
+      violation_type: {type: types.TEXT, not_null: true},
       type: {type: types.TEXT, not_null: true},
       status: {type: types.INTEGER, not_null: true},
       type_remark: {type: types.TEXT, not_null: false},

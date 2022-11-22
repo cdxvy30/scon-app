@@ -37,7 +37,6 @@ const WorkItemListScreen = ({navigation, route}) => {
       setWorkItemList(sortedWorkItems);
       setProjectId(project.id);
       setProject(project)
-      console.log(workitems)
     };
 
     if (isFocused) {
