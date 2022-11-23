@@ -47,6 +47,7 @@ const determineStatusColor = item => {
 };
 
 const IssueListScreen = ({ navigation, route }) => {
+  const axios = require('axios');
   const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState({});
   const [issueList, setIssueList] = useState([]);
@@ -54,6 +55,7 @@ const IssueListScreen = ({ navigation, route }) => {
   const [selectedIssueId, setSelectedIssueId] = useState(null);
   const [ selectedStartDate, setSelectedStartDate ] = useState(null);
   const [ selectedEndDate , setSelectedEndDate ] = useState(null)
+  const [violationType, setViolationType] = useState('')
   const isFocused = useIsFocused();
 
   function issuesFiller (sortedIssues) {
@@ -96,6 +98,39 @@ const IssueListScreen = ({ navigation, route }) => {
       item,
     });
 
+  };
+
+  const detectViolationTypeThenSwitchToIssueScreen = async (imagee) => {
+    console.log("Send image detect request");
+    var bodyFormData = new FormData();
+    let image = imagee;
+    image.uri = 'file://' + image.uri.replace("file://", "");
+    bodyFormData.append('file', {
+      uri: image.uri,
+      name: image.fileName,
+      type: "image/jpg"
+    }); 
+    axios({
+      method: "post",
+      url: "http://34.80.209.101:8000/predict",
+      data: bodyFormData,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then(async function (response) {
+        //handle success
+        //console.log(response.data);
+        navigation.navigate('Issue', {
+          projectId: projectId,
+          project: project,
+          action: 'create new issue',
+          violation_type:response.data.violation_type,
+          item: CreateItemByImage(image),
+        });
+      })
+      .catch(function (response) {
+        //handle error
+        console.log(response);
+      });
   };
 
   const issueSortHandler = () => {
@@ -287,17 +322,18 @@ const IssueListScreen = ({ navigation, route }) => {
 
               if (!res.didCancel) {
                 const image = res.assets[0];
-                navigation.navigate('Issue', {
-                  project: project,
-                  projectId: projectId,
-                  action: 'create new issue',
-                  item: CreateItemByImage(image),
-                });
+                detectViolationTypeThenSwitchToIssueScreen(image)
+                // navigation.navigate('Issue', {
+                //   projectId: projectId,
+                //   project: project,
+                //   action: 'create new issue',
+                //   item: CreateItemByImage(image),
+                // });
               }
             });
             break;
           case 2:
-            launchImageLibrary({ mediaType: 'photo' }, res => {
+            launchImageLibrary({ mediaType: 'photo' },res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
                 return;
@@ -305,12 +341,13 @@ const IssueListScreen = ({ navigation, route }) => {
 
               if (!res.didCancel) {
                 const image = res.assets[0];
-                navigation.navigate('Issue', {
-                  projectId: projectId,
-                  project: project,
-                  action: 'create new issue',
-                  item: CreateItemByImage(image),
-                });
+                detectViolationTypeThenSwitchToIssueScreen(image)
+                // navigation.navigate('Issue', {
+                //   projectId: projectId,
+                //   project: project,
+                //   action: 'create new issue',
+                //   item: CreateItemByImage(image),
+                // });
               }
             });
             break;
@@ -369,7 +406,7 @@ const IssueListScreen = ({ navigation, route }) => {
       id: '',
       title: '',
       type: '',
-      violation_type: '',
+      violation_type: violationType,
       image,
       status: ISSUE_STATUS.lowRisk.id,
       tracking: false,
@@ -414,7 +451,7 @@ const IssueListScreen = ({ navigation, route }) => {
               {new Date(item.timestamp).toISOString()}
             </Text>
           </View>
-          <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:`[${item.violation_type}]\n${item.title}`}</Text>
+          <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:(item.violation_type!=''?`[${item.violation_type}]\n${item.title}`:'')}</Text>
           <View style={styles.objLabelAreaContainer}>
             {Array.isArray(item.labels) ? (
               item.labels.map((label, i) => {

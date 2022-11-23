@@ -31,6 +31,7 @@ import SqliteManager from '../../services/SqliteManager';
 import { transformLabels } from '../../util/sqliteHelper';
 import {useIsFocused} from '@react-navigation/native';
 import { ISSUE_STATUS, getIssueStatusById } from './IssueEnum';
+import { ISSUE_TYPE } from '../../configs/issueTypeConfig'
 import { PROJECT_STATUS } from './ProjectEnum';
 import { transformIssues } from '../../util/sqliteHelper';
 import { WorkItemList } from './WorkItemListScreen'
@@ -45,7 +46,7 @@ const IssueScreen = ({ navigation, route }) => {
   const projectId = route.params.projectId;
   const [action, setAction] = useState(route.params.action);
   const [issueId, setIssueId] = useState(item.id);
-  const [violationType, setViolationType] = useState(item.violation_type);
+  const [violationType, setViolationType] = useState(route.params.violation_type?route.params.violation_type:item.violation_type);
   const [issueType, setIssueType] = useState(item.type);
   const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);
   const [issueTrack, setIssueTrack] = useState(item.tracking);
@@ -259,6 +260,60 @@ const IssueScreen = ({ navigation, route }) => {
     });
   };
 
+  function decideIssueTypes(violationType){
+    switch (violationType){
+      case '墜落':
+        return ISSUE_TYPE[0].type
+      case '倒塌崩塌':
+        return ISSUE_TYPE[1].type
+      case '感電':
+        return ISSUE_TYPE[2].type
+      case '火災爆炸':
+        return ISSUE_TYPE[3].type
+      case '中毒缺氧':
+        return ISSUE_TYPE[4].type
+      case '其他':
+        return ISSUE_TYPE[5].type
+      default:
+        return ['---不存在---']
+    }
+  }
+
+  const newIssueTypeClickHandler = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: violationType?decideIssueTypes(violationType):['---請選取缺失類別---'],
+        // destructiveButtonIndex: [1,2],
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'light', //'dark'
+      },
+      buttonIndex => {
+        switch (buttonIndex) {
+          case 0: // cancel action
+            break;
+          case 1:
+            setIssueType(`${decideIssueTypes(violationType)[1]}`)
+            break;
+          case 2:
+            setIssueType(`${decideIssueTypes(violationType)[2]}`)
+            break;
+          case 3:
+            setIssueType(`${decideIssueTypes(violationType)[3]}`)
+            break;
+          case 4:
+            setIssueType(`${decideIssueTypes(violationType)[4]}`)
+            break;
+          case 5:
+            setIssueType(`${decideIssueTypes(violationType)[5]}`)
+            break;
+          case 6:
+            setIssueType(`${decideIssueTypes(violationType)[6]}`)
+            break;
+        }
+      },
+    );
+  };
+
   const violationTypeClickHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -305,7 +360,7 @@ const IssueScreen = ({ navigation, route }) => {
       assignee: item.assignee,
       assignee_phone_number: item.assignee_phone_number,
       safety_manager: item.safetyManager,
-      violation_type: item.violation_type,
+      violation_type: route.params.violation_type,
       type: item.type,
       status: item.status,
       type_remark: item.typeRemark,
@@ -449,10 +504,10 @@ const IssueScreen = ({ navigation, route }) => {
           <View style={styles.group}>
           <TouchableOpacity onPress={() => violationTypeClickHandler()}>
               <View style={styles.item}>
-                <Text style={styles.title}>缺失種類</Text>
+                <Text style={styles.title}>缺失類別</Text>
                 <View style={{ flexDirection: 'row' }}>
                   <Text style={styles.description}>
-                    {violationType ? violationType : '選取缺失種類'}
+                    {violationType ? violationType : '選取缺失類別'}
                   </Text>
                   <Ionicons
                     style={styles.description}
@@ -464,7 +519,7 @@ const IssueScreen = ({ navigation, route }) => {
             <Separator />
             {violationType != "其他" ?
               (<React.Fragment>
-                <TouchableOpacity onPress={() => issueTypeClickHandler()}>
+                <TouchableOpacity onPress={() => newIssueTypeClickHandler()}>
                   <View style={styles.item}>
                     <Text style={styles.title}>缺失項目</Text>
                     <View style={{ flexDirection: 'row' }}>
