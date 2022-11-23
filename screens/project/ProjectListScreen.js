@@ -78,13 +78,12 @@ const ProjectListScreen = ({ navigation }) => {
 
   const projectEditHandler = async () => {
     let project = await SqliteManager.getProject(selectedProjectId);
-    console.log(project);
     navigation.navigate('ProjectAdd', { name: 'Create new project', project: project });
   };
 
   const projectSelectHandler = async item => {
     setSelectedProjectId(item.id);
-    navigation.navigate('IssueList', { name: item.title });
+    await navigation.navigate('IssueList', { name: item.title, project: await SqliteManager.getProject(selectedProjectId) });
   };
 
   const swipeBtns = [
