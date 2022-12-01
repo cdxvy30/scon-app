@@ -11,6 +11,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 import Separator from '../../components/Separator';
@@ -24,7 +25,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { transformIssues, transformExportIssues } from '../../util/sqliteHelper';
 import { ISSUE_STATUS , getIssueStatusById } from './IssueEnum';
 import { Document, Packer } from "docx";
-import { issueReportGenerator, improveReportGenerator } from './OutputTable';
+import { issueReportGenerator, improveReportGenerator, FongYuImproveReportGenerator } from './OutputTable';
 import IssueAttachment from '../../models/IssueAttachment';
 import { ISSUE_ATTACHMENT } from '../../data/issueAttachment';
 import { getIssuesByProjectId } from '../../services/SqliteManager'
@@ -55,6 +56,7 @@ const IssueListScreen = ({ navigation, route }) => {
   const [selectedIssueId, setSelectedIssueId] = useState(null);
   const [ selectedStartDate, setSelectedStartDate ] = useState(null);
   const [ selectedEndDate , setSelectedEndDate ] = useState(null)
+  const [ isDedecting , setIsDedecting ] = useState(false)
   const isFocused = useIsFocused();
 
   function issuesFiller (sortedIssues) {
@@ -99,8 +101,15 @@ const IssueListScreen = ({ navigation, route }) => {
 
   };
 
+  const loading = () =>{
+    <View style={[styles.loading_container, styles.loading_horizontal]}>
+      <ActivityIndicator size="large" color="#00ff00" />
+    </View>
+  }
+
   const detectViolationTypeThenSwitchToIssueScreen = async (imagee) => {
     console.log("Send image detect request");
+    setIsDedecting(true)
     var bodyFormData = new FormData();
     let image = imagee;
     image.uri = 'file://' + image.uri.replace("file://", "");
@@ -114,10 +123,12 @@ const IssueListScreen = ({ navigation, route }) => {
       url: "http://34.80.209.101:8000/predict",
       data: bodyFormData,
       headers: { "Content-Type": "multipart/form-data" },
+      timeout: 5000
     })
       .then(async function (response) {
         //handle success
         //console.log(response.data);
+        setIsDedecting(false)
         navigation.navigate('Issue', {
           projectId: projectId,
           project: project,
@@ -128,6 +139,7 @@ const IssueListScreen = ({ navigation, route }) => {
       })
       .catch(function (response) {
         //handle error
+        setIsDedecting(false)
         console.log(response);
         navigation.navigate('Issue', {
           projectId: projectId,
@@ -142,7 +154,7 @@ const IssueListScreen = ({ navigation, route }) => {
   const outputReportHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '匯出專案資訊', '匯出專案圖片', '匯出缺失記錄表', '匯出缺失改善前後記錄表'],
+        options: ['取消', '匯出專案資訊', '匯出專案圖片', '匯出缺失記錄表', '匯出缺失改善前後記錄表', '匯出稽查記錄表(豐譽人文大樓)'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
@@ -156,90 +168,117 @@ const IssueListScreen = ({ navigation, route }) => {
         switch (buttonIndex) {
           case 0: // cancel action
             break;
-            case 1:
-              await fs.writeFile(
-                `${docPath}/${projectName}-data.json`,
-                JSON.stringify(transformExportIssues(selectedEndDate?selectedIssueList:issueList)),
-                'utf8',
+          case 1:
+            await fs.writeFile(
+              `${docPath}/${projectName}-data.json`,
+              JSON.stringify(transformExportIssues(selectedEndDate?selectedIssueList:issueList)),
+              'utf8',
+            );
+
+            const shareDataOption = {
+              title: 'MyApp',
+              message: `${projectName}-data`,
+              url: `file://${docPath}/${projectName}-data.json`,
+              type: 'application/json',
+              subject: `${projectName}-data`, // for email
+            };
+
+            await Share.open(shareDataOption); // ...after the file is saved, send it to a system share intent
+            break;
+          case 2:
+            let urls = (selectedEndDate?selectediIssueList:issueList).map(issue => 'file://' + issue.image.uri);
+            (selectedEndDate?selectedIssueList:issueList).map(issue =>
+              issue.attachments.map(
+                att => (urls = urls.concat('file://' + att.image)),
+              ),
+            );
+
+            const shareImageOption = {
+              title: 'MyApp',
+              message: `${projectName}-image`,
+              urls,
+              subject: `${projectName}-image`, // for email
+            };
+            await Share.open(shareImageOption);
+            break;
+          case 3:
+            const doc = new Document({
+              sections: issueReportGenerator(projectName, project, selectedEndDate, selectedIssueList, issueList, fs),
+          });
+
+            await Packer.toBase64String(doc).then((base64) => {
+              fs.writeFile(`${docPath}/${projectName}-缺失記錄表.docx`, 
+              base64,
+              'base64'
               );
-  
-              const shareDataOption = {
-                title: 'MyApp',
-                message: `${projectName}-data`,
-                url: `file://${docPath}/${projectName}-data.json`,
-                type: 'application/json',
-                subject: `${projectName}-data`, // for email
-              };
-  
-              await Share.open(shareDataOption); // ...after the file is saved, send it to a system share intent
-              break;
-            case 2:
-              let urls = (selectedEndDate?selectediIssueList:issueList).map(issue => 'file://' + issue.image.uri);
-              (selectedEndDate?selectedIssueList:issueList).map(issue =>
-                issue.attachments.map(
-                  att => (urls = urls.concat('file://' + att.image)),
-                ),
+          });
+
+            const shareDataTableOption = {
+              title: 'MyApp',
+              message: `${projectName}-缺失記錄表`,
+              url: `file://${docPath}/${projectName}-缺失記錄表.docx`,
+              type: 'application/docx',
+              subject: `${projectName}-缺失記錄表`, // for email
+            };
+
+            await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
+            break;
+        
+          case 4:
+            const doc_2 = new Document({
+              sections: [
+                  {
+                      properties: {},
+                      children: improveReportGenerator((selectedEndDate?selectedIssueList:issueList),fs,project,projectName),
+                  },
+              ],
+          });
+
+            await Packer.toBase64String(doc_2).then((base64) => {
+              fs.writeFile(`${docPath}/${projectName}-缺失改善前後記錄表.docx`, 
+              base64,
+              'base64'
               );
-  
-              const shareImageOption = {
-                title: 'MyApp',
-                message: `${projectName}-image`,
-                urls,
-                subject: `${projectName}-image`, // for email
-              };
-              await Share.open(shareImageOption);
-              break;
-            case 3:
-              const doc = new Document({
-                sections: issueReportGenerator(projectName, project, selectedEndDate, selectedIssueList, issueList, fs),
-            });
-  
-              await Packer.toBase64String(doc).then((base64) => {
-                fs.writeFile(`${docPath}/${projectName}-缺失記錄表.docx`, 
-                base64,
-                'base64'
-                );
-            });
-  
-              const shareDataTableOption = {
-                title: 'MyApp',
-                message: `${projectName}-缺失記錄表`,
-                url: `file://${docPath}/${projectName}-缺失記錄表.docx`,
-                type: 'application/docx',
-                subject: `${projectName}-缺失記錄表`, // for email
-              };
-  
-              await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
-              break;
-          
-            case 4:
-              console.log(project)
-              const doc_2 = new Document({
-                sections: [
-                    {
-                        properties: {},
-                        children: improveReportGenerator((selectedEndDate?selectedIssueList:issueList),fs,project,projectName),
-                    },
-                ],
-            });
-  
-              await Packer.toBase64String(doc_2).then((base64) => {
-                fs.writeFile(`${docPath}/${projectName}-缺失改善前後記錄表.docx`, 
-                base64,
-                'base64'
-                );
-            });
-  
-              const shareDataTableOption_2 = {
-                title: 'MyApp',
-                message: `${projectName}-缺失改善前後記錄表`,
-                url: `file://${docPath}/${projectName}-缺失改善前後記錄表.docx`,
-                type: 'application/docx',
-                subject: `${projectName}-缺失改善前後記錄表`, // for email
-              };
-  
-              await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
-              break;
+          });
+
+            const shareDataTableOption_2 = {
+              title: 'MyApp',
+              message: `${projectName}-缺失改善前後記錄表`,
+              url: `file://${docPath}/${projectName}-缺失改善前後記錄表.docx`,
+              type: 'application/docx',
+              subject: `${projectName}-缺失改善前後記錄表`, // for email
+            };
+
+            await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
+            break;
+
+          case 5:
+            const doc_3 = new Document({
+              sections: [
+                  {
+                      properties: {},
+                      children: FongYuImproveReportGenerator((selectedEndDate?selectedIssueList:issueList),fs,project,projectName),
+                  },
+              ],
+          });
+
+            await Packer.toBase64String(doc_3).then((base64) => {
+              fs.writeFile(`${docPath}/${projectName}-稽查結果改善通知書.docx`, 
+              base64,
+              'base64'
+              );
+          });
+
+            const shareDataTableOption_3 = {
+              title: 'MyApp',
+              message: `${projectName}-稽查結果改善通知書`,
+              url: `file://${docPath}/${projectName}-稽查結果改善通知書.docx`,
+              type: 'application/docx',
+              subject: `${projectName}-稽查結果改善通知書`, // for email
+            };
+
+            await Share.open(shareDataTableOption_3); // ...after the file is saved, send it to a system share intent
+            break;
         }
       },
     );
@@ -273,7 +312,7 @@ const IssueListScreen = ({ navigation, route }) => {
   const issueOptionHandler = React.useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '匯出檔案', '篩選(按日期)'],
+        options: ['取消', '按日期篩選'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
@@ -283,9 +322,6 @@ const IssueListScreen = ({ navigation, route }) => {
           case 0:
             break; // cancel action
           case 1:
-            outputReportHandler()
-            break;
-          case 2:
             await navigation.navigate('DateSelector',{
               setSelectedStartDate,
               setSelectedEndDate,
@@ -373,15 +409,37 @@ const IssueListScreen = ({ navigation, route }) => {
     if (isFocused) {
       fetchIssues();
     }
-  }, [route.params.name, isFocused]);
+  }, [route.params.name, issueReportGenerator, isFocused]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <React.Fragment>
-          <Button title="排序" onPress={issueSortHandler} />
-          <Button title="選項" onPress={issueOptionHandler} />
+          <Icon
+            style={{marginRight: 10}}
+            name="ios-swap-vertical-sharp"
+            type="ionicon"
+            color="dodgerblue"
+            size={25}
+            onPress={() => issueSortHandler()}
+          />
+          <Icon
+            style={{marginRight: 10}}
+            name="ios-filter"
+            type="ionicon"
+            color="dodgerblue"
+            size={25}
+            onPress={() => issueOptionHandler()}
+          />
+          <Icon
+            name="ios-document-text"
+            type="ionicon"
+            color="dodgerblue"
+            size={25}
+            onPress={() => outputReportHandler()}
+          />
         </React.Fragment>
+
       ),
     });
   }, [issueOptionHandler, navigation]);
@@ -447,7 +505,7 @@ const IssueListScreen = ({ navigation, route }) => {
               {new Date(item.timestamp).toISOString()}
             </Text>
           </View>
-          <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:(item.violation_type!=''?`[${item.violation_type}]\n${item.title}`:'')}</Text>
+          <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:(item.violation_type!=''?`(${item.violation_type})\n${item.title}`:'')}</Text>
           <View style={styles.objLabelAreaContainer}>
             {Array.isArray(item.labels) ? (
               item.labels.map((label, i) => {
@@ -472,7 +530,6 @@ const IssueListScreen = ({ navigation, route }) => {
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
 
-    
     return (
       <React.Fragment>
         <Item
@@ -487,30 +544,45 @@ const IssueListScreen = ({ navigation, route }) => {
     );
   };
 
-  return (
-    <React.Fragment>
-      <SafeAreaView style={styles.container}>
-        <FlatList
-          ListHeaderComponent={<Separator />}
-          data={selectedEndDate? selectedIssueList:issueList}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          extraData={selectedIssueId}
-        />
-        <View style={styles.addPhotoBtn}>
-          <Icon
-            raised
-            name="ios-add"
-            type="ionicon"
-            color="dodgerblue"
-            size={32}
-            iconStyle={{ fontSize: 52, marginLeft: 4 }}
-            onPress={() => imageSelectHandler()}
+  if (isDedecting == true){
+    return (
+      <React.Fragment>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.loading_container}>
+            <ActivityIndicator size='large' color="#000000" />
+            <Text style={[styles.loading_text]}>缺失類別辨識中...</Text>
+          </View>
+        </SafeAreaView>
+      </React.Fragment>
+    )
+  }
+  else{
+    return (
+      <React.Fragment>
+        <SafeAreaView style={styles.container}>
+          <FlatList
+            ListHeaderComponent={<Separator />}
+            data={selectedEndDate? selectedIssueList:issueList}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            extraData={selectedIssueId}
           />
-        </View>
-      </SafeAreaView>
-    </React.Fragment>
-  );
+          <View style={styles.addPhotoBtn}>
+            <Icon
+              raised
+              name="ios-add"
+              type="ionicon"
+              color="dodgerblue"
+              size={32}
+              iconStyle={{ fontSize: 52, marginLeft: 4 }}
+              onPress={() => imageSelectHandler()}
+            />
+          </View>
+        </SafeAreaView>
+      </React.Fragment>
+    )
+  }
+  ;
 };
 
 const styles = StyleSheet.create({
@@ -586,12 +658,18 @@ const styles = StyleSheet.create({
     shadowRadius: 13,
     shadowOffset: { width: 3, height: 8 },
   },
+  loading_container: {
+    position: 'absolute',
+    alignItems: 'center',
+    alignSelf:'center',
+    display: 'flex',
+    marginTop:300,
+  },
+  loading_text:{
+    fontSize:32,
+    color: 'white',
+    backgroundColor: 'gray'
+  }
 });
-
-
-
-
-
-
 
 export default IssueListScreen;

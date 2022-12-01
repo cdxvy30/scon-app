@@ -261,21 +261,15 @@ const IssueScreen = ({ navigation, route }) => {
   };
 
   function decideIssueTypes(violationType){
-    switch (violationType){
-      case '墜落':
-        return ISSUE_TYPE[0].type
-      case '倒塌崩塌':
-        return ISSUE_TYPE[1].type
-      case '感電':
-        return ISSUE_TYPE[2].type
-      case '火災爆炸':
-        return ISSUE_TYPE[3].type
-      case '中毒缺氧':
-        return ISSUE_TYPE[4].type
-      case '其他':
-        return ISSUE_TYPE[5].type
-      default:
-        return ['---不存在---']
+  
+    for (i=0; i<ISSUE_TYPE[0].titles.length; i++){
+      if (violationType != ISSUE_TYPE[0].titles[i]){
+        //判斷是哪個type
+      }
+      else{
+        //回傳缺失細頂
+        return ISSUE_TYPE[i+1].type
+      }
     }
   }
 
@@ -288,27 +282,11 @@ const IssueScreen = ({ navigation, route }) => {
         userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
-        switch (buttonIndex) {
-          case 0: // cancel action
-            break;
-          case 1:
-            setIssueType(`${decideIssueTypes(violationType)[1]}`)
-            break;
-          case 2:
-            setIssueType(`${decideIssueTypes(violationType)[2]}`)
-            break;
-          case 3:
-            setIssueType(`${decideIssueTypes(violationType)[3]}`)
-            break;
-          case 4:
-            setIssueType(`${decideIssueTypes(violationType)[4]}`)
-            break;
-          case 5:
-            setIssueType(`${decideIssueTypes(violationType)[5]}`)
-            break;
-          case 6:
-            setIssueType(`${decideIssueTypes(violationType)[6]}`)
-            break;
+        if (buttonIndex == 0){ 
+          // cancel action
+        }
+        else{
+          setIssueType(`${decideIssueTypes(violationType)[buttonIndex]}`)
         }
       },
     );
@@ -317,33 +295,18 @@ const IssueScreen = ({ navigation, route }) => {
   const violationTypeClickHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '墜落', '倒塌崩塌', '感電', '火災爆炸', '中毒缺氧', '其他'],
+        options: ['取消', '墜落', '機械', '物料', '感電', '防護具', '穿刺', '爆炸', '工作場所', '搬運', '其他'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
-        switch (buttonIndex) {
-          case 0: // cancel action
-            break;
-          case 1:
-            setViolationType('墜落')
-            break;
-          case 2:
-            setViolationType('倒塌崩塌')
-            break;
-          case 3:
-            setViolationType('感電')
-            break;
-          case 4:
-            setViolationType('火災爆炸')
-            break;
-          case 5:
-            setViolationType('中毒缺氧')
-            break;
-          case 6:
-            setViolationType('其他')
-            break;
+        if (buttonIndex == 0){
+          // cancel action
+        }
+        else{
+          setViolationType(ISSUE_TYPE[0].titles[buttonIndex-1])
+          setIssueType('')
         }
       },
     );
