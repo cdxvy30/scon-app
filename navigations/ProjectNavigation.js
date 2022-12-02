@@ -70,7 +70,6 @@ const ProjectNavigation = ({navigation}) => {
           component={DateSelectorScreen}
           options={{title: '選取日期範圍'}}
         />
-
       </Stack.Navigator>
     </React.Fragment>
   );
