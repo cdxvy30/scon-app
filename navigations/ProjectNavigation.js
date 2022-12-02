@@ -9,7 +9,7 @@ import PhotoScreen from '../screens/project/PhotoScreen';
 import ObjectTypeSelectorScreen from '../screens/project/selector/ObjectTypeSelectorScreen';
 import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelectorScreen';
 import WorkItemListScreen from '../screens/project/WorkItemListScreen';
-import WorkItemAddScreen from '../screens/project/WorkItemAddScreen'
+import WorkItemAddScreen from '../screens/project/WorkItemAddScreen';
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
 
 const Stack = createNativeStackNavigator();

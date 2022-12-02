@@ -362,6 +362,8 @@ PODS:
     - React-perflogger (= 0.67.2)
   - rn-fetch-blob (0.12.0):
     - React-Core
+  - RNCAsyncStorage (1.17.11):
+    - React-Core
   - RNScreens (3.12.0):
     - React-Core
     - React-RCTImage
@@ -438,6 +440,7 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
   - "RNSketchCanvas (from `../node_modules/@terrylinla/react-native-sketch-canvas`)"
@@ -538,6 +541,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNShare:
@@ -601,6 +606,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 2450b43df7ffe8e805a0b3dcb2abd4282f1f1836
   ReactCommon: d98c6c96b567f9b3a15f9fd4cc302c1eda8e3cf2
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
+  RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
   RNScreens: 2559f98b0835103cbef3b26ba77fa61d4bb37ae7
   RNShare: f116bbb04f310c665ca483d0bd1e88cf59b3b334
   RNSketchCanvas: 9c28adb5381543ed55cc98ce6de46479cb3cb12c

@@ -12,6 +12,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import TabNavigation from './navigations/TabNavigation';
 import SqliteManager from './services/SqliteManager';
 
+import {AuthProvider} from './context/AuthContext';
+import Navigation from './navigations/Navigation';
+
 const App = () => {
   const [isDatabaseSetup, setIsDatabaseSetup] = useState(false);
   useEffect(() => {
@@ -24,23 +27,28 @@ const App = () => {
 
     dbSetup();
   }, []);
+  // return (
+  //   <React.Fragment>
+  //     {isDatabaseSetup ? (
+  //       <>
+  //         <StatusBar
+  //           animated={true}
+  //           barStyle={'dark-content'} //'default', 'dark-content', 'light-content'
+  //           showHideTransition={'fade'} //'fade', 'slide', 'none'
+  //         />
+  //         <NavigationContainer>
+  //           <TabNavigation />
+  //         </NavigationContainer>
+  //       </>
+  //     ) : (
+  //       <></>
+  //     )}
+  //   </React.Fragment>
+  // );
   return (
-    <React.Fragment>
-      {isDatabaseSetup ? (
-        <>
-          <StatusBar
-            animated={true}
-            barStyle={'dark-content'} //'default', 'dark-content', 'light-content'
-            showHideTransition={'fade'} //'fade', 'slide', 'none'
-          />
-          <NavigationContainer>
-            <TabNavigation />
-          </NavigationContainer>
-        </>
-      ) : (
-        <></>
-      )}
-    </React.Fragment>
+    <AuthProvider>
+      <Navigation />
+    </AuthProvider>
   );
 };
 
