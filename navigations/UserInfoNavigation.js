@@ -1,7 +1,7 @@
 import React from 'react';
 // import type {Node} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import UserInfoScreen from '../screens/users/UserInfoScreen';
+import UserInfoScreen from '../screens/user/UserInfoScreen';
 
 const Stack = createNativeStackNavigator();
 

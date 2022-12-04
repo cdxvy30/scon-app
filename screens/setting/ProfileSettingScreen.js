@@ -12,11 +12,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Separator from '../../components/Separator';
 import {OBJECT_TYPE} from '../../configs/objectTypeConfig';
 
-
-
-
 const ProfileSettingScreen = () => {
- 
   return (
     <React.Fragment>
       <SafeAreaView>

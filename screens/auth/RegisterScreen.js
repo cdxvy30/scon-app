@@ -7,10 +7,8 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
-import style from 'react-native-datepicker/style';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {AuthContext} from '../../context/AuthContext';
-// import {BASE_URL} from '../../configs/authConfig';
 
 const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState(null);
@@ -51,6 +49,7 @@ const RegisterScreen = ({navigation}) => {
         />
         <Button
           title="Register"
+          style={styles.input}
           onPress={() => {
             register(name, corporation, email, password);
           }}
@@ -59,7 +58,7 @@ const RegisterScreen = ({navigation}) => {
         <View style={{flexDirection: 'row', marginTop: 20}}>
           <Text>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={style.link}>Login</Text>
+            <Text style={styles.link}>Login</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -77,11 +76,16 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   input: {
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#bbb',
-    borderRadius: 5,
-    paddingHorizontal: 14,
+    marginTop: 16,
+    paddingVertical: 8,
+    borderWidth: 4,
+    borderColor: '#20232a',
+    borderRadius: 6,
+    backgroundColor: '#61dafb',
+    color: '#20232a',
+    textAlign: 'center',
+    fontSize: 30,
+    fontWeight: 'bold',
   },
   link: {
     color: 'blue',
