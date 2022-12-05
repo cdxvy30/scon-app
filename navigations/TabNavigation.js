@@ -17,15 +17,12 @@ const TabNavigation = ({}) => {
             let iconName;
 
             if (route.name === '專案') {
-              console.log(route.name);
               iconName = focused ? 'ios-newspaper' : 'ios-newspaper-outline';
             } else if (route.name === '設定') {
-              console.log(route.name);
               iconName = focused
                 ? 'ios-settings-sharp'
                 : 'ios-settings-outline';
             } else if (route.name === '使用者資訊') {
-              console.log(route.name);
               iconName = focused ? 'person-circle' : 'person-circle-outline';
             }
 

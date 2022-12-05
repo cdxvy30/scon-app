@@ -37,22 +37,38 @@ export const AuthProvider = ({children}) => {
   const login = (email, password) => {
     setIsLoading(true);
 
-    axios
-      .post(`${BASE_URL}/auth/login`, {
-        email,
-        password,
-      })
-      .then(async res => {
-        let userInfo = await res.data;
-        console.log(userInfo);
-        setUserInfo(userInfo);
-        setIsLoading(false);
-        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-      })
-      .catch(e => {
-        console.log(`login error : ${e}`);
-        setIsLoading(false);
-      });
+    // 簡化前端開發流程，不必每次都要與後端溝通登入(暫時性)
+    let userInfo = {
+      token:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjQzY2FlMGQtMmQ1OS00ZTZmLTg3YTYtYmNjMDRjYWVjNzdiIiwiaWF0IjoxNjcwMjIwMTQ0LCJleHAiOjE2NzAyMjM3NDR9.rNpZlcNt6cHWZsq421y9worQA5HC7yegYkkQFtzXkDI',
+      user: {
+        name: '林之謙',
+        email: 'jechian@gmail.com',
+        corporation: '臺大土木',
+        permission: 'admin',
+      },
+    };
+    console.log(userInfo);
+    setUserInfo(userInfo);
+    AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+    setIsLoading(false);
+
+    // axios
+    //   .post(`${BASE_URL}/auth/login`, {
+    //     email,
+    //     password,
+    //   })
+    //   .then(async res => {
+    //     let userInfo = await res.data;  // token與email, name資訊
+    //     console.log(userInfo);
+    //     setUserInfo(userInfo);
+    //     setIsLoading(false);
+    //     AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+    //   })
+    //   .catch(e => {
+    //     console.log(`login error : ${e}`);
+    //     setIsLoading(false);
+    //   });
   };
 
   const logout = () => {

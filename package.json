@@ -25,6 +25,7 @@
     "react-native-date-picker": "^4.2.6",
     "react-native-datepicker": "^1.7.2",
     "react-native-draggable": "^3.3.0",
+    "react-native-dropdown-select-list": "^2.0.4",
     "react-native-elements": "^3.4.2",
     "react-native-image-picker": "^4.7.3",
     "react-native-loading-spinner-overlay": "^3.0.1",

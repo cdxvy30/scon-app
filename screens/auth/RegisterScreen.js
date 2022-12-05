@@ -7,6 +7,7 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
+import {SelectList} from 'react-native-dropdown-select-list';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {AuthContext} from '../../context/AuthContext';
 
@@ -16,39 +17,57 @@ const RegisterScreen = ({navigation}) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
+  const [selected, setSelected] = useState(null);
+
   const {isLoading, register} = useContext(AuthContext);
+
+  const permissionList = [
+    {key: '0', value: '管理員'},
+    {key: '1', value: '專案管理員'},
+    {key: '2', value: '專案使用者'},
+    {key: '3', value: '訪客'},
+  ];
 
   return (
     <View style={styles.container}>
       <Spinner visible={isLoading} />
       <View style={styles.wrapper}>
+        <Text style={styles.caption_top}>
+          營建工地智慧視覺監視與自動報告系統
+        </Text>
         <TextInput
           style={styles.input}
           value={name}
-          placeholder="Enter name"
+          placeholder="輸入您的名字"
           onChangeText={text => setName(text)}
         />
         <TextInput
           style={styles.input}
           value={corporation}
-          placeholder="Enter your corporation name"
+          placeholder="輸入公司名稱"
           onChangeText={text => setCorporation(text)}
         />
         <TextInput
           style={styles.input}
           value={email}
-          placeholder="Enter email"
+          placeholder="輸入信箱"
           onChangeText={text => setEmail(text)}
         />
         <TextInput
           style={styles.input}
           value={password}
-          placeholder="Enter password"
+          placeholder="設定密碼"
           onChangeText={text => setPassword(text)}
           secureTextEntry
         />
+        <SelectList
+          boxStyles={styles.input}
+          setSelected={val => setSelected(val)}
+          data={permissionList}
+          save="value"
+        />
         <Button
-          title="Register"
+          title="註冊"
           style={styles.input}
           onPress={() => {
             register(name, corporation, email, password);
@@ -56,12 +75,13 @@ const RegisterScreen = ({navigation}) => {
         />
 
         <View style={{flexDirection: 'row', marginTop: 20}}>
-          <Text>Already have an account? </Text>
+          <Text>已經有帳號了嗎？ </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.link}>Login</Text>
+            <Text style={styles.link}>登入</Text>
           </TouchableOpacity>
         </View>
       </View>
+      <Text style={styles.caption_bottom}>Powerd By 台大土木營管組與CAE組</Text>
     </View>
   );
 };
@@ -89,6 +109,17 @@ const styles = StyleSheet.create({
   },
   link: {
     color: 'blue',
+  },
+  caption_top: {
+    textAlign: 'center',
+    marginBottom: 10,
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+  caption_bottom: {
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
   },
 });
 

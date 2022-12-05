@@ -10,8 +10,9 @@ const UserInfoScreen = () => {
   return (
     <React.Fragment>
       <Spinner visible={isLoading} />
-      <Text style={styles.welcome}>Welcome, {userInfo.user.name}</Text>
-      <Button title="Logout" color="red" onPress={logout} />
+      <Text style={styles.welcome}>歡迎回來, {userInfo.user.name}</Text>
+      <Text style={styles.welcome}>您的身份是:{userInfo.user.permission}</Text>
+      <Button title="登出" color="red" onPress={logout} />
     </React.Fragment>
   );
 };

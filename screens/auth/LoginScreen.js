@@ -20,34 +20,40 @@ const LoginScreen = ({navigation}) => {
     <View style={styles.container}>
       <Spinner visible={isLoading} />
       <View style={styles.wrapper}>
+        <Text style={styles.caption_top}>
+          營建工地智慧視覺監視與自動報告系統
+        </Text>
         <TextInput
           style={styles.input}
           value={email}
-          placeholder="Enter email"
+          placeholder="輸入信箱"
           onChangeText={text => setEmail(text)}
         />
 
         <TextInput
           style={styles.input}
           value={password}
-          placeholder="Enter password"
+          placeholder="輸入密碼"
           onChangeText={text => setPassword(text)}
           secureTextEntry
         />
 
         <Button
-          title="Login"
+          title="登入"
           onPress={() => {
             login(email, password);
           }}
         />
 
         <View style={{flexDirection: 'row', marginTop: 20}}>
-          <Text>Don't have an account? </Text>
+          <Text>還沒有帳號嗎？ </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.link}>Register</Text>
+            <Text style={styles.link}>註冊一個</Text>
           </TouchableOpacity>
         </View>
+        <Text style={styles.caption_bottom}>
+          Powerd By 台大土木營管組與CAE組
+        </Text>
       </View>
     </View>
   );
@@ -63,11 +69,6 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   input: {
-    // marginBottom: 20,
-    // borderWidth: 1,
-    // borderColor: '#bbb',
-    // borderRadius: 5,
-    // paddingHorizontal: 14,
     marginTop: 14,
     paddingVertical: 8,
     borderWidth: 4,
@@ -81,6 +82,16 @@ const styles = StyleSheet.create({
   },
   link: {
     color: 'blue',
+  },
+  caption_top: {
+    textAlign: 'center',
+    marginBottom: 10,
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+  caption_bottom: {
+    textAlign: 'center',
+    justifyContent: 'center',
   },
 });
 
