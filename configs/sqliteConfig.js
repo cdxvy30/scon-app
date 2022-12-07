@@ -12,8 +12,8 @@ const SYSTEM_CONFIG = {
   project_table_shcema: {
     id: 'TEXT PRIMARY KEY NOT NULL',
     name: 'TEXT NOT NULL',
-    image: 'TEXT NOT NULL',
-    status: 'INTEGER NOT NULL',
+    image: 'TEXT NOT NULL', //
+    status: 'INTEGER NOT NULL', //
     address: 'TEXT NOT NULL',
     company_in_charge: 'TEXT NOT NULL',
     project_person_in_charge: 'TEXT NOT NULL',
@@ -31,7 +31,7 @@ const SYSTEM_CONFIG = {
     location: 'TEXT NOT NULL',
     activity: 'TEXT NOT NULL',
     activity_person_in_charge: 'TEXT NOT NULL',
-    assignee_phone_number:'TEXT NOT NULL',
+    assignee_phone_number: 'TEXT NOT NULL',
     she_person_in_charge: 'TEXT NOT NULL',
     project_id: 'TEXT NOT NULL',
     created_at: 'INTEGER NOT NULL',

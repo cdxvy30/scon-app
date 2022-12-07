@@ -52,7 +52,7 @@ const LoginScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <Text style={styles.caption_bottom}>
-          Powerd By 台大土木營管組與CAE組
+          Powerd By 臺大土木工程資訊模擬與管理研究中心
         </Text>
       </View>
     </View>

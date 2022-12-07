@@ -37,7 +37,7 @@ const ProjectListScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const projects = await SqliteManager.getAllProjects();
+      const projects = await SqliteManager.getAllProjects();  // 改成向遠端主機fetch
       const transformedProjects = transformProjects(projects);
       const sortedProjects = transformedProjects.sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp),

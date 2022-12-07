@@ -25,8 +25,13 @@ import {
 import SqliteManager from '../../services/SqliteManager';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PROJECT_STATUS } from './ProjectEnum';
+import axios from 'axios';
+import {BASE_URL} from '../../configs/authConfig';
 
 const ProjectAddScreen = ({navigation, route}) => {
+  // console.log(route);
+  // console.log(route.params);
+  // console.log(BASE_URL);
   let project = route.params.project;
   const [thumbnail, setThumbnail] = useState(project? project.image:'');
   const [name, setName] = useState(project? project.name:'');
@@ -35,6 +40,8 @@ const ProjectAddScreen = ({navigation, route}) => {
   const [company, setCompany] = useState(project? project.company:'');
   const [inspector, setInspector] = useState(project? project.inspector:'');
   const [email, setEmail] = useState(project? project.email:'');
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const projectAddHandler = React.useCallback(async () => {
     if (!name) {
@@ -56,6 +63,38 @@ const ProjectAddScreen = ({navigation, route}) => {
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVZ5Jn3h_R2_PdWnYoXgOqjwFKT5C4JTODvCjfDwaleOsM6AxT8L1DBhRi4FeGP7ua7F8&usqp=CAU',
       status: PROJECT_STATUS.lowRisk.id,
     };
+    // 將project內容存入地端資料庫
+    const projectAddToPGSQL = (
+      name,
+      address,
+      company,
+      manager,
+      inspector,
+      email,
+    ) => {
+      console.log(name);
+      console.log('try to store in PGSQL.');
+      setIsLoading(true);
+      axios
+        .post(`${BASE_URL}/projects`, {
+          name,
+          address,
+          company,
+          manager,
+          inspector,
+          email,
+        })
+        .then(async res => {
+          let project_data = await res.data;
+          console.log(project_data);
+          setIsLoading(false);
+        })
+        .catch(e => {
+          console.log(`add new project error: ${e}`);
+        });
+    };
+    projectAddToPGSQL();
+    
     await SqliteManager.createProject(newProject);
     navigation.goBack();
   }, [
@@ -88,7 +127,6 @@ const ProjectAddScreen = ({navigation, route}) => {
         thumbnail.uri ??
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVZ5Jn3h_R2_PdWnYoXgOqjwFKT5C4JTODvCjfDwaleOsM6AxT8L1DBhRi4FeGP7ua7F8&usqp=CAU',
     };
-    console.log(newProject);
     await SqliteManager.updateProject(route.params.project.id, newProject);
     navigation.goBack();
   }, [
@@ -138,8 +176,20 @@ const ProjectAddScreen = ({navigation, route}) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Button title="完成" onPress={project? projectUpdateHandler:projectAddHandler} />,
-      headerLeft: () => <Button title="取消" onPress={() => {navigation.goBack();}} />
+      headerRight: () => (
+        <Button
+          title="完成"
+          onPress={project ? projectUpdateHandler : projectAddHandler}
+        />
+      ),
+      headerLeft: () => (
+        <Button
+          title="取消"
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+      ),
     });
   }, [projectAddHandler, navigation]);
 
