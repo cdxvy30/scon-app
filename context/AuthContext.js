@@ -10,7 +10,7 @@ export const AuthProvider = ({children}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [splashLoading, setSplashLoading] = useState(false);
 
-  const register = (name, corporation, email, password) => {
+  const register = (name, corporation, email, password, permission) => {
     // console.log(children);
     setIsLoading(true);
     axios
@@ -19,6 +19,7 @@ export const AuthProvider = ({children}) => {
         corporation,
         email,
         password,
+        permission,
       })
       .then(async res => {
         let userInfo = await res.data;

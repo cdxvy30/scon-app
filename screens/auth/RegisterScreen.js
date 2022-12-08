@@ -16,8 +16,9 @@ const RegisterScreen = ({navigation}) => {
   const [corporation, setCorporation] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  // const [permission, setPermission] = useState(null);
 
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(null); // 以selected取代使用者身份
 
   const {isLoading, register} = useContext(AuthContext);
 
@@ -62,15 +63,18 @@ const RegisterScreen = ({navigation}) => {
         />
         <SelectList
           boxStyles={styles.input}
-          setSelected={val => setSelected(val)}
           data={permissionList}
+          placeholder="請選擇您的身份"
+          defaultOption={'3'}
+          setSelected={setSelected}
           save="value"
         />
         <Button
           title="註冊"
           style={styles.input}
           onPress={() => {
-            register(name, corporation, email, password);
+            register(name, corporation, email, password, selected);
+            console.log(selected);
           }}
         />
 
