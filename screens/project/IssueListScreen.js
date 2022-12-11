@@ -235,6 +235,7 @@ const IssueListScreen = ({ navigation, route }) => {
           });
 
             await Packer.toBase64String(doc_2).then((base64) => {
+              console.log('exporting Roport')
               fs.writeFile(`${docPath}/${projectName}-缺失改善前後記錄表.docx`, 
               base64,
               'base64'
