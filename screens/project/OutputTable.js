@@ -1,135 +1,325 @@
-import { AlignmentType, HeightRule, ImageRun, Paragraph, Table, TableCell, TableRow, TextRun, UnderlineType, VerticalAlign, WidthType } from "docx";
+import { AlignmentType, HeightRule, ImageRun, Paragraph, SectionType, Table, TableCell, TableRow, TextRun, UnderlineType, VerticalAlign, WidthType, PageBreak } from "docx";
 import { getIssueStatusById } from './IssueEnum';
-import { ISSUE_TYPE } from '../../configs/issueTypeConfig';
 
-
-export function issueReportGenerator(projectName, project, selectedEndDate, selectedIssueList, issueList, fs){
+export function issueReportGenerator(projectName, project, selectedEndDate, selectedStartDate, selectedIssueList, issueList, fs){
   return [
     {
-        properties: {},
         children: [
-            new Paragraph({children:[new TextRun({text: "缺失記錄表", size: 40, bold: true,  })], alignment:AlignmentType.CENTER}),
+            new Paragraph({children:[new TextRun({text: `${projectName}--缺失記錄表`, size: 40, bold: true,  })], alignment:AlignmentType.CENTER}),
             new Paragraph({
                 children: [
-                    new TextRun({text: "工程名稱：", size: 30, bold: true}),
-                    new TextRun({text: `${projectName}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
-                    new TextRun({text:"\t\t巡檢人員：", size: 30, bold: true}),
-                    new TextRun({text: `${project.inspector}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                  new TextRun({text: "地址：", size: 30, bold: true}),
+                  new TextRun({text: `${project.address}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
                 ], alignment:AlignmentType.CENTER
             }),
             new Paragraph({
               children: [
-                  new TextRun({text: "地址：", size: 30, bold: true}),
-                  new TextRun({text: `${project.address}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
-                  new TextRun({text:"\t專案建立日期：", size: 30, bold: true}),
-                  new TextRun({text: `${new Date(project.created_at).getFullYear()}/${new Date(project.created_at).getMonth()+1}/${new Date(project.created_at).getDate()}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
-              ], alignment:AlignmentType.CENTER
+                  new TextRun({text:"工地負責人：", size: 30, bold: true}),
+                  new TextRun({text: `${project.manager}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                  new TextRun({text:"   缺失日期範圍：", size: 30, bold: true}),
+                  new TextRun({text: selectedEndDate?`${new Date(selectedStartDate).toLocaleDateString()} - ${new Date(selectedEndDate).toLocaleDateString()}`:`${new Date(project.created_at).toLocaleDateString()} - ${new Date().toLocaleDateString()}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                ], alignment:AlignmentType.CENTER
             }),
-            table = new Table({
+            new Table({
               rows: issueRowsGenerator((selectedEndDate?selectedIssueList:issueList),fs),
               alignment:AlignmentType.CENTER,
             }),
-
         ],
     },
 ]
 }
 
 function issueRowsGenerator (issueList,fs) {
+  var count = 0
   let rows = [
       new TableRow({
       children:[
           new TableCell({
-          children: [new Paragraph({children:[new TextRun({text: "編號", size: 30, })], alignment:AlignmentType.CENTER}), ],
+          children: [new Paragraph({children:[new TextRun({text: "No.", size: 30, bold: true})], alignment:AlignmentType.CENTER}), ],
           verticalAlign:VerticalAlign.CENTER,
           width:{size:500, type:WidthType.DXA}
           }),
           new TableCell({
-          children: [new Paragraph({children:[new TextRun({text: "施工廠商", size: 30, })], alignment:AlignmentType.CENTER}), ],
+          children: [new Paragraph({children:[new TextRun({text: "缺失照片", size: 30, bold: true})], alignment:AlignmentType.CENTER}), ],
           verticalAlign:VerticalAlign.CENTER,
-          width:{size:500, type:WidthType.DXA}
+          width:{size:3500, type:WidthType.DXA}
           }),
           new TableCell({
-          children: [new Paragraph({children:[new TextRun({text: "缺失照片", size: 30, })], alignment:AlignmentType.CENTER}), ],
+          children: [new Paragraph({children:[new TextRun({text: "內容", size: 30, bold: true})], alignment:AlignmentType.CENTER}), ],
           verticalAlign:VerticalAlign.CENTER,
-          width:{size:4600, type:WidthType.DXA}
+          width:{size:5800, type:WidthType.DXA},
+          columnSpan:2
           }),
-          new TableCell({
-          children: [new Paragraph({children:[new TextRun({text: "缺失地點、內容", size: 30, })], alignment:AlignmentType.CENTER}), ],
-          verticalAlign:VerticalAlign.CENTER,
-          width:{size:1600, type:WidthType.DXA}
-          }),
-          new TableCell({
-          children: [new Paragraph({children:[new TextRun({text: "風險狀態、時間、追蹤", size: 30, })], alignment:AlignmentType.CENTER}), ],
-          verticalAlign:VerticalAlign.CENTER,
-          width:{size:2000, type:WidthType.DXA}
-          }),
-          
       ],
+      tableHeader: true,
       cantSplit:true,
       }),
   ];
-      for (let i = issueList.length - 1; i >= 0; i--){
-      var issue_item = issueList[i].type;
-      if (issue_item === '其他'){
-          issue_item = issueList[i].type_remark
-      }
-      
-      rows.push(
-          new TableRow({
-          children:[
+  for (let i = issueList.length - 1; i >= 0; i--){
+  var issue_item = issueList[i].type;
+  if (issue_item === '其他'){
+      issue_item = issueList[i].type_remark
+  }
+  if (Math.round(count%4)==0 && count!=0){
+    rows.push(
+      new TableRow({
+        children:[
+          new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: `${issueList.length - i}`, size: 30, })], pageBreakBefore:true, alignment:AlignmentType.CENTER}), ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:500, type:WidthType.DXA},
+              height:{size:6000, type:WidthType.DXA},
+              rowSpan: 6,
+              cantSplit:true,
+          }),
+          new TableCell({
+              children: [new Paragraph({children:[new ImageRun({data:fs.readFile(`.${issueList[i].image.uri}`, "ascii") ,transformation:{width:[210],height:[157.5]}})], alignment:AlignmentType.CENTER}), ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:3500, type:WidthType.DXA},
+              height:{size:6000, type:WidthType.DXA},
+              rowSpan: 6,
+              cantSplit:true,
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '類別', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].violation_type, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '項目', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].title, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '地點', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].location, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '工項負責人', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '手機號碼', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee_phone_number, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '記錄人員', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].safetyManager, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [
+              new Paragraph({children:[new TextRun({text: '', size: 30})], }),
+              new Paragraph({children:[new TextRun({text: '', size: 30})], }),
+            ],
+            columnSpan:4,
+            height:{size:500, type:WidthType.EXACT},
+          }),
+      ],
+      cantSplit:true,
+      }),
+    )
+  }
+  else{
+    rows.push(
+      new TableRow({
+        children:[
           new TableCell({
               children: [new Paragraph({children:[new TextRun({text: `${issueList.length - i}`, size: 30, })], alignment:AlignmentType.CENTER}), ],
               verticalAlign:VerticalAlign.CENTER,
-              width:{size:500, type:WidthType.DXA}
+              width:{size:500, type:WidthType.DXA},
+              height:{size:6000, type:WidthType.DXA},
+              rowSpan: 6,
+              cantSplit:true,
           }),
           new TableCell({
-              children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee, size: 30, })], alignment:AlignmentType.CENTER}), ],
+              children: [new Paragraph({children:[new ImageRun({data:fs.readFile(`.${issueList[i].image.uri}`, "ascii") ,transformation:{width:[210],height:[157.5]}})], alignment:AlignmentType.CENTER}), ],
               verticalAlign:VerticalAlign.CENTER,
-              width:{size:500, type:WidthType.DXA}
+              width:{size:3500, type:WidthType.DXA},
+              height:{size:6000, type:WidthType.DXA},
+              rowSpan: 6,
+              cantSplit:true,
           }),
           new TableCell({
-              children: [new Paragraph({children:[new ImageRun({data:fs.readFile(`.${issueList[i].image.uri}`, "ascii") ,transformation:{width:[240],height:[180]}})], alignment:AlignmentType.CENTER}), ],
-              verticalAlign:VerticalAlign.CENTER,
-              width:{size:4600, type:WidthType.DXA}
+            children: [new Paragraph({children:[new TextRun({text: '類別', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
           }),
           new TableCell({
-              children: [
-              new Paragraph({children:[
-                  new TextRun({text: `地點: ${issueList[i].location}`, size: 30, }),
-              ], 
-                  alignment:AlignmentType.CENTER}), 
-              new Paragraph({children:[
-                  new TextRun({text: `內容: ${issue_item}`, size: 30, }),
-              ], 
-                  alignment:AlignmentType.CENTER}),
-              ],
-              verticalAlign:VerticalAlign.CENTER,
-              width:{size:1600, type:WidthType.DXA}
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].violation_type, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '項目', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
           }),
           new TableCell({
-              children: [
-              new Paragraph({children:[
-                  new TextRun({text: `狀態: ${getIssueStatusById(issueList[i].status).name}`, size: 30, }),                              
-              ], 
-                  alignment:AlignmentType.CENTER}), 
-              new Paragraph({children:[
-                  new TextRun({text: `時間: ${new Date(issueList[i].timestamp).getFullYear()}/${new Date(issueList[i].timestamp).getMonth()+1}/${new Date(issueList[i].timestamp).getDate()}`, size: 30, }),
-              ], 
-                  alignment:AlignmentType.CENTER}),
-              new Paragraph({children:[
-                  new TextRun({text: `是否追蹤: ${issueList[i].tracking}`, size: 30, }),
-              ], 
-                  alignment:AlignmentType.CENTER}),  
-              ],
-              verticalAlign:VerticalAlign.CENTER,
-              width:{size:2000, type:WidthType.DXA}
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].title, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
           }),
-          ],
-          height:{value:3000, rule:HeightRule.EXACT},
-          cantSplit:true,
-      }))
-      }
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '地點', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].location, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '負責廠商', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '手機號碼', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee_phone_number, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '記錄人員', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].safetyManager, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
+            children: [
+              new Paragraph({children:[new TextRun({text: '', size: 30})], }),
+              new Paragraph({children:[new TextRun({text: '', size: 30})], }),
+            ],
+            columnSpan:4,
+            height:{size:500, type:WidthType.EXACT},
+          }),
+      ],
+      cantSplit:true,
+      }),
+    )
+  }
+  count = count + 1
+  }
   return (rows);
 }
 
@@ -147,7 +337,7 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
         var improve_time = `${new Date(issueList[i]['attachments'][0]['updated_at']).getFullYear()}/${new Date(issueList[i]['attachments'][0]['updated_at']).getMonth()+1}/${new Date(issueList[i]['attachments'][0]['updated_at']).getDate()}`
         var improve_remark = issueList[i]['attachments'][0]['remark']
         var improve_image = fs.readFile(`.${issueList[i]['attachments'][0]['image']}`, "ascii")
-      } else{
+        } else{
         var improve_time = '未改善'
         var improve_remark = '未改善'
         var improve_image = null
@@ -162,7 +352,7 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
       var issue_title = issueList[i].violation_type;
       
       pages.push(
-        new Paragraph({children:[new TextRun({text: "缺失改善前後記錄表", size: 40, bold: true,  })], alignment:AlignmentType.CENTER}),
+        new Paragraph({children:[new TextRun({text: "缺失改善前後記錄表", size: 40, bold: true,  })], pageBreakBefore:true, alignment:AlignmentType.CENTER}),
                 new Paragraph({
                     children: [
                         new TextRun({text: "工程名稱：", size: 30, bold: true}),
@@ -221,12 +411,12 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                           width:{size:3200, type:WidthType.DXA}
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: "發現日期", size: 32, bold:true})], alignment:AlignmentType.CENTER}), ],
+                          children: [new Paragraph({children:[new TextRun({text: "風險評級", size: 32, bold:true})], alignment:AlignmentType.CENTER}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1500, type:WidthType.DXA}
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: `${new Date(issueList[i].timestamp).getFullYear()}/${new Date(issueList[i].timestamp).getMonth()+1}/${new Date(issueList[i].timestamp).getDate()}`, size: 30, })], alignment:AlignmentType.LEFT}), ],
+                          children: [new Paragraph({children:[new TextRun({text: `${getIssueStatusById(issueList[i].status).name}`, size: 30, })], alignment:AlignmentType.LEFT}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:3200, type:WidthType.DXA}
                         }),
@@ -251,29 +441,34 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                       new TableCell({
                         children: [new Paragraph({children:[new TextRun({text: '缺失類別: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}), 
                                    new Paragraph({children:[new TextRun({text: issue_title, size: 30, })], alignment:AlignmentType.LEFT}),
-                                   new Paragraph({children:[new TextRun({text: '缺失概述: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}),
-                                   new Paragraph({children:[new TextRun({text: issue_item, size: 30, })], alignment:AlignmentType.LEFT})],
+                                   new Paragraph({}),
+                                   new Paragraph({children:[new TextRun({text: '缺失項目: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}),
+                                   new Paragraph({children:[new TextRun({text: issue_item, size: 30, })], alignment:AlignmentType.LEFT}),
+                                   new Paragraph({}),
+                                   new Paragraph({children:[new TextRun({text: '發現日期: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}),
+                                   new Paragraph({children:[new TextRun({text: `${new Date(issueList[i].timestamp).getFullYear()}/${new Date(issueList[i].timestamp).getMonth()+1}/${new Date(issueList[i].timestamp).getDate()}`, size: 30, })], alignment:AlignmentType.LEFT})],
+                                   
                         width:{size:3200, type:WidthType.DXA},
                       }),
                     ],
-                    height:{value:5200, rule:HeightRule.EXACT},
+                    height:{value:5100, rule:HeightRule.EXACT},
                     cantSplit:true,
                     }),
                     new TableRow({
                       children:[
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: '改善後照片', size: 30, bold:true})], alignment:AlignmentType.CENTER}), ],
+                          children: [new Paragraph({children:[new TextRun({text: '改善後', size: 30, bold:true})], alignment:AlignmentType.CENTER}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1500, type:WidthType.DXA}
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new ImageRun({data: improve_image ,transformation:{width:[300],height:[255]}})], alignment:AlignmentType.CENTER}), ],
+                          children: [new Paragraph({children:improve_image == null?[]:[new ImageRun({data: improve_image ,transformation:{width:[300],height:[225]}})], alignment:AlignmentType.CENTER}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:4700, type:WidthType.DXA},
                           columnSpan: 2,
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: '改善備註', size: 30, bold:true,})], alignment:AlignmentType.LEFT}), 
+                          children: [new Paragraph({children:[new TextRun({text: '備註', size: 30, bold:true,})], alignment:AlignmentType.LEFT}), 
                                      new Paragraph({children:[new TextRun({text: improve_remark, size: 30, })], alignment:AlignmentType.LEFT}), 
                                      new Paragraph({}),
                                      new Paragraph({children:[new TextRun({text: '改善日期: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}), 
@@ -281,7 +476,7 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                           width:{size:3200, type:WidthType.DXA},               
                         }),
                       ],
-                      height:{value:5200, rule:HeightRule.EXACT},
+                      height:{value:5100, rule:HeightRule.EXACT},
                       cantSplit:true,
                     })
                   ],

@@ -154,7 +154,7 @@ const IssueListScreen = ({ navigation, route }) => {
   const outputReportHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '匯出專案資訊', '匯出專案圖片', '匯出缺失記錄表', '匯出缺失改善前後記錄表', '匯出稽查記錄表(豐譽人文大樓)'],
+        options: ['取消', '匯出專案資訊', '匯出專案圖片', '匯出缺失記錄表', '匯出缺失改善前後記錄表'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
@@ -203,7 +203,7 @@ const IssueListScreen = ({ navigation, route }) => {
             break;
           case 3:
             const doc = new Document({
-              sections: issueReportGenerator(projectName, project, selectedEndDate, selectedIssueList, issueList, fs),
+              sections: issueReportGenerator(projectName, project, selectedEndDate, selectedStartDate, selectedIssueList, issueList, fs),
           });
 
             await Packer.toBase64String(doc).then((base64) => {
@@ -250,34 +250,6 @@ const IssueListScreen = ({ navigation, route }) => {
             };
 
             await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
-            break;
-
-          case 5:
-            const doc_3 = new Document({
-              sections: [
-                  {
-                      properties: {},
-                      children: FongYuImproveReportGenerator((selectedEndDate?selectedIssueList:issueList),fs,project,projectName),
-                  },
-              ],
-          });
-
-            await Packer.toBase64String(doc_3).then((base64) => {
-              fs.writeFile(`${docPath}/${projectName}-稽查結果改善通知書.docx`, 
-              base64,
-              'base64'
-              );
-          });
-
-            const shareDataTableOption_3 = {
-              title: 'MyApp',
-              message: `${projectName}-稽查結果改善通知書`,
-              url: `file://${docPath}/${projectName}-稽查結果改善通知書.docx`,
-              type: 'application/docx',
-              subject: `${projectName}-稽查結果改善通知書`, // for email
-            };
-
-            await Share.open(shareDataTableOption_3); // ...after the file is saved, send it to a system share intent
             break;
         }
       },

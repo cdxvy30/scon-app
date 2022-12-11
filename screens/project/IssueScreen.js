@@ -599,30 +599,34 @@ const IssueScreen = ({ navigation, route }) => {
           </View>
 
           <View style={styles.group}>
+          {issueAttachments[0]? undefined:
             <View style={styles.item}>
               <Text style={styles.title}>缺失改善</Text>
               <TouchableOpacity onPress={() => imageSelectHandler()}>
                 <View style={{ flexDirection: 'row' }}>
-                  <Text style={{ color: 'goldenrod', fontSize: 18 }}>
-                    新增照片
-                  </Text>
-                  <Ionicons
+                    <Text style={{ color: 'goldenrod', fontSize: 18 }}>
+                    新增已改善照片
+                    </Text>
+                    <Ionicons
                     style={{ color: 'goldenrod', fontSize: 22 }}
                     name={'ios-add-circle-outline'}
-                  />
+                    />
                 </View>
               </TouchableOpacity>
-            </View>
+            </View>}
             {issueAttachments ? (
               issueAttachments.map((a, i) => {
                 return (
                   <View key={`issue_attachment_${i}`}>
+                    <View style={{ marginBottom: 15, ...styles.item }}>
+                      <Text style={styles.title}>已改善照片</Text>
+                    </View>
                     <TouchableOpacity
                       onPress={() => attachmentDeleteHandler(i)}>
                       <Image style={styles.itemImage} source={{ uri: a.image }} />
                     </TouchableOpacity>
                     <View style={{ marginBottom: 15, ...styles.item }}>
-                      <Text style={styles.title}>備註</Text>
+                      <Text style={styles.title}>備註：</Text>
                       <TextInput
                         id={a.id}
                         key={a.id}
@@ -633,7 +637,7 @@ const IssueScreen = ({ navigation, route }) => {
                       />
                     </View>
                   </View>
-                );
+                )
               })
             ) : (
               <></>
