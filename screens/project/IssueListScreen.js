@@ -57,6 +57,7 @@ const IssueListScreen = ({ navigation, route }) => {
   const [ selectedStartDate, setSelectedStartDate ] = useState(null);
   const [ selectedEndDate , setSelectedEndDate ] = useState(null)
   const [ isDedecting , setIsDedecting ] = useState(false)
+  const [ isExporting , setIsExporting ] = useState(false)
   const isFocused = useIsFocused();
 
   function issuesFiller (sortedIssues) {
@@ -202,6 +203,7 @@ const IssueListScreen = ({ navigation, route }) => {
             await Share.open(shareImageOption);
             break;
           case 3:
+            setIsExporting(true)
             const doc = new Document({
               sections: issueReportGenerator(projectName, project, selectedEndDate, selectedStartDate, selectedIssueList, issueList, fs),
           });
@@ -211,6 +213,7 @@ const IssueListScreen = ({ navigation, route }) => {
               base64,
               'base64'
               );
+              setIsExporting(false)
           });
 
             const shareDataTableOption = {
@@ -225,6 +228,7 @@ const IssueListScreen = ({ navigation, route }) => {
             break;
         
           case 4:
+            setIsExporting(true)
             const doc_2 = new Document({
               sections: [
                   {
@@ -240,6 +244,7 @@ const IssueListScreen = ({ navigation, route }) => {
               base64,
               'base64'
               );
+              setIsExporting(false)
           });
 
             const shareDataTableOption_2 = {
@@ -437,7 +442,7 @@ const IssueListScreen = ({ navigation, route }) => {
       image,
       status: ISSUE_STATUS.lowRisk.id,
       tracking: false,
-      location: project.name,
+      location: '',
       activity: '',
       assignee: '',
       assignee_phone_number: '',
@@ -516,7 +521,18 @@ const IssueListScreen = ({ navigation, route }) => {
       </React.Fragment>
     );
   };
-
+  if (isExporting == true){
+    return (
+      <React.Fragment>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.loading_container}>
+            <ActivityIndicator size='large' color="#000000" />
+            <Text style={[styles.loading_text]}>缺失表單生成中...</Text>
+          </View>
+        </SafeAreaView>
+      </React.Fragment>
+    )
+  }
   if (isDedecting == true){
     return (
       <React.Fragment>

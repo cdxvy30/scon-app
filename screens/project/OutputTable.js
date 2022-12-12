@@ -352,7 +352,7 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
       var issue_title = issueList[i].violation_type;
       
       pages.push(
-        new Paragraph({children:[new TextRun({text: "缺失改善前後記錄表", size: 40, bold: true,  })], pageBreakBefore:true, alignment:AlignmentType.CENTER}),
+        new Paragraph({children:[new TextRun({text: `${project.company} 缺失改善前後記錄表`, size: 40, bold: true,  })], pageBreakBefore:true, alignment:AlignmentType.CENTER}),
                 new Paragraph({
                     children: [
                         new TextRun({text: "工程名稱：", size: 30, bold: true}),
@@ -365,8 +365,8 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                   children: [
                       new TextRun({text: "地址：", size: 30, bold: true}),
                       new TextRun({text: `${project.address}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
-                      new TextRun({text:"\t專案建立日期：", size: 30, bold: true}),
-                      new TextRun({text: `${new Date(project.created_at).getFullYear()}/${new Date(project.created_at).getMonth()+1}/${new Date(project.created_at).getDate()}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                      new TextRun({text:"\t記錄人員：", size: 30, bold: true}),
+                      new TextRun({text: `${project.inspector}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
                   ], alignment:AlignmentType.CENTER
                 }),
                 table = new Table({
@@ -384,12 +384,12 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                           width:{size:1000, type:WidthType.DXA}
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: "記錄人員", size: 32, bold:true })], alignment:AlignmentType.CENTER}), ],
+                          children: [new Paragraph({children:[new TextRun({text: "聯絡電話", size: 32, bold:true })], alignment:AlignmentType.CENTER}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1000, type:WidthType.DXA}
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: project.inspector, size: 30, })], alignment:AlignmentType.LEFT}), ],
+                          children: [new Paragraph({children:[new TextRun({text: `${issueList[i].assignee_phone_number}`, size: 30, })], alignment:AlignmentType.LEFT}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1000, type:WidthType.DXA}
                         }),
