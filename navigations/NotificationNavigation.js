@@ -1,22 +1,22 @@
 import React from 'react';
 // import type {Node} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import ProfileSettingScreen from '../screens/setting/ProfileSettingScreen';
+import NotificationScreen from '../screens/setting/NotificationScreen';
 
 const Stack = createNativeStackNavigator();
 
-const SettingNavigation = ({navigation}) => {
+const NotificationNavigation = ({navigation}) => {
   return (
     <React.Fragment>
       <Stack.Navigator>
         <Stack.Screen
-          name="Settings"
-          component={ProfileSettingScreen}
-          options={{title: '設定列表'}}
+          name="Notification"
+          component={NotificationScreen}
+          options={{title: '通知'}}
         />
       </Stack.Navigator>
     </React.Fragment>
   );
 };
 
-export default SettingNavigation;
+export default NotificationNavigation;

@@ -386,7 +386,8 @@ const IssueListScreen = ({ navigation, route }) => {
 
     if (isFocused) {
       fetchIssues();
-    }
+    }selectedIssueList
+  
   }, [route.params.name, issueReportGenerator, isFocused]);
 
   React.useLayoutEffect(() => {
@@ -454,10 +455,6 @@ const IssueListScreen = ({ navigation, route }) => {
   };
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
-    <Swipeout
-      key={item.id}
-      right={swipeBtns}
-      onOpen={() => setSelectedIssueId(item.id)}>
       <TouchableOpacity
         onPress={onPress}
         style={[styles.item, backgroundColor]}>
@@ -501,7 +498,7 @@ const IssueListScreen = ({ navigation, route }) => {
           </View>
         </View>
       </TouchableOpacity>
-    </Swipeout>
+  
   );
 
   const renderItem = ({ item }) => {
@@ -510,13 +507,18 @@ const IssueListScreen = ({ navigation, route }) => {
 
     return (
       <React.Fragment>
-        <Item
-          key={`${item.id}`}
-          item={item}
-          onPress={() => issueSelectHandler(item)}
-          backgroundColor={{ backgroundColor }}
-          textColor={{ color }}
-        />
+        <Swipeout
+        key={item.id}
+        right={swipeBtns}
+        onOpen={() => setSelectedIssueId(item.id)}>
+          <Item
+            key={`${item.id}`}
+            item={item}
+            onPress={() => issueSelectHandler(item)}
+            backgroundColor={{ backgroundColor }}
+            textColor={{ color }}
+          />
+        </Swipeout>
         <Separator key={`seperator_${item.id}`} />
       </React.Fragment>
     );

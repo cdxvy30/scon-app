@@ -17,6 +17,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import SqliteManager from '../../services/SqliteManager';
 import { useIsFocused } from '@react-navigation/native';
 import { transformProjects } from '../../util/sqliteHelper';
+import { VerticalAlign } from 'docx';
 
 const determineStatusColor = item => {
   let color = 'grey';
@@ -102,10 +103,6 @@ const ProjectListScreen = ({ navigation }) => {
   ];
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
-    <Swipeout
-      key={item.id}
-      right={swipeBtns}
-      onOpen={() => setSelectedProjectId(item.id)}>
       <TouchableOpacity
         onPress={onPress}
         style={[styles.item, backgroundColor]}>
@@ -120,7 +117,6 @@ const ProjectListScreen = ({ navigation }) => {
           color={determineStatusColor(item)}
         />
       </TouchableOpacity>
-    </Swipeout>
   );
 
   const renderItem = ({ item }) => {
@@ -129,13 +125,18 @@ const ProjectListScreen = ({ navigation }) => {
 
     return (
       <React.Fragment>
-        <Item
-          item={item}
-          ket={item.id}
-          onPress={() => projectSelectHandler(item)}
-          backgroundColor={{ backgroundColor }}
-          textColor={{ color }}
-        />
+        <Swipeout
+        key={item.id}
+        right={swipeBtns}
+        onOpen={() => setSelectedProjectId(item.id)}>
+          <Item
+            item={item}
+            ket={item.id}
+            onPress={() => projectSelectHandler(item)}
+            backgroundColor={{ backgroundColor }}
+            textColor={{ color }}
+          />
+        </Swipeout>
         <Separator />
       </React.Fragment>
     );
@@ -187,8 +188,9 @@ const styles = StyleSheet.create({
   },
   title: {
     marginLeft: 12,
-    marginTop: 26,
     fontSize: 24,
+    width:250,
+    alignSelf:'center'
   },
   status: {
     marginTop: 26,

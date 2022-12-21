@@ -90,23 +90,6 @@ const WorkItemListScreen = ({navigation, route}) => {
   };
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
-    <Swipeout
-      key={item.id}
-      right={[
-        {
-          text: <Ionicons name={'create-outline'} size={24} color={'white'} />,
-          backgroundColor: 'orange',
-          underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-          onPress: () =>{workItemEditHandler(item)}
-        },
-        {
-          text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
-          backgroundColor: 'red',
-          underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-          onPress: () => workItemDeleteHandler(),
-        }
-      ]}
-      onOpen={() => setSelectedWorkItemId(item.id)}>
       <TouchableOpacity
         onPress={onPress}
         style={[styles.item, backgroundColor]}>
@@ -114,7 +97,6 @@ const WorkItemListScreen = ({navigation, route}) => {
           <Text style={[styles.title, textColor]}>{`${item.name}-${item.company}`}</Text>
         </View>
       </TouchableOpacity>
-    </Swipeout>
   );
 
   const renderItem = ({ item }) => {
@@ -122,13 +104,33 @@ const WorkItemListScreen = ({navigation, route}) => {
     const color = item.id === selectedWorkItemId ? 'black' : 'black'; //'white' : 'black';
     return (
       <React.Fragment>
-        <Item
-          item={item}
-          ket={item.id}
-          onPress={() => workItemSelectHandler(item)}
-          backgroundColor={{ backgroundColor }}
-          textColor={{ color }}
-        />
+        <Swipeout
+        key={item.id}
+        right={
+          [
+            {
+              text: <Ionicons name={'create-outline'} size={24} color={'white'} />,
+              backgroundColor: 'orange',
+              underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
+              onPress: () =>{workItemEditHandler(item)}
+            },
+            {
+              text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
+              backgroundColor: 'red',
+              underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
+              onPress: () => workItemDeleteHandler(),
+            }
+          ]
+        }
+        onOpen={() => setSelectedWorkItemId(item.id)}>
+          <Item
+            item={item}
+            ket={item.id}
+            onPress={() => workItemSelectHandler(item)}
+            backgroundColor={{ backgroundColor }}
+            textColor={{ color }}
+          />
+        </Swipeout>
         <Separator />
       </React.Fragment>
     );
