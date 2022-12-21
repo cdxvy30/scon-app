@@ -441,7 +441,7 @@ const IssueListScreen = ({ navigation, route }) => {
       violation_type: '',
       image,
       status: ISSUE_STATUS.lowRisk.id,
-      tracking: false,
+      tracking: true,
       location: '',
       activity: '',
       assignee: '',
