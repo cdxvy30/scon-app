@@ -120,17 +120,18 @@ export const AuthProvider = ({children}) => {
 
   const getUsers = () => {
     setIsLoading(true);
+    console.log('getUsers');
 
     axios
       .get(`${BASE_URL}/users/all`)
       .then(async res => {
-        let users = res.data;
+        let users = await res.data;
         console.log(users);
         setIsLoading(false);
       })
       .catch(e => {
         console.info(e);
-        console.log(`register error : ${e}`);
+        console.log(`Get users error : ${e}`);
         setIsLoading(false);
       });
   };
