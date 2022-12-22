@@ -4,12 +4,8 @@ import Spinner from 'react-native-loading-spinner-overlay/lib';
 import { AuthContext } from '../../context/AuthContext';
 import { useIsFocused } from '@react-navigation/native';
 
-const UserInfoScreen = ({navigation}) => {
-  const {userInfo, isLoading, logout} = useContext(AuthContext);
-
-  const switchToSettingScteen = async () => {
-    navigation.navigate('Setting', { name: 'Setting' });
-  };
+const SettingScreen = ({navigation}) => {
+  const {userInfo, isLoading, getUsers, logout} = useContext(AuthContext);
 
   return (
     <React.Fragment>
@@ -20,7 +16,7 @@ const UserInfoScreen = ({navigation}) => {
           <Image style={styles.icon} source={require('../../configs/icon.png')} />
           <Text style={styles.corporation}>{userInfo.user.corporation}</Text>
           <Text style={styles.permission}>{userInfo.user.permission}</Text>
-          <TouchableOpacity onPress={() => {}} style={[styles.group]}>
+          <TouchableOpacity onPress={getUsers} style={[styles.group]}>
             <Text style={[styles.text]}>
               {'使用者管理'}
             </Text>
@@ -56,48 +52,48 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   name: {
-    alignSelf:'center',
+    alignSelf: 'center',
     height: 44,
     fontStyle: 'normal',
     fontSize: 36,
     lineHeight: 44,
-    color: '#000000'
+    color: '#000000',
   },
   icon: {
-    marginTop:10,
-    alignSelf:'center',
+    marginTop: 10,
+    alignSelf: 'center',
     width: 157,
     height: 157,
-    borderRadius:157/2,
-    borderColor:'black',
-    borderWidth:2
+    borderRadius: 157/2,
+    borderColor: 'black',
+    borderWidth: 2,
 
   },
-  corporation:{
-    marginTop:10,
-    alignSelf:'center',
+  corporation: {
+    marginTop: 10,
+    alignSelf: 'center',
     height: 34,
     fontStyle: 'normal',
     fontSize: 28,
     lineHeight: 34,
     color: 'rgba(0, 0, 0, 0.4)',
   },
-  permission:{
-    alignSelf:'center',
+  permission: {
+    alignSelf: 'center',
     height: 34,
     fontStyle: 'normal',
     fontSize: 28,
     lineHeight: 34,
     color: 'rgba(0, 0, 0, 0.4)',
-    marginBottom:60
+    marginBottom: 60,
   },
-  group:{
-    marginBottom:20,
+  group: {
+    marginBottom: 20,
     backgroundColor: '#61dafb',
-    paddingVertical:'3%',
+    paddingVertical: '3%',
     borderRadius: 10,
   },
-  text:{
+  text: {
     color: '#20232a',
     textAlign: 'center',
     fontSize: 30,
@@ -106,9 +102,9 @@ const styles = StyleSheet.create({
   logout: {
     textAlign: 'center',
     fontSize: 20,
-    alignSelf:'center',
-    color:"red"
+    alignSelf: 'center',
+    color: 'red',
   },
 });
 
-export default UserInfoScreen;
+export default SettingScreen;
