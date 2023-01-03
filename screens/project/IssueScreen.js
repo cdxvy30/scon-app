@@ -309,23 +309,28 @@ const IssueScreen = ({ navigation, route }) => {
   };
 
   const responsibleCorporationclickHandler = async () => {
-    var options = ['取消']
-    for (i of await SqliteManager.getWorkItemsByProjectId(projectId)){
-      options.push(i.company)
-    }
+    var options = await SqliteManager.getWorkItemsByProjectId(projectId)
+    options.push({company:'新增責任廠商'}, {company:'取消'})
+    console.log(options)
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: options,
-        cancelButtonIndex :0,
+        options: options.map(item => item.company),
+        cancelButtonIndex :options.length-1,
         userInterfaceStyle:'light',
       },
       (buttonIndex) => {
-        if (buttonIndex != 0){
-          setResponsibleCorporation(options[buttonIndex])
+        if (buttonIndex == options.length-1){
+          setResponsibleCorporation(responsibleCorporation)
+        }else if(buttonIndex == options.length-2){
+          navigation.navigate('WorkItemAdd', { 
+            name: 'Create new workitem' ,
+            projectId: projectId
+          })
         }else{
-          setResponsibleCorporation('')
+          setResponsibleCorporation(options[buttonIndex].company)
+          setIssueAssigneeText(options[buttonIndex].manager)
+          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number)
         }
-        
       }
     )
   }
@@ -337,54 +342,67 @@ const IssueScreen = ({ navigation, route }) => {
       setIssueLocationText,  
     })};  
 
-  const issueLocationClickHandler = async () => {
-    var options = ['取消','新增地點']
-    for (i of await SqliteManager.getIssueLocationsByProjectId(projectId)){
-      options.splice(1, 0, i.location)
-    }
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: options,
-        cancelButtonIndex :0,
-        userInterfaceStyle:'light',
-      },
-      async (buttonIndex) => {
-        if (buttonIndex == 0){
-          setIssueLocationText(issueLocationText)
-        }else if(buttonIndex == options.length-1){
-          Alert.prompt(
-            '請輸入缺失位置',
-            '(如: 2F西側)',
-            async (location) => {
-              setIssueLocationText(location),
-              await SqliteManager.createIssueLocation({
-                project_id: projectId,
-                location: location,
-              });
-            },
-          )
-        }else{
-          console.log(options)
-          Alert.alert(`目前選擇: ${options[buttonIndex]}`,"刪除 或 點選",
-            [
-              {
-                text: "刪除地點",
-                onPress: async () => {
-                  await SqliteManager.deleteIssueLocation(options[buttonIndex]);
-                }
-              },
-              {
-                text: "確定點選",
-                onPress: async () => {
-                  setIssueLocationText(options[buttonIndex]);
-                }
-              }
-            ]
-          )
-        }
-      }
-    )
-  }
+  //   const issueLocationClickHandler = async () => {
+  //   console.log(await SqliteManager.getIssueLocationsByProjectId(projectId))
+  //   var options = (
+  //     await SqliteManager.getIssueLocationsByProjectId(projectId)
+  //   ).map(item => {return {location:item.location, id:item.id}})
+  //   options.sort((a, b) => {
+  //     if (parseFloat(a.location) != NaN && parseFloat(b.location) != NaN){
+  //       return(parseInt(a.location.replace(/[^\d]/g, "")) - parseInt(b.location.replace(/[^\d]/g, "")))
+  //     }else if(parseFloat(b.location)!= NaN && parseFloat(a.location) == NaN){
+  //       return 1
+  //     }else if(parseFloat(a.location)!= NaN && parseFloat(b.location) == NaN){
+  //       return -1
+  //     }else{
+  //       return 0
+  //     }
+  //   }).push({location:'新增地點'}, {location:'取消'})
+  //   ActionSheetIOS.showActionSheetWithOptions(
+  //     {
+  //       options: options.map(item => item.location),
+  //       cancelButtonIndex :options.length-1,
+  //       userInterfaceStyle:'light',
+  //     },
+  //     async (buttonIndex) => {
+  //       if (buttonIndex == options.length-1){
+  //         setIssueLocationText(issueLocationText)
+  //       }else if(buttonIndex == options.length-2){
+  //         Alert.prompt(
+  //           '請輸入缺失位置',
+  //           '(如: 2F西側)',
+  //           async (location) => {
+  //             setIssueLocationText(location),
+  //             await SqliteManager.createIssueLocation({
+  //               project_id: projectId,
+  //               location: location,
+  //             });
+  //           },
+  //         )
+  //       }else{
+  //         Alert.alert(`目前選擇: ${options[buttonIndex].location}`,"刪除／點選",
+  //           [
+  //             {
+  //               text: "刪除地點",
+  //               style:'destructive',
+  //               onPress: async () => {
+  //                 await SqliteManager.deleteIssueLocation(options[buttonIndex].id);
+  //                 setIssueLocationText('')
+  //               }
+  //             },
+  //             {
+  //               text: "確定",
+  //               onPress: async () => {
+  //                 setIssueLocationText(options[buttonIndex].location);
+  //               }
+  //             }
+  //           ],
+  //           'light',
+  //         )
+  //       }
+  //     }
+  //   )
+  // }
 
   const issueCreateHandler = React.useCallback(async () => {
 
@@ -675,18 +693,18 @@ const IssueScreen = ({ navigation, route }) => {
             </TouchableOpacity>
             <Separator />
             <TouchableOpacity onPress={WorkItemListHandler}>
-              <View style={styles.item}>
-                <Text style={styles.title}>工項</Text>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text style={styles.textInput}>
-                      {!!issueTaskText? issueTaskText:undefined}
-                    </Text>
-                    <Ionicons
-                      style={styles.description}
-                      name={'ios-chevron-forward'}
-                    />
-                  </View>
+            <View style={styles.item}>
+              <Text style={styles.title}>工項</Text><Text style={{fontSize: 18, color:'#8C8C8C'}}>(選填)            </Text>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={styles.textInput}>
+                  {!!issueTaskText? issueTaskText:undefined}
+                </Text>
+                <Ionicons
+                  style={styles.description}
+                  name={'ios-chevron-forward'}
+                />
               </View>
+            </View>
             </TouchableOpacity>
             <Separator />
             {issueTaskText?

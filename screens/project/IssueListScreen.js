@@ -90,13 +90,14 @@ const IssueListScreen = ({ navigation, route }) => {
 
   const issueSelectHandler = item => {
     setSelectedIssueId(item.id);
-    console.log(item)
-    navigation.navigate('Issue', {
-      projectId: projectId,
-      project: project,
-      action: 'update existing issue',
-      item,
-    });
+    navigation.navigate(
+      'Issue', {
+        projectId: projectId,
+        project: project,
+        action: 'update existing issue',
+        item,
+      }
+    );
 
   };
 
@@ -470,7 +471,7 @@ const IssueListScreen = ({ navigation, route }) => {
               color={determineStatusColor(item)}
             />
             <Text style={[styles.timestampText, textColor]}>
-              {new Date(item.timestamp).toISOString()}
+              {new Date(item.timestamp).toLocaleString()}
             </Text>
           </View>
           <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:(item.violation_type!=''?`(${item.violation_type})\n${item.title}`:'')}</Text>

@@ -5,20 +5,28 @@ export function issueReportGenerator(projectName, project, selectedEndDate, sele
   return [
     {
         children: [
-            new Paragraph({children:[new TextRun({text: `${projectName}--缺失記錄表`, size: 40, bold: true,  })], alignment:AlignmentType.CENTER}),
+            new Paragraph({children:[new TextRun({text: `${project.company}--缺失記錄表`, size: 40, bold: true,  })], alignment:AlignmentType.CENTER}),
             new Paragraph({
-                children: [
-                  new TextRun({text: "地址：", size: 30, bold: true}),
-                  new TextRun({text: `${project.address}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
-                ], alignment:AlignmentType.CENTER
+              children: [
+                  new TextRun({text: "工程名稱：", size: 30, bold: true}),
+                  new TextRun({text: `${projectName}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                  new TextRun({text:"  工地負責人：", size: 30, bold: true}),
+                  new TextRun({text: `${project.manager}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+              ], alignment:AlignmentType.CENTER
             }),
             new Paragraph({
               children: [
-                  new TextRun({text:"工地負責人：", size: 30, bold: true}),
-                  new TextRun({text: `${project.manager}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
-                  new TextRun({text:"   缺失日期範圍：", size: 30, bold: true}),
-                  new TextRun({text: selectedEndDate?`${new Date(selectedStartDate).toLocaleDateString()} - ${new Date(selectedEndDate).toLocaleDateString()}`:`${new Date(project.created_at).toLocaleDateString()} - ${new Date().toLocaleDateString()}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
-                ], alignment:AlignmentType.CENTER
+                  new TextRun({text: "地址：", size: 30, bold: true}),
+                  new TextRun({text: `${project.address}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                  new TextRun({text:"\t記錄人員：", size: 30, bold: true}),
+                  new TextRun({text: `${project.inspector}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                  ], alignment:AlignmentType.CENTER
+            }),
+            new Paragraph({
+              children: [
+                  new TextRun({text:"  缺失日期範圍：", size: 30, bold: true}),
+                  new TextRun({text: selectedEndDate?`${new Date(selectedStartDate).toLocaleDateString()} - ${new Date(selectedEndDate).toLocaleDateString()}`:`${new Date(project.created_at).toLocaleDateString()} - ${new Date().toLocaleDateString()}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}})
+              ], alignment:AlignmentType.CENTER
             }),
             new Table({
               rows: issueRowsGenerator((selectedEndDate?selectedIssueList:issueList),fs),
@@ -113,6 +121,22 @@ function issueRowsGenerator (issueList,fs) {
       new TableRow({
         children:[
           new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: '風險評級', size: 30, bold: true,})], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:1500, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+          new TableCell({
+            children: [new Paragraph({children:[new TextRun({text: `${getIssueStatusById(issueList[i].status).name}`, size: 28, })], }), ],
+            verticalAlign:VerticalAlign.CENTER,
+            width:{size:4000, type:WidthType.DXA},
+            height:{size:1000, type:WidthType.DXA},
+          }),
+        ],
+      }),
+      new TableRow({
+        children:[
+          new TableCell({
             children: [new Paragraph({children:[new TextRun({text: '地點', size: 30, bold: true,})], }), ],
             verticalAlign:VerticalAlign.CENTER,
             width:{size:1500, type:WidthType.DXA},
@@ -152,22 +176,6 @@ function issueRowsGenerator (issueList,fs) {
           }),
           new TableCell({
             children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee_phone_number, size: 28, })], }), ],
-            verticalAlign:VerticalAlign.CENTER,
-            width:{size:4000, type:WidthType.DXA},
-            height:{size:1000, type:WidthType.DXA},
-          }),
-        ],
-      }),
-      new TableRow({
-        children:[
-          new TableCell({
-            children: [new Paragraph({children:[new TextRun({text: '記錄人員', size: 30, bold: true,})], }), ],
-            verticalAlign:VerticalAlign.CENTER,
-            width:{size:1500, type:WidthType.DXA},
-            height:{size:1000, type:WidthType.DXA},
-          }),
-          new TableCell({
-            children: [new Paragraph({children:[new TextRun({text: issueList[i].safetyManager, size: 28, })], }), ],
             verticalAlign:VerticalAlign.CENTER,
             width:{size:4000, type:WidthType.DXA},
             height:{size:1000, type:WidthType.DXA},
@@ -258,13 +266,13 @@ function issueRowsGenerator (issueList,fs) {
       new TableRow({
         children:[
           new TableCell({
-            children: [new Paragraph({children:[new TextRun({text: '負責廠商', size: 30, bold: true,})], }), ],
+            children: [new Paragraph({children:[new TextRun({text: '責任廠商', size: 30, bold: true,})], }), ],
             verticalAlign:VerticalAlign.CENTER,
             width:{size:1500, type:WidthType.DXA},
             height:{size:1000, type:WidthType.DXA},
           }),
           new TableCell({
-            children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee, size: 28, })], }), ],
+            children: [new Paragraph({children:[new TextRun({text: issueList[i].responsible_corporation, size: 28, })], }), ],
             verticalAlign:VerticalAlign.CENTER,
             width:{size:4000, type:WidthType.DXA},
             height:{size:1000, type:WidthType.DXA},
@@ -352,7 +360,7 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
       var issue_title = issueList[i].violation_type;
       
       pages.push(
-        new Paragraph({children:[new TextRun({text: `${project.company} 缺失改善前後記錄表`, size: 40, bold: true,  })], pageBreakBefore:true, alignment:AlignmentType.CENTER}),
+        new Paragraph({children:[new TextRun({text: `${project.company}--缺失改善前後記錄表`, size: 40, bold: true,  })], pageBreakBefore:true, alignment:AlignmentType.CENTER}),
                 new Paragraph({
                     children: [
                         new TextRun({text: "工程名稱：", size: 30, bold: true}),
@@ -374,12 +382,12 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                     new TableRow({
                       children:[
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: "施工廠商", size: 32, bold:true })], alignment:AlignmentType.CENTER}), ],
+                          children: [new Paragraph({children:[new TextRun({text: "責任廠商", size: 32, bold:true })], alignment:AlignmentType.CENTER}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1000, type:WidthType.DXA}
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: issueList[i].assignee, size: 30, })], alignment:AlignmentType.LEFT}), ],
+                          children: [new Paragraph({children:[new TextRun({text: issueList[i].responsible_corporation, size: 30, })], alignment:AlignmentType.LEFT}), ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1000, type:WidthType.DXA}
                         }),
@@ -393,7 +401,6 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1000, type:WidthType.DXA}
                         }),
-                        
                       ],
                       height:{value:1000, rule:HeightRule.EXACT},
                       cantSplit:true,
@@ -428,7 +435,7 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
                     new TableRow({
                     children:[
                       new TableCell({
-                        children: [new Paragraph({children:[new TextRun({text: '缺失照片', size: 30, bold:true})], alignment:AlignmentType.CENTER}), ],
+                        children: [new Paragraph({children:[new TextRun({text: '改善前', size: 30, bold:true})], alignment:AlignmentType.CENTER}), ],
                         verticalAlign:VerticalAlign.CENTER,
                         width:{size:1500, type:WidthType.DXA}
                       }),

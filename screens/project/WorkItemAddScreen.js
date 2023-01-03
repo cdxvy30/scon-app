@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-
 import {
   Button,
   SafeAreaView,
@@ -105,7 +104,7 @@ const WorkItemAddScreen = ({navigation, route}) => {
                 style={styles.input}
               />
             </View>
-            <Text style={styles.title}>工項負責人</Text>
+            <Text style={styles.title}>負責人</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}

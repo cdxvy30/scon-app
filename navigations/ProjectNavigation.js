@@ -32,7 +32,7 @@ const ProjectNavigation = ({navigation}) => {
         <Stack.Screen
           name="Issue"
           component={IssueScreen}
-          options={{title: ''}}
+          options={{title:'', gestureEnabled: false,}}
         />
         <Stack.Group screenOptions={{presentation: 'modal'}}>
           <Stack.Screen
@@ -56,6 +56,7 @@ const ProjectNavigation = ({navigation}) => {
           component={IssueTypeSelectorScreen}
           options={{title: '缺失項目'}}
         />
+        <Stack.Group screenOptions={{presentation: 'formSheet'}}>
         <Stack.Screen
           name="WorkItemList"
           component={WorkItemListScreen}
@@ -76,6 +77,7 @@ const ProjectNavigation = ({navigation}) => {
           component={IssueLocationListScreen}
           options={{title: '缺失地點列表'}}
         />
+        </Stack.Group>
       </Stack.Navigator>
     </React.Fragment>
   );

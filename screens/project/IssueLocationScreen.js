@@ -17,68 +17,7 @@ import {
     View,
   } from 'react-native';
 
-  // const issueLocationClickHandler = async () => {
-  //   var options = (
-  //     await SqliteManager.getIssueLocationsByProjectId(projectId)
-  //   ).map(item => {return {location:item.location, id:item.id}})
-  //   options.sort((a, b) => {
-  //     if (parseFloat(a.location) != NaN && parseFloat(b.location) != NaN){
-  //       return(parseInt(a.location.replace(/[^\d]/g, "")) - parseInt(b.location.replace(/[^\d]/g, "")))
-  //     }else if(parseFloat(b.location)!= NaN && parseFloat(a.location) == NaN){
-  //       return 1
-  //     }else if(parseFloat(a.location)!= NaN && parseFloat(b.location) == NaN){
-  //       return -1
-  //     }else{
-  //       return 0
-  //     }
-  //   }).push({location:'新增地點'}, {location:'取消'})
-  //   ActionSheetIOS.showActionSheetWithOptions(
-  //     {
-  //       options: options.map(item => item.location),
-  //       cancelButtonIndex :options.length-1,
-  //       userInterfaceStyle:'light',
-  //     },
-  //     async (buttonIndex) => {
-  //       if (buttonIndex == options.length-1){
-  //         setIssueLocationText(issueLocationText)
-  //       }else if(buttonIndex == options.length-2){
-  //         Alert.prompt(
-  //           '請輸入缺失位置',
-  //           '(如: 2F西側)',
-  //           async (location) => {
-  //             setIssueLocationText(location),
-  //             await SqliteManager.createIssueLocation({
-  //               project_id: projectId,
-  //               location: location,
-  //             });
-  //           },
-  //         )
-  //       }else{
-  //         Alert.alert(`目前選擇: ${options[buttonIndex].location}`,"刪除／點選",
-  //           [
-  //             {
-  //               text: "刪除地點",
-  //               style:'destructive',
-  //               onPress: async () => {
-  //                 await SqliteManager.deleteIssueLocation(options[buttonIndex].id);
-  //                 setIssueLocationText('')
-  //               }
-  //             },
-  //             {
-  //               text: "確定",
-  //               onPress: async () => {
-  //                 setIssueLocationText(options[buttonIndex].location);
-  //               }
-  //             }
-  //           ],
-  //           'light',
-  //         )
-  //       }
-  //     }
-  //   )
-  // }
 const IssueLocationListScreen = ({navigation, route}) => {
-
   const [issueLocationList, setIssueLocationList] = useState(null);
   const [projectId, setProjectId] = useState(route.params.projectId);
   const [project, setProject] = useState(route.params.project);
@@ -99,12 +38,17 @@ const IssueLocationListScreen = ({navigation, route}) => {
                 '請輸入缺失位置',
                 '(如: 2F西側)',
                 async (location) => {
-                  route.params.setIssueLocationText(location);
-                  navigation.goBack();
-                  await SqliteManager.createIssueLocation({
-                    project_id: projectId,
-                    location: location,
-                  });
+                  if (location == '') {
+                    Alert.alert('未填寫任何位置');
+                  }else{
+                    route.params.setIssueLocationText(location);
+                    navigation.goBack();
+                    await SqliteManager.createIssueLocation({
+                      project_id: projectId,
+                      location: location,
+                    });
+                  }
+
                 },
               )
             }}
@@ -124,7 +68,6 @@ const IssueLocationListScreen = ({navigation, route}) => {
 
   useEffect(() => {
     const fetchIssueLocations = async () => {
-      console.log(await SqliteManager.getIssueLocationsByProjectId(project.id))
       const issuelocations = await SqliteManager.getIssueLocationsByProjectId(project.id);
       const sortedIssuelocations = issuelocations.sort(
         (a, b) => new Date(a.created_at) - new Date(b.created_at),

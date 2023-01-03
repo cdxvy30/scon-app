@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import Separator from '../../components/Separator';
 import SqliteManager from '../../services/SqliteManager';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Icon } from 'react-native-elements';
 import { useIsFocused } from '@react-navigation/native';
 import { transformWorkItems } from '../../util/sqliteHelper';
 import Swipeout from 'react-native-swipeout';
@@ -25,6 +26,24 @@ const WorkItemListScreen = ({navigation, route}) => {
   const [projectId, setProjectId] = useState(route.params.projectId);
   const [project, setProject] = useState(route.params.project);
   const isFocused = useIsFocused();
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <React.Fragment>
+          <Icon
+            style={{marginRight: 10}}
+            name="ios-add"
+            type="ionicon"
+            color="dodgerblue"
+            size={30}
+            onPress={() => {workItemAddHandler()}}
+          />
+        </React.Fragment>
+
+      ),
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const fetchWorkItems = async () => {
@@ -146,13 +165,6 @@ const WorkItemListScreen = ({navigation, route}) => {
           renderItem={renderItem}
           keyExtractor={item => item.id}
           extraData={selectedWorkItemId}
-          ListFooterComponent={
-            <TouchableOpacity onPress={workItemAddHandler} style={[styles.item]}>
-              <Text style={[styles.title, { marginTop: 0, color: 'dodgerblue' }]}>
-                {'新增工項'}
-              </Text>
-            </TouchableOpacity>
-          }
         />
       </SafeAreaView>
     </React.Fragment>
