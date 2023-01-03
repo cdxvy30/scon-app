@@ -14,3 +14,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
+const UserListScreen = () => {
+
+  return (
+    <ReactFra></>
+  );
+};
+
+export default UserListScreen;

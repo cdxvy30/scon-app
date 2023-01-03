@@ -30,9 +30,6 @@ import IssueAttachment from '../../models/IssueAttachment';
 import { ISSUE_ATTACHMENT } from '../../data/issueAttachment';
 import { getIssuesByProjectId } from '../../services/SqliteManager'
 
-
-
-
 // import { MobileModel, Image } from "react-native-pytorch-core";
 
 const determineStatusColor = item => {
