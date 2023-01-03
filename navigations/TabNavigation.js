@@ -19,11 +19,11 @@ const TabNavigation = ({}) => {
             if (route.name === '專案') {
               iconName = focused ? 'ios-newspaper' : 'ios-newspaper-outline';
             } else if (route.name === '設定') {
-              iconName = focused ? 'person-circle' : 'person-circle-outline';
+              iconName = focused ? 'ios-settings' : 'ios-settings-outline';
             } else if (route.name === '通知') {
               iconName = focused
-                ? 'notifications-outline'
-                : 'ios-settings-outline';
+                ? 'notifications'
+                : 'notifications-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;

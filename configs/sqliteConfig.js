@@ -29,6 +29,7 @@ const SYSTEM_CONFIG = {
     image: 'TEXT NOT NULL',
     tracking: 'BOOLEAN NOT NULL',
     location: 'TEXT NOT NULL',
+    responsible_corporation: 'TEXT NOT NULL',
     activity: 'TEXT NOT NULL',
     activity_person_in_charge: 'TEXT NOT NULL',
     assignee_phone_number: 'TEXT NOT NULL',
@@ -77,6 +78,14 @@ const SYSTEM_CONFIG = {
     min_x: 'INTEGER NOT NULL',
     min_y: 'INTEGER NOT NULL',
     created_at: 'INTEGER NOT NULL',
+  },
+  issue_location_table_name: 'issue_location', // 缺失地點
+  issue_location_table_shcema: {
+    id: 'TEXT PRIMARY KEY NOT NULL',
+    location: 'TEXT NOT NULL',
+    project_id: 'TEXT NOT NULL',
+    created_at: 'INTEGER NOT NULL',
+    updated_at: 'INTEGER NOT NULL',
   },
   work_item_table_name: 'workitem', // 工項
   work_item_table_shcema: {

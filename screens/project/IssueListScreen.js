@@ -93,6 +93,7 @@ const IssueListScreen = ({ navigation, route }) => {
 
   const issueSelectHandler = item => {
     setSelectedIssueId(item.id);
+    console.log(item)
     navigation.navigate('Issue', {
       projectId: projectId,
       project: project,
@@ -101,12 +102,6 @@ const IssueListScreen = ({ navigation, route }) => {
     });
 
   };
-
-  const loading = () =>{
-    <View style={[styles.loading_container, styles.loading_horizontal]}>
-      <ActivityIndicator size="large" color="#00ff00" />
-    </View>
-  }
 
   const detectViolationTypeThenSwitchToIssueScreen = async (imagee) => {
     console.log("Send image detect request");
@@ -447,6 +442,7 @@ const IssueListScreen = ({ navigation, route }) => {
       activity: '',
       assignee: '',
       assignee_phone_number: '',
+      responsible_corporation: '',
       safetyManager: project.inspector,
       attachments: [],
       labels: [],

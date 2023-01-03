@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {launchImageLibrary} from 'react-native-image-picker';
+import { AuthContext } from '../../context/AuthContext';
 
 import {
   ActionSheetIOS,
@@ -29,6 +30,7 @@ import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
 
 const ProjectAddScreen = ({navigation, route}) => {
+  const {userInfo} = useContext(AuthContext);
   // console.log(route);
   // console.log(route.params);
   // console.log(BASE_URL);
@@ -38,10 +40,10 @@ const ProjectAddScreen = ({navigation, route}) => {
   const [address, setAddress] = useState(project? project.address:'');
   const [manager, setManager] = useState(project? project.manager:'');
   const [company, setCompany] = useState(project? project.company:'');
-  const [inspector, setInspector] = useState(project? project.inspector:'');
-  const [email, setEmail] = useState(project? project.email:'');
-
+  const [inspector, setInspector] = useState(project? project.inspector:userInfo.user.name);
+  const [email, setEmail] = useState(project? project.email:userInfo.user.email);
   const [isLoading, setIsLoading] = useState(false);
+
 
   const projectAddHandler = React.useCallback(async () => {
     if (!name) {

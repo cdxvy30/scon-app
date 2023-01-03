@@ -1,13 +1,16 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useContext} from 'react';
+import { AuthContext } from '../../context/AuthContext';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Separator from '../../components/Separator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PhotoLabelViewer from './../../components/PhotoLabelViewer';
 import Share from 'react-native-share';
 import {
+  Alert,
   ActionSheetIOS,
   Button,
   Image,
+  Icon,
   Keyboard,
   SafeAreaView,
   ScrollView,
@@ -35,31 +38,32 @@ import { ISSUE_TYPE } from '../../configs/issueTypeConfig'
 import { PROJECT_STATUS } from './ProjectEnum';
 import { transformIssues } from '../../util/sqliteHelper';
 import { WorkItemList } from './WorkItemListScreen'
+import { ButtonGroup } from 'react-native-elements';
 
 
 
 const IssueScreen = ({ navigation, route }) => {
   const axios = require('axios');
-
+  const {userInfo} = useContext(AuthContext);
   const isFocused = useIsFocused();
   const item = route.params.item;
   const projectId = route.params.projectId;
   const [action, setAction] = useState(route.params.action);
   const [issueId, setIssueId] = useState(item.id);
+  const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);
   const [violationType, setViolationType] = useState(route.params.violation_type?route.params.violation_type:item.violation_type);
   const [issueType, setIssueType] = useState(item.type);
   const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);
   const [issueTrack, setIssueTrack] = useState(item.tracking);
   const [issueLocationText, setIssueLocationText] = useState(item.location);
   const [issueTaskText, setIssueTaskText] = useState(item.activity);
+  const [responsibleCorporation, setResponsibleCorporation] = useState(item.responsible_corporation);
   const [issueAssigneeText, setIssueAssigneeText] = useState(item.assignee);
   const [issueAssigneePhoneNumberText, setIssueAssigneePhoneNumberText] = useState(item.assignee_phone_number);
-  const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(item.safetyManager,);
+  const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(userInfo.user.name);
   const [issueAttachments, setIssueAttachments] = useState(item.attachments);
   const [issueLabels, setIssueLabels] = useState(transformLabels(item.labels));
   const [issueStatus, setIssueStatus] = useState(item.status);
- 
-
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const keyboardDidShowListener = useRef();
   const keyboardDidHideListener = useRef();
@@ -251,14 +255,6 @@ const IssueScreen = ({ navigation, route }) => {
     })
   };
 
-  const issueTypeClickHandler = () => {
-    navigation.navigate('IssueTypeSelector', {
-      name: issueType ?? undefined,
-      setIssueType: type => {
-        setIssueType(type);
-      },
-    });
-  };
 
   function decideIssueTypes(violationType){
   
@@ -312,13 +308,93 @@ const IssueScreen = ({ navigation, route }) => {
     );
   };
 
+  const responsibleCorporationclickHandler = async () => {
+    var options = ['取消']
+    for (i of await SqliteManager.getWorkItemsByProjectId(projectId)){
+      options.push(i.company)
+    }
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: options,
+        cancelButtonIndex :0,
+        userInterfaceStyle:'light',
+      },
+      (buttonIndex) => {
+        if (buttonIndex != 0){
+          setResponsibleCorporation(options[buttonIndex])
+        }else{
+          setResponsibleCorporation('')
+        }
+        
+      }
+    )
+  }
+
+  const IssueLocationListHandler = async () => {
+    navigation.navigate('IssueLocationList', { 
+      project: route.params.project,
+      projectId: route.params.projectId,
+      setIssueLocationText,  
+    })};  
+
+  const issueLocationClickHandler = async () => {
+    var options = ['取消','新增地點']
+    for (i of await SqliteManager.getIssueLocationsByProjectId(projectId)){
+      options.splice(1, 0, i.location)
+    }
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: options,
+        cancelButtonIndex :0,
+        userInterfaceStyle:'light',
+      },
+      async (buttonIndex) => {
+        if (buttonIndex == 0){
+          setIssueLocationText(issueLocationText)
+        }else if(buttonIndex == options.length-1){
+          Alert.prompt(
+            '請輸入缺失位置',
+            '(如: 2F西側)',
+            async (location) => {
+              setIssueLocationText(location),
+              await SqliteManager.createIssueLocation({
+                project_id: projectId,
+                location: location,
+              });
+            },
+          )
+        }else{
+          console.log(options)
+          Alert.alert(`目前選擇: ${options[buttonIndex]}`,"刪除 或 點選",
+            [
+              {
+                text: "刪除地點",
+                onPress: async () => {
+                  await SqliteManager.deleteIssueLocation(options[buttonIndex]);
+                }
+              },
+              {
+                text: "確定點選",
+                onPress: async () => {
+                  setIssueLocationText(options[buttonIndex]);
+                }
+              }
+            ]
+          )
+        }
+      }
+    )
+  }
+
   const issueCreateHandler = React.useCallback(async () => {
+
     const transformedIssue = {
       image_uri: item.image.uri.replace('file://', ''),
       image_width: item.image.width,
       image_height: item.image.height,
       tracking: item.tracking,
       location: item.location,
+      responsible_corporation:item.responsible_corporation,
       activity: item.activity,
       assignee: item.assignee,
       assignee_phone_number: item.assignee_phone_number,
@@ -350,6 +426,7 @@ const IssueScreen = ({ navigation, route }) => {
       tracking: issueTrack,
       location: issueLocationText,
       activity: issueTaskText,
+      responsible_corporation:responsibleCorporation,
       assignee: issueAssigneeText,
       assignee_phone_number: issueAssigneePhoneNumberText,
       safety_manager: issueSafetyManagerText,
@@ -365,6 +442,7 @@ const IssueScreen = ({ navigation, route }) => {
     issueAssigneePhoneNumberText,
     issueId,
     issueLocationText,
+    responsibleCorporation,
     issueSafetyManagerText,
     issueTaskText,
     violationType,
@@ -413,6 +491,7 @@ const IssueScreen = ({ navigation, route }) => {
     issueId,
     issueLocationText,
     issueTaskText,
+    responsibleCorporation,
     issueAssigneeText,
     issueAssigneePhoneNumberText,
     issueSafetyManagerText,
@@ -447,8 +526,46 @@ const IssueScreen = ({ navigation, route }) => {
           <Button title="匯出" onPress={() => imageExportHandler()} />
         </React.Fragment>
       ),
+      headerLeft: () => (
+        <Button
+          title="完成"
+          onPress={() => {
+            if (!violationType) {
+              Alert.alert('請點選缺失類別');
+              return;
+            }else if(!issueType){
+              Alert.alert('請點選缺失項目');
+              return;
+            }else if(!issueLocationText){
+              Alert.alert('請點選缺失地點');
+              return;
+            }else if(!responsibleCorporation){
+              Alert.alert('請點選責任廠商');
+              return;
+            }else if(!issueSafetyManagerText){
+              Alert.alert('請填寫記錄人員');
+              return;
+            }
+            navigation.goBack();
+          }}
+        />
+      ),
     });
-  }, [imageExportHandler, navigation]);
+  }, [
+    imageExportHandler, 
+    navigation,
+    issueTrack,
+    violationType,
+    issueType,
+    issueLocationText,
+    issueTaskText,
+    responsibleCorporation,
+    issueAssigneeText,
+    issueAssigneePhoneNumberText,
+    issueSafetyManagerText,
+    issueStatus,
+    issueTypeRemark,
+  ]);
 
   return (
     <React.Fragment>
@@ -527,54 +644,78 @@ const IssueScreen = ({ navigation, route }) => {
             </View>
           </View>
           <View style={styles.group}>
-            <View style={styles.item}>
-              <Text style={styles.title}>缺失地點</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={setIssueLocationText}
-                  defaultValue={issueLocationText}
-                />
-              </View>
-            </View>
-            <Separator />
-            <TouchableOpacity onPress={WorkItemListHandler}>
-            <View style={styles.item}>
-              <Text style={styles.title}>工項</Text>
+            <TouchableOpacity onPress={IssueLocationListHandler}>
+              <View style={styles.item}>
+                <Text style={styles.title}>缺失地點</Text>
                 <View style={{ flexDirection: 'row' }}>
                   <Text style={styles.textInput}>
-                    {!!issueTaskText? issueTaskText:undefined}
-                  </Text>
-                  <Ionicons
-                    style={styles.description}
-                    name={'ios-chevron-forward'}
+                   {!!issueLocationText? issueLocationText:undefined}
+                 </Text>
+                 <Ionicons
+                   style={styles.description}
+                   name={'ios-chevron-forward'}
                   />
                 </View>
-            </View>
+              </View>
             </TouchableOpacity>
             <Separator />
-            <View style={styles.item}>
-              <Text style={styles.title}>工項負責人</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={setIssueAssigneeText}
-                  defaultValue={issueAssigneeText}
-                />
+            <TouchableOpacity onPress={responsibleCorporationclickHandler}>
+              <View style={styles.item}>
+                <Text style={styles.title}>責任廠商</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={styles.textInput}>
+                      {!!responsibleCorporation? responsibleCorporation:undefined}
+                    </Text>
+                    <Ionicons
+                      style={styles.description}
+                      name={'ios-chevron-forward'}
+                    />
+                  </View>
               </View>
-            </View>
+            </TouchableOpacity>
             <Separator />
-            <View style={styles.item}>
-              <Text style={styles.title}>工項負責人電話</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={setIssueAssigneePhoneNumberText}
-                  defaultValue={issueAssigneePhoneNumberText}
-                />
+            <TouchableOpacity onPress={WorkItemListHandler}>
+              <View style={styles.item}>
+                <Text style={styles.title}>工項</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={styles.textInput}>
+                      {!!issueTaskText? issueTaskText:undefined}
+                    </Text>
+                    <Ionicons
+                      style={styles.description}
+                      name={'ios-chevron-forward'}
+                    />
+                  </View>
               </View>
-            </View>
+            </TouchableOpacity>
             <Separator />
+            {issueTaskText?
+              (<React.Fragment>
+              <View style={styles.item}>
+                <Text style={styles.title}>工項負責人</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={setIssueAssigneeText}
+                    defaultValue={issueAssigneeText}
+                  />
+                </View>
+              </View>
+              <Separator />
+              <View style={styles.item}>
+                <Text style={styles.title}>工項負責人電話</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={setIssueAssigneePhoneNumberText}
+                    defaultValue={issueAssigneePhoneNumberText}
+                  />
+                </View>
+              </View>
+              <Separator />
+              </React.Fragment>
+              ) : undefined
+            }
             <View style={styles.item}>
               <Text style={styles.title}>記錄人員</Text>
               <View style={{ flexDirection: 'row' }}>

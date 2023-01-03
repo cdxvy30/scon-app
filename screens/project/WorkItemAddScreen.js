@@ -94,16 +94,15 @@ const WorkItemAddScreen = ({navigation, route}) => {
       <SafeAreaView style={styles.container}>
         <ScrollView>
           <View style={styles.inputAreaContainer}>
-            <Text style={styles.title}>工項名稱</Text>
+            <Text style={styles.title}>廠商名稱</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setName(text)}
-                defaultValue={name}
-                value={name}
+                onChangeText={text => setCompany(text)}
+                defaultValue={company}
+                value={company}
                 style={styles.input}
-                
               />
             </View>
             <Text style={styles.title}>工項負責人</Text>
@@ -128,14 +127,14 @@ const WorkItemAddScreen = ({navigation, route}) => {
                 style={styles.input}
               />
             </View>
-            <Text style={styles.title}>廠商名稱</Text>
+            <Text style={styles.title}>負責工項</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setCompany(text)}
-                defaultValue={company}
-                value={company}
+                onChangeText={text => setName(text)}
+                defaultValue={name}
+                value={name}
                 style={styles.input}
               />
             </View>

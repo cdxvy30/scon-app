@@ -23,6 +23,7 @@ export default class Issue extends BaseModel {
       image_height: {type: types.INTEGER, not_null: true},
       tracking: {type: types.BOOLEAN, not_null: true},
       location: {type: types.TEXT, not_null: true},
+      responsible_corporation: {type: types.TEXT, not_null: true},
       activity: {type: types.TEXT, not_null: true},
       assignee: {type: types.TEXT, not_null: true},
       assignee_phone_number: {type: types.TEXT, not_null: true},

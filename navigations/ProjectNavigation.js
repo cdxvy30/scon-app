@@ -11,6 +11,7 @@ import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelect
 import WorkItemListScreen from '../screens/project/WorkItemListScreen';
 import WorkItemAddScreen from '../screens/project/WorkItemAddScreen';
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
+import IssueLocationListScreen from '../screens/project/IssueLocationScreen'
 
 const Stack = createNativeStackNavigator();
 
@@ -69,6 +70,11 @@ const ProjectNavigation = ({navigation}) => {
           name="DateSelector"
           component={DateSelectorScreen}
           options={{title: '選取日期範圍'}}
+        />
+        <Stack.Screen
+          name="IssueLocationList"
+          component={IssueLocationListScreen}
+          options={{title: '缺失地點列表'}}
         />
       </Stack.Navigator>
     </React.Fragment>

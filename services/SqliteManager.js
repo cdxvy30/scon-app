@@ -2,6 +2,7 @@ import User from '../models/User';
 import Project from '../models/Project';
 import Issue from '../models/Issue';
 import IssueAttachment from '../models/IssueAttachment';
+import IssueLocation from '../models/IssueLocation';
 import IssueLabel from '../models/IssueLabel';
 import WorkItem from '../models/WorkItem';
 import sampleData from '../data';
@@ -17,6 +18,7 @@ export default class SqliteManager {
       await IssueAttachment.createTable();
       await IssueLabel.createTable();
       await WorkItem.createTable();
+      await IssueLocation.createTable();
       
       // await User.destroyAll();
       // await Project.destroyAll();
@@ -24,6 +26,7 @@ export default class SqliteManager {
       // await IssueAttachment.destroyAll();
       // await IssueLabel.destroyAll();
       // await WorkItem.destroyAll();
+      // await IssueLocation.destroyAll();
 
       console.log('[Sqlite] Datebase initialization succeeded.');
     } catch (error) {
@@ -85,6 +88,15 @@ export default class SqliteManager {
       );
       await Promise.all(issueLabelPromises);
 
+      // Issue location
+      const issueLocations = sampleData.issue_location;
+      const issueLocationPromises = issueLocations.map(issueLocation =>
+        this.createIssueLocation({
+          ...issueLocation,
+        }),
+      );
+      await Promise.all(issueLabelPromises);
+
       // Work Item
       const workitems = sampleData.workitem;
       const workitemPromises = workitems.map(workitem =>
@@ -93,7 +105,6 @@ export default class SqliteManager {
         }),
       );
       await Promise.all(workitemPromises);
-      const allWorkItem = await this.getAllWorkItems();
 
 
       console.log('[Sqlite] Sample data import succeeded.');
@@ -237,6 +248,7 @@ export default class SqliteManager {
   static createIssueAttachment = props =>
     this.createInstance(IssueAttachment, props, []);
   static createIssueLabel = props => this.createInstance(IssueLabel, props, []);
+  static createIssueLocation = props => this.createInstance(IssueLocation, props, []);
   static createWorkItem = props => this.createInstance(WorkItem, props, []);
 
   static updateUser = (id, props) =>
@@ -251,6 +263,8 @@ export default class SqliteManager {
     this.updateInstance(IssueAttachment, id, props, []);
   static updateIssueLabel = (id, props) =>
     this.updateInstance(IssueLabel, id, props, []);
+  static updateIssueLocation = (id, props) =>
+    this.updateInstance(IssueLocation, id, props, []);
   static updateWorkItem = (id, props) =>
     this.updateInstance(WorkItem, id, props, []);
 
@@ -269,7 +283,12 @@ export default class SqliteManager {
       this.deleteInstance(WorkItem, workitem.id),
     );
     await Promise.all(workitemDeletePromises);
-
+    
+    const issueLocations = await this.getIssueLocationsByProjectId(id);
+    const issueLocationDeletePromises = issueLocations.map(issueLocation =>
+      this.deleteInstance(IssueLocation, issueLocation.id),
+    );
+    await Promise.all(issueLocationDeletePromises);
   };
   static deleteIssue = async id => {
     await this.deleteInstance(Issue, id);
@@ -288,7 +307,7 @@ export default class SqliteManager {
   };
 
   static deleteWorkItem = id => this.deleteInstance(WorkItem, id);
-
+  static deleteIssueLocation = id => this.deleteInstance(IssueLocation, id);
   static deleteIssueAttachment = id => this.deleteInstance(IssueAttachment, id);
   static deleteIssueLabel = id => this.deleteInstance(IssueLabel, id);
 
@@ -296,6 +315,8 @@ export default class SqliteManager {
   static deleteAllProjects = async () => {
     await this.deleteAllInstances(Project);
     await this.deleteAllIssues();
+    await this.deleteAllInstances(WorkItem);
+    await this.deleteAllInstances(IssueLocation);
   };
   static deleteAllIssues = async () => {
     await this.deleteAllInstances(Issue);
@@ -313,12 +334,13 @@ export default class SqliteManager {
   static getIssueAttachment = id => this.getInstanceById(IssueAttachment, id);
   static getIssueLabel = id => this.getInstanceById(IssueLabel, id);
   static getWorkItem = id => this.getInstancesById(WorkItem, id);
-
+  static getIssueLocation = id => this.getInstanceById(IssueLocation, id);
   static getAllUsers = () => this.getInstances(User);
   static getAllProjects = () => this.getInstances(Project);
   static getAllIssues = () => this.getInstances(Issue);
   static getAllIssueAttachments = () => this.getInstances(IssueAttachment);
   static getAllIssueLabels = () => this.getInstances(IssueLabel);
+  static getAllIssueLocation = () => this.getInstances(IssueLocation);
   static getAllWorkItems = () => this.getInstances(WorkItem);
   /* ********************** */
 
@@ -342,6 +364,8 @@ export default class SqliteManager {
     this.getInstancesByProp(IssueAttachment, 'issue_id', issueId);
   static getIssueLabelsByIssueId = issueId =>
     this.getInstancesByProp(IssueLabel, 'issue_id', issueId);
+  static getIssueLocationsByProjectId = projectId =>
+    this.getInstancesByProp(IssueLocation, 'project_id', projectId);
   static getWorkItemsByProjectId = projectId =>
     this.getInstancesByProp(WorkItem, 'project_id', projectId);
   /* ************************* */
