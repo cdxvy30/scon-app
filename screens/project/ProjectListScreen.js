@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Button,
@@ -15,30 +15,27 @@ import Swipeout from 'react-native-swipeout';
 import Separator from '../../components/Separator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SqliteManager from '../../services/SqliteManager';
-import { useIsFocused } from '@react-navigation/native';
-import { transformProjects } from '../../util/sqliteHelper';
-import { VerticalAlign } from 'docx';
+import {useIsFocused} from '@react-navigation/native';
+import {transformProjects} from '../../util/sqliteHelper';
+import {VerticalAlign} from 'docx';
 
 const determineStatusColor = item => {
   let color = 'grey';
-  if(item.status===0)
-    color = 'limegreen';
-  if(item.status===1)
-    color = 'gold';
-  if(item.status===2)
-    color = 'orangered';
+  if (item.status === 0) color = 'limegreen';
+  if (item.status === 1) color = 'gold';
+  if (item.status === 2) color = 'orangered';
 
   return color;
 };
 
-const ProjectListScreen = ({ navigation }) => {
+const ProjectListScreen = ({navigation}) => {
   const [projectList, setProjectList] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const projects = await SqliteManager.getAllProjects();  // 改成向遠端主機fetch
+      const projects = await SqliteManager.getAllProjects(); // 改成向遠端主機fetch
       const transformedProjects = transformProjects(projects);
       const sortedProjects = transformedProjects.sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
@@ -52,39 +49,43 @@ const ProjectListScreen = ({ navigation }) => {
   }, [isFocused]);
 
   const projectAddHandler = async () => {
-    navigation.navigate('ProjectAdd', { name: 'Create new project' });
+    navigation.navigate('ProjectAdd', {name: 'Create new project'});
   };
 
   const projectDeleteHandler = async () => {
-    Alert.alert(
-      "刪除專案",
-      "真的要刪除專案嗎？",
-      [
-        {
-          text: "取消",
-          onPress: () => {console.log(projectList)},
-          style: "cancel"
+    Alert.alert('刪除專案', '真的要刪除專案嗎？', [
+      {
+        text: '取消',
+        onPress: () => {
+          console.log(projectList);
         },
-        {
-          text: "確定", onPress: async () => {
-            await SqliteManager.deleteProject(selectedProjectId);
-            setProjectList(projectList.filter(p => p.id !== selectedProjectId));
-          },
-          style: "destructive"
-        }
-      ]
-    );
-
+        style: 'cancel',
+      },
+      {
+        text: '確定',
+        onPress: async () => {
+          await SqliteManager.deleteProject(selectedProjectId);
+          setProjectList(projectList.filter(p => p.id !== selectedProjectId));
+        },
+        style: 'destructive',
+      },
+    ]);
   };
 
   const projectEditHandler = async () => {
     let project = await SqliteManager.getProject(selectedProjectId);
-    navigation.navigate('ProjectAdd', { name: 'Create new project', project: project });
+    navigation.navigate('ProjectAdd', {
+      name: 'Create new project',
+      project: project,
+    });
   };
 
   const projectSelectHandler = async item => {
     setSelectedProjectId(item.id);
-    await navigation.navigate('IssueList', { name: item.title, project: await SqliteManager.getProject(selectedProjectId) });
+    await navigation.navigate('IssueList', {
+      name: item.title,
+      project: await SqliteManager.getProject(selectedProjectId),
+    });
   };
 
   const swipeBtns = [
@@ -99,42 +100,40 @@ const ProjectListScreen = ({ navigation }) => {
       backgroundColor: 'red',
       underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
       onPress: () => projectDeleteHandler(),
-    }
+    },
   ];
 
-  const Item = ({ item, onPress, backgroundColor, textColor }) => (
-      <TouchableOpacity
-        onPress={onPress}
-        style={[styles.item, backgroundColor]}>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          <Image style={styles.thumbnail} source={{ uri: item.thumbnail }} />
-          <Text style={[styles.title, textColor]}>{item.title}</Text>
-        </View>
-        <Ionicons
-          style={styles.status}
-          name={'ios-ellipse'}
-          size={24}
-          color={determineStatusColor(item)}
-        />
-      </TouchableOpacity>
+  const Item = ({item, onPress, backgroundColor, textColor}) => (
+    <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+      <View style={{flex: 1, flexDirection: 'row'}}>
+        <Image style={styles.thumbnail} source={{uri: item.thumbnail}} />
+        <Text style={[styles.title, textColor]}>{item.title}</Text>
+      </View>
+      <Ionicons
+        style={styles.status}
+        name={'ios-ellipse'}
+        size={24}
+        color={determineStatusColor(item)}
+      />
+    </TouchableOpacity>
   );
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     const backgroundColor = item.id === selectedProjectId ? 'white' : 'white'; //"darkgrey" : "white";
     const color = item.id === selectedProjectId ? 'black' : 'black'; //'white' : 'black';
 
     return (
       <React.Fragment>
         <Swipeout
-        key={item.id}
-        right={swipeBtns}
-        onOpen={() => setSelectedProjectId(item.id)}>
+          key={item.id}
+          right={swipeBtns}
+          onOpen={() => setSelectedProjectId(item.id)}>
           <Item
             item={item}
             ket={item.id}
             onPress={() => projectSelectHandler(item)}
-            backgroundColor={{ backgroundColor }}
-            textColor={{ color }}
+            backgroundColor={{backgroundColor}}
+            textColor={{color}}
           />
         </Swipeout>
         <Separator />
@@ -154,7 +153,7 @@ const ProjectListScreen = ({ navigation }) => {
           extraData={selectedProjectId}
           ListFooterComponent={
             <TouchableOpacity onPress={projectAddHandler} style={[styles.item]}>
-              <Text style={[styles.title, { marginTop: 0, color: 'dodgerblue' }]}>
+              <Text style={[styles.title, {marginTop: 0, color: 'dodgerblue'}]}>
                 {'新增專案'}
               </Text>
             </TouchableOpacity>
@@ -189,8 +188,8 @@ const styles = StyleSheet.create({
   title: {
     marginLeft: 12,
     fontSize: 24,
-    width:250,
-    alignSelf:'center'
+    width: 250,
+    alignSelf: 'center',
   },
   status: {
     marginTop: 26,

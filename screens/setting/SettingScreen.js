@@ -1,14 +1,20 @@
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import {Text, StyleSheet, View, TouchableOpacity, Image} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import { AuthContext } from '../../context/AuthContext';
-import { useIsFocused } from '@react-navigation/native';
+import {AuthContext} from '../../context/AuthContext';
+import {useIsFocused} from '@react-navigation/native';
+import UserManagementScreen from '../user/UserListScreen';
 
 const SettingScreen = ({navigation}) => {
   const {userInfo, isLoading, getUsers, logout} = useContext(AuthContext);
 
+  const UserManagementHandler = async () => {
+    navigation.navigate('UserListScreen');
+  };
+
   const dataManagementHandler = async () => {
-  navigation.navigate('DataManageList')};
+    navigation.navigate('DataManageList');
+  };
 
   return (
     <React.Fragment>
@@ -16,28 +22,27 @@ const SettingScreen = ({navigation}) => {
         <View style={styles.wrapper}>
           <Spinner visible={isLoading} />
           <Text style={styles.name}>{userInfo.user.name}</Text>
-          <Image style={styles.icon} source={require('../../configs/icon.png')} />
+          <Image
+            style={styles.icon}
+            source={require('../../configs/icon.png')}
+          />
           <Text style={styles.corporation}>{userInfo.user.corporation}</Text>
           <Text style={styles.permission}>{userInfo.user.permission}</Text>
-          <TouchableOpacity onPress={getUsers} style={[styles.group]}>
-            <Text style={[styles.text]}>
-              {'使用者管理'}
-            </Text>
+          <TouchableOpacity
+            onPress={UserManagementHandler}
+            style={[styles.group]}>
+            <Text style={[styles.text]}>{'使用者管理'}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {}} style={[styles.group]}>
-            <Text style={[styles.text]}>
-              {'編輯個人資料'}
-            </Text>
+            <Text style={[styles.text]}>{'編輯個人資料'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={dataManagementHandler} style={[styles.group]}>
-            <Text style={[styles.text]}>
-              {'資料管理'}
-            </Text>
+          <TouchableOpacity
+            onPress={dataManagementHandler}
+            style={[styles.group]}>
+            <Text style={[styles.text]}>{'資料管理'}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={logout} style={[styles.group]}>
-            <Text style={[styles.text]}>
-              {'登出'}
-            </Text>
+            <Text style={[styles.text]}>{'登出'}</Text>
           </TouchableOpacity>
         </View>
       </View>

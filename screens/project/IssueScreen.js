@@ -358,11 +358,11 @@ const IssueScreen = ({navigation, route}) => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options.map(item => `${item.company} ${item.name}`),
-        cancelButtonIndex :options.length-1,
-        userInterfaceStyle:'light',
+        cancelButtonIndex: options.length - 1,
+        userInterfaceStyle: 'light',
       },
       (buttonIndex) => {
-        if (buttonIndex == options.length-1){
+        if (buttonIndex == options.length - 1){
           setIssueTaskText(issueTaskText)
         }else{
           setIssueTaskText(options[buttonIndex].name)
@@ -750,7 +750,7 @@ const IssueScreen = ({navigation, route}) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            <TouchableOpacity onPress={WorkItemListHandler}>
+            {/* <TouchableOpacity onPress={WorkItemListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>工項</Text>
                 <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填) </Text>
@@ -764,19 +764,21 @@ const IssueScreen = ({navigation, route}) => {
                   />
                 </View>
               </View>
+            </TouchableOpacity> */}
             <TouchableOpacity onPress={workItemClickHandler}>
-            <View style={styles.item}>
-              <Text style={styles.title}>工項</Text><Text style={{fontSize: 18, color:'#8C8C8C'}}>(選填)            </Text>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={styles.textInput}>
-                  {!!issueTaskText? issueTaskText:undefined}
-                </Text>
-                <Ionicons
-                  style={styles.description}
-                  name={'ios-chevron-forward'}
-                />
+              <View style={styles.item}>
+                <Text style={styles.title}>工項</Text>
+                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填) </Text>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.textInput}>
+                    {!!issueTaskText ? issueTaskText : undefined}
+                  </Text>
+                  <Ionicons
+                    style={styles.description}
+                    name={'ios-chevron-forward'}
+                  />
+                </View>
               </View>
-            </View>
             </TouchableOpacity>
             <Separator />
             {/* {issueTaskText?

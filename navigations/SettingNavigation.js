@@ -5,8 +5,7 @@ import DataManagementScreenList from '../screens/setting/DataManagementListScree
 import DataManagementScreen from '../screens/setting/DataManagementScreen';
 import CorporationListScreen from '../screens/setting/CorporationListScreen';
 import CorporationAddScreen from '../screens/setting/CorporationAddScreen';
-
-
+import UserListScreen from '../screens/user/UserListScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +37,11 @@ const SettingNavigation = ({}) => {
           name="CorporationAdd"
           component={CorporationAddScreen}
           options={{title: '廠商資訊'}}
+        />
+        <Stack.Screen
+          name="UserListScreen"
+          component={UserListScreen}
+          options={{title: '使用者管理'}}
         />
       </Stack.Navigator>
     </React.Fragment>

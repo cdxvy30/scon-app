@@ -125,7 +125,7 @@ export const AuthProvider = ({children}) => {
     axios
       .get(`${BASE_URL}/users/all`)
       .then(async res => {
-        let users = await res.data;
+        let users = await res.data.rows;
         console.log(users);
         setIsLoading(false);
       })

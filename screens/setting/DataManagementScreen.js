@@ -23,10 +23,10 @@ const DataManageScreen = ({navigation, route}) => {
   useEffect(() => {
     const fetchData = async () => {
       const project = await SqliteManager.getProjectByName(route.params.name);
-      const corporations = await SqliteManager.getWorkItemsByProjectId(project.id)
+      const corporations = await SqliteManager.getWorkItemsByProjectId(project.id);
       setProjectId(project.id);
       setProject(project);
-      setCorporationList(corporations)
+      setCorporationList(corporations);
     };
     if (isFocused) {
       fetchData();
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 18,
-    color: 'gray'
+    color: 'gray',
   },
 });
 

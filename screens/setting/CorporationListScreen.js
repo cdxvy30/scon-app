@@ -6,9 +6,6 @@ import { Icon } from 'react-native-elements';
 import { useIsFocused } from '@react-navigation/native';
 import { transformWorkItems } from '../../util/sqliteHelper';
 import Swipeout from 'react-native-swipeout';
-
-
-
 import {
     Alert,
     FlatList,

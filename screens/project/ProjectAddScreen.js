@@ -53,7 +53,7 @@ const ProjectAddScreen = ({navigation, route}) => {
       return;
     }
 
-    const users = await SqliteManager.getAllUsers();
+    const users = await SqliteManager.getAllUsers();  // 改成從遠端伺服器fetch
     const newProject = {
       name,
       address,

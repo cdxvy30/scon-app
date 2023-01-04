@@ -26,18 +26,17 @@ import SqliteManager from '../../services/SqliteManager';
 
 const WorkItemAddScreen = ({navigation, route}) => {
   let workitem = route.params.item;
-  const [name, setName] = useState(workitem? workitem.name:'');
-  const [manager, setManager] = useState(workitem? workitem.manager:'');
-  const [phone_number, setPhone_Number] = useState(workitem? workitem.phone_number:'');
-  const [company, setCompany] = useState(workitem? workitem.company:'');
-  const projectId = route.params.projectId; 
+  const [name, setName] = useState(workitem ? workitem.name : '');
+  const [manager, setManager] = useState(workitem ? workitem.manager : '');
+  const [phone_number, setPhone_Number] = useState(workitem ? workitem.phone_number : '');
+  const [company, setCompany] = useState(workitem ? workitem.company : '');
+  const projectId = route.params.projectId;
 
   const workitemAddHandler = React.useCallback(async () => {
     if (!name) {
       Alert.alert('請填入工項');
       return;
     }
-
 
     const newWorkItem = {
       name,

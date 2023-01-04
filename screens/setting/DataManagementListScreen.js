@@ -21,8 +21,8 @@ const DataManageListScreen = ({navigation}) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const projects = await SqliteManager.getAllProjects()
-      setProjectList(projects)
+      const projects = await SqliteManager.getAllProjects();
+      setProjectList(projects);
     };
     if (isFocused) {
       fetchData();
@@ -30,24 +30,24 @@ const DataManageListScreen = ({navigation}) => {
   }, [isFocused]);
 
   projectListClickHandler = () => {
-    var options = projectList.map(item => item.name)
-    options.push('取消')
+    var options = projectList.map(item => item.name);
+    options.push('取消');
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options,
-        cancelButtonIndex :options.length-1,
+        cancelButtonIndex: options.length - 1,
         userInterfaceStyle:'light',
       },
       async (buttonIndex) => {
-        if (buttonIndex == options.length-1){
+        if (buttonIndex == options.length - 1) {
           return;
-        }else{
+        } else {
           setSelectedProjectId(projectList[buttonIndex].id);
           await navigation.navigate('DataManage', { name: projectList[buttonIndex].name, project: await SqliteManager.getProject(selectedProjectId) });
         }
-      }
-    )
-  }
+      },
+    );
+  };
 
   return (
     <React.Fragment>
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 18,
-    color: 'gray'
+    color: 'gray',
   },
 });
 
