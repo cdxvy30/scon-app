@@ -76,15 +76,15 @@ const IssueScreen = ({ navigation, route }) => {
     setIssueTrack(previousState => !previousState);
   };
 
-  const WorkItemListHandler = async () => {
-    navigation.navigate('WorkItemList', { 
-      project: route.params.project,
-      projectId: route.params.projectId,
-      setIssueTaskText, 
-      setIssueAssigneeText, 
-      setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
+  // const WorkItemListHandler = async () => {
+  //   navigation.navigate('WorkItemList', { 
+  //     project: route.params.project,
+  //     projectId: route.params.projectId,
+  //     setIssueTaskText, 
+  //     setIssueAssigneeText, 
+  //     setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
       
-    })};
+  //   })};
 
 
   const attachmentAddHandler = async image => {
@@ -310,8 +310,7 @@ const IssueScreen = ({ navigation, route }) => {
 
   const responsibleCorporationclickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId)
-    options.push({company:'新增責任廠商'}, {company:'取消'})
-    console.log(options)
+    options.push({company:'取消'})
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options.map(item => item.company),
@@ -321,15 +320,29 @@ const IssueScreen = ({ navigation, route }) => {
       (buttonIndex) => {
         if (buttonIndex == options.length-1){
           setResponsibleCorporation(responsibleCorporation)
-        }else if(buttonIndex == options.length-2){
-          navigation.navigate('WorkItemAdd', { 
-            name: 'Create new workitem' ,
-            projectId: projectId
-          })
         }else{
           setResponsibleCorporation(options[buttonIndex].company)
-          setIssueAssigneeText(options[buttonIndex].manager)
-          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number)
+          // setIssueAssigneeText(options[buttonIndex].manager)
+          // setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number)
+        }
+      }
+    )
+  }
+
+  const workItemclickHandler = async () => {
+    var options = await SqliteManager.getWorkItemsByProjectId(projectId)
+    options.push({company:'', name:'取消'})
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: options.map(item => `${item.company} ${item.name}`),
+        cancelButtonIndex :options.length-1,
+        userInterfaceStyle:'light',
+      },
+      (buttonIndex) => {
+        if (buttonIndex == options.length-1){
+          setIssueTaskText(issueTaskText)
+        }else{
+          setIssueTaskText(options[buttonIndex].name)
         }
       }
     )
@@ -342,7 +355,7 @@ const IssueScreen = ({ navigation, route }) => {
       setIssueLocationText,  
     })};  
 
-  //   const issueLocationClickHandler = async () => {
+  // const issueLocationClickHandler = async () => {
   //   console.log(await SqliteManager.getIssueLocationsByProjectId(projectId))
   //   var options = (
   //     await SqliteManager.getIssueLocationsByProjectId(projectId)
@@ -357,7 +370,7 @@ const IssueScreen = ({ navigation, route }) => {
   //     }else{
   //       return 0
   //     }
-  //   }).push({location:'新增地點'}, {location:'取消'})
+  //   }).push({location:'取消'})
   //   ActionSheetIOS.showActionSheetWithOptions(
   //     {
   //       options: options.map(item => item.location),
@@ -367,19 +380,21 @@ const IssueScreen = ({ navigation, route }) => {
   //     async (buttonIndex) => {
   //       if (buttonIndex == options.length-1){
   //         setIssueLocationText(issueLocationText)
-  //       }else if(buttonIndex == options.length-2){
-  //         Alert.prompt(
-  //           '請輸入缺失位置',
-  //           '(如: 2F西側)',
-  //           async (location) => {
-  //             setIssueLocationText(location),
-  //             await SqliteManager.createIssueLocation({
-  //               project_id: projectId,
-  //               location: location,
-  //             });
-  //           },
-  //         )
-  //       }else{
+  //       }
+  //       // else if(buttonIndex == options.length-2){
+  //       //   Alert.prompt(
+  //       //     '請輸入缺失位置',
+  //       //     '(如: 2F西側)',
+  //       //     async (location) => {
+  //       //       setIssueLocationText(location),
+  //       //       await SqliteManager.createIssueLocation({
+  //       //         project_id: projectId,
+  //       //         location: location,
+  //       //       });
+  //       //     },
+  //       //   )
+  //       // }
+  //       else{
   //         Alert.alert(`目前選擇: ${options[buttonIndex].location}`,"刪除／點選",
   //           [
   //             {
@@ -692,7 +707,7 @@ const IssueScreen = ({ navigation, route }) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            <TouchableOpacity onPress={WorkItemListHandler}>
+            <TouchableOpacity onPress={workItemclickHandler}>
             <View style={styles.item}>
               <Text style={styles.title}>工項</Text><Text style={{fontSize: 18, color:'#8C8C8C'}}>(選填)            </Text>
               <View style={{ flexDirection: 'row' }}>
@@ -707,7 +722,7 @@ const IssueScreen = ({ navigation, route }) => {
             </View>
             </TouchableOpacity>
             <Separator />
-            {issueTaskText?
+            {/* {issueTaskText?
               (<React.Fragment>
               <View style={styles.item}>
                 <Text style={styles.title}>工項負責人</Text>
@@ -733,7 +748,7 @@ const IssueScreen = ({ navigation, route }) => {
               <Separator />
               </React.Fragment>
               ) : undefined
-            }
+            } */}
             <View style={styles.item}>
               <Text style={styles.title}>記錄人員</Text>
               <View style={{ flexDirection: 'row' }}>

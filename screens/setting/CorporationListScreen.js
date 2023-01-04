@@ -64,12 +64,10 @@ const WorkItemListScreen = ({navigation, route}) => {
   }, [isFocused]);
 
   const workItemAddHandler = async () => {
-    navigation.navigate('WorkItemAdd', { 
-      name: 'Create new workitem' ,
+    navigation.navigate('CorporationAdd', { 
+      name: 'Create new corporation' ,
       projectId: projectId
     })};
-
-  
 
   const workItemDeleteHandler = async () => {
     Alert.alert(
@@ -93,19 +91,10 @@ const WorkItemListScreen = ({navigation, route}) => {
 
   const workItemEditHandler = item => {
     setSelectedWorkItemId(item.id);
-    navigation.navigate('WorkItemAdd', { 
-      action: 'update existing workitem',
+    navigation.navigate('CorporationAdd', { 
+      action: 'update existing corporation',
       projectId: projectId,
       item, });
-  };
-
-
-
-  const workItemSelectHandler = item => {
-    route.params.setIssueTaskText(item.name);
-    route.params.setIssueAssigneeText(`${item.company}-${item.manager}`);
-    route.params.setIssueAssigneePhoneNumberText(item.phone_number);
-    navigation.goBack();
   };
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
@@ -128,12 +117,6 @@ const WorkItemListScreen = ({navigation, route}) => {
         right={
           [
             {
-              text: <Ionicons name={'create-outline'} size={24} color={'white'} />,
-              backgroundColor: 'orange',
-              underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-              onPress: () =>{workItemEditHandler(item)}
-            },
-            {
               text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
               backgroundColor: 'red',
               underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
@@ -145,7 +128,7 @@ const WorkItemListScreen = ({navigation, route}) => {
           <Item
             item={item}
             ket={item.id}
-            onPress={() => workItemSelectHandler(item)}
+            onPress={() => workItemEditHandler(item)}
             backgroundColor={{ backgroundColor }}
             textColor={{ color }}
           />

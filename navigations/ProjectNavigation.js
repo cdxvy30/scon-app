@@ -8,8 +8,6 @@ import IssueScreen from '../screens/project/IssueScreen';
 import PhotoScreen from '../screens/project/PhotoScreen';
 import ObjectTypeSelectorScreen from '../screens/project/selector/ObjectTypeSelectorScreen';
 import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelectorScreen';
-import WorkItemListScreen from '../screens/project/WorkItemListScreen';
-import WorkItemAddScreen from '../screens/project/WorkItemAddScreen';
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
 import IssueLocationListScreen from '../screens/project/IssueLocationScreen'
 
@@ -57,16 +55,6 @@ const ProjectNavigation = ({navigation}) => {
           options={{title: '缺失項目'}}
         />
         <Stack.Group screenOptions={{presentation: 'formSheet'}}>
-        <Stack.Screen
-          name="WorkItemList"
-          component={WorkItemListScreen}
-          options={{title: '工項列表'}}
-        />
-        <Stack.Screen
-          name="WorkItemAdd"
-          component={WorkItemAddScreen}
-          options={{title: '工項資訊'}}
-        />
         <Stack.Screen
           name="DateSelector"
           component={DateSelectorScreen}

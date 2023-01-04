@@ -342,12 +342,6 @@ const IssueListScreen = ({ navigation, route }) => {
               if (!res.didCancel) {
                 const image = res.assets[0];
                 detectViolationTypeThenSwitchToIssueScreen(image)
-                // navigation.navigate('Issue', {
-                //   projectId: projectId,
-                //   project: project,
-                //   action: 'create new issue',
-                //   item: CreateItemByImage(image),
-                // });
               }
             });
             break;
@@ -361,12 +355,6 @@ const IssueListScreen = ({ navigation, route }) => {
               if (!res.didCancel) {
                 const image = res.assets[0];
                 detectViolationTypeThenSwitchToIssueScreen(image)
-                // navigation.navigate('Issue', {
-                //   projectId: projectId,
-                //   project: project,
-                //   action: 'create new issue',
-                //   item: CreateItemByImage(image),
-                // });
               }
             });
             break;

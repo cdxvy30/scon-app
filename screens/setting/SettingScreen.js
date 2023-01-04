@@ -7,6 +7,9 @@ import { useIsFocused } from '@react-navigation/native';
 const SettingScreen = ({navigation}) => {
   const {userInfo, isLoading, getUsers, logout} = useContext(AuthContext);
 
+  const dataManagementHandler = async () => {
+  navigation.navigate('DataManageList')};
+
   return (
     <React.Fragment>
       <View style={styles.container}>
@@ -26,9 +29,9 @@ const SettingScreen = ({navigation}) => {
               {'編輯個人資料'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={[styles.group]}>
+          <TouchableOpacity onPress={dataManagementHandler} style={[styles.group]}>
             <Text style={[styles.text]}>
-              {'修改密碼'}
+              {'資料管理'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={logout} style={[styles.group]}>
