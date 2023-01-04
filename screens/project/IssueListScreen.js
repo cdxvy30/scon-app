@@ -456,6 +456,7 @@ const IssueListScreen = ({ navigation, route }) => {
       activity: '',
       assignee: '',
       assignee_phone_number: '',
+      responsible_corporation: '',
       safetyManager: project.inspector,
       attachments: [],
       labels: [],
@@ -486,7 +487,7 @@ const IssueListScreen = ({ navigation, route }) => {
               color={determineStatusColor(item)}
             />
             <Text style={[styles.timestampText, textColor]}>
-              {new Date(item.timestamp).toISOString()}
+              {new Date(item.timestamp).toLocaleString()}
             </Text>
           </View>
           <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:(item.violation_type!=''?`(${item.violation_type})\n${item.title}`:'')}</Text>
