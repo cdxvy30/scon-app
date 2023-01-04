@@ -91,18 +91,6 @@ const IssueScreen = ({navigation, route}) => {
     setIssueTrack(previousState => !previousState);
   };
 
-  const WorkItemListHandler = async () => {
-    navigation.navigate('WorkItemList', {
-      project: route.params.project,
-      projectId: route.params.projectId,
-      setIssueTaskText,
-      setIssueAssigneeText,
-      setIssueAssigneePhoneNumberText: assignee_phone_number => {
-        setIssueAssigneePhoneNumberText(assignee_phone_number);
-      },
-    });
-  };
-
   // const WorkItemListHandler = async () => {
   //   navigation.navigate('WorkItemList', { 
   //     project: route.params.project,
@@ -345,9 +333,6 @@ const IssueScreen = ({navigation, route}) => {
 
   const responsibleCorporationclickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId);
-    options.push({company: '新增責任廠商'}, {company: '取消'});
-    console.log(options);
-    var options = await SqliteManager.getWorkItemsByProjectId(projectId)
     options.push({company:'取消'})
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -355,22 +340,10 @@ const IssueScreen = ({navigation, route}) => {
         cancelButtonIndex: options.length - 1,
         userInterfaceStyle: 'light',
       },
-      buttonIndex => {
-        if (buttonIndex == options.length - 1) {
-          setResponsibleCorporation(responsibleCorporation);
-        } else if (buttonIndex == options.length - 2) {
-          navigation.navigate('WorkItemAdd', {
-            name: 'Create new workitem',
-            projectId: projectId,
-          });
-        } else {
-          setResponsibleCorporation(options[buttonIndex].company);
-          setIssueAssigneeText(options[buttonIndex].manager);
-          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number);
       (buttonIndex) => {
         if (buttonIndex == options.length-1){
           setResponsibleCorporation(responsibleCorporation)
-        }else{
+        } else {
           setResponsibleCorporation(options[buttonIndex].company)
           // setIssueAssigneeText(options[buttonIndex].manager)
           // setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number)
@@ -379,7 +352,7 @@ const IssueScreen = ({navigation, route}) => {
     )
   }
 
-  const workItemclickHandler = async () => {
+  const workItemClickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId)
     options.push({company:'', name:'取消'})
     ActionSheetIOS.showActionSheetWithOptions(
@@ -791,7 +764,7 @@ const IssueScreen = ({navigation, route}) => {
                   />
                 </View>
               </View>
-            <TouchableOpacity onPress={workItemclickHandler}>
+            <TouchableOpacity onPress={workItemClickHandler}>
             <View style={styles.item}>
               <Text style={styles.title}>工項</Text><Text style={{fontSize: 18, color:'#8C8C8C'}}>(選填)            </Text>
               <View style={{ flexDirection: 'row' }}>
@@ -806,30 +779,6 @@ const IssueScreen = ({navigation, route}) => {
             </View>
             </TouchableOpacity>
             <Separator />
-            {issueTaskText ? (
-              <React.Fragment>
-                <View style={styles.item}>
-                  <Text style={styles.title}>工項負責人</Text>
-                  <View style={{flexDirection: 'row'}}>
-                    <TextInput
-                      style={styles.textInput}
-                      onChangeText={setIssueAssigneeText}
-                      defaultValue={issueAssigneeText}
-                    />
-                  </View>
-                </View>
-                <Separator />
-                <View style={styles.item}>
-                  <Text style={styles.title}>工項負責人電話</Text>
-                  <View style={{flexDirection: 'row'}}>
-                    <TextInput
-                      style={styles.textInput}
-                      onChangeText={setIssueAssigneePhoneNumberText}
-                      defaultValue={issueAssigneePhoneNumberText}
-                    />
-                  </View>
-                </View>
-                <Separator />
             {/* {issueTaskText?
               (<React.Fragment>
               <View style={styles.item}>

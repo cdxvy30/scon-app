@@ -39,9 +39,9 @@ import axios from 'axios';
 
 const determineStatusColor = item => {
   let color = 'grey';
-  if (item.status == 0) color = 'limegreen';
-  if (item.status == 1) color = 'gold';
-  if (item.status == 2) color = 'orangered';
+  if (item.status === 0) color = 'limegreen';
+  if (item.status === 1) color = 'gold';
+  if (item.status === 2) color = 'orangered';
 
   return color;
 };
@@ -61,7 +61,7 @@ const IssueListScreen = ({navigation, route}) => {
 
   function issuesFiller(sortedIssues) {
     var a = [];
-    for (i = 0; i < sortedIssues.length; i++) {
+    for (let i = 0; i < sortedIssues.length; i++) {
       if (
         new Date(selectedEndDate).getTime() + 43200000 >=
           new Date(sortedIssues[i].timestamp).getTime() &&
@@ -383,12 +383,6 @@ const IssueListScreen = ({navigation, route}) => {
                 if (!res.didCancel) {
                   const image = res.assets[0];
                   detectViolationTypeThenSwitchToIssueScreen(image);
-                  // navigation.navigate('Issue', {
-                  //   projectId: projectId,
-                  //   project: project,
-                  //   action: 'create new issue',
-                  //   item: CreateItemByImage(image),
-                  // });
                 }
               },
             );
@@ -403,12 +397,6 @@ const IssueListScreen = ({navigation, route}) => {
               if (!res.didCancel) {
                 const image = res.assets[0];
                 detectViolationTypeThenSwitchToIssueScreen(image);
-                // navigation.navigate('Issue', {
-                //   projectId: projectId,
-                //   project: project,
-                //   action: 'create new issue',
-                //   item: CreateItemByImage(image),
-                // });
               }
             });
             break;
