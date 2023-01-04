@@ -1,6 +1,12 @@
-import React, { useState, useRef, useEffect, useLayoutEffect, useContext} from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useContext,
+} from 'react';
+import {AuthContext} from '../../context/AuthContext';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Separator from '../../components/Separator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PhotoLabelViewer from './../../components/PhotoLabelViewer';
@@ -31,19 +37,19 @@ import {
 // } from 'react-native/Libraries/NewAppScreen';
 // import RNFetchBlob from 'rn-fetch-blob';
 import SqliteManager from '../../services/SqliteManager';
-import { transformLabels } from '../../util/sqliteHelper';
+import {transformLabels} from '../../util/sqliteHelper';
 import {useIsFocused} from '@react-navigation/native';
-import { ISSUE_STATUS, getIssueStatusById } from './IssueEnum';
-import { ISSUE_TYPE } from '../../configs/issueTypeConfig'
-import { PROJECT_STATUS } from './ProjectEnum';
-import { transformIssues } from '../../util/sqliteHelper';
-import { WorkItemList } from './WorkItemListScreen'
-import { ButtonGroup } from 'react-native-elements';
+import {ISSUE_STATUS, getIssueStatusById} from './IssueEnum';
+import {ISSUE_TYPE} from '../../configs/issueTypeConfig';
+import {PROJECT_STATUS} from './ProjectEnum';
+import {transformIssues} from '../../util/sqliteHelper';
+import {WorkItemList} from './WorkItemListScreen';
+import {ButtonGroup} from 'react-native-elements';
+import { BASE_URL } from '../../configs/authConfig';
+import axios from 'axios';
 
-
-
-const IssueScreen = ({ navigation, route }) => {
-  const axios = require('axios');
+const IssueScreen = ({navigation, route}) => {
+  // const axios = require('axios');
   const {userInfo} = useContext(AuthContext);
   const isFocused = useIsFocused();
   const item = route.params.item;
@@ -51,16 +57,25 @@ const IssueScreen = ({ navigation, route }) => {
   const [action, setAction] = useState(route.params.action);
   const [issueId, setIssueId] = useState(item.id);
   const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);
-  const [violationType, setViolationType] = useState(route.params.violation_type?route.params.violation_type:item.violation_type);
+  const [violationType, setViolationType] = useState(
+    route.params.violation_type
+      ? route.params.violation_type
+      : item.violation_type,
+  );
   const [issueType, setIssueType] = useState(item.type);
   const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);
   const [issueTrack, setIssueTrack] = useState(item.tracking);
   const [issueLocationText, setIssueLocationText] = useState(item.location);
   const [issueTaskText, setIssueTaskText] = useState(item.activity);
-  const [responsibleCorporation, setResponsibleCorporation] = useState(item.responsible_corporation);
+  const [responsibleCorporation, setResponsibleCorporation] = useState(
+    item.responsible_corporation,
+  );
   const [issueAssigneeText, setIssueAssigneeText] = useState(item.assignee);
-  const [issueAssigneePhoneNumberText, setIssueAssigneePhoneNumberText] = useState(item.assignee_phone_number);
-  const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(userInfo.user.name);
+  const [issueAssigneePhoneNumberText, setIssueAssigneePhoneNumberText] =
+    useState(item.assignee_phone_number);
+  const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(
+    userInfo.user.name,
+  );
   const [issueAttachments, setIssueAttachments] = useState(item.attachments);
   const [issueLabels, setIssueLabels] = useState(transformLabels(item.labels));
   const [issueStatus, setIssueStatus] = useState(item.status);
@@ -76,6 +91,7 @@ const IssueScreen = ({ navigation, route }) => {
     setIssueTrack(previousState => !previousState);
   };
 
+<<<<<<< HEAD
   // const WorkItemListHandler = async () => {
   //   navigation.navigate('WorkItemList', { 
   //     project: route.params.project,
@@ -86,6 +102,19 @@ const IssueScreen = ({ navigation, route }) => {
       
   //   })};
 
+=======
+  const WorkItemListHandler = async () => {
+    navigation.navigate('WorkItemList', {
+      project: route.params.project,
+      projectId: route.params.projectId,
+      setIssueTaskText,
+      setIssueAssigneeText,
+      setIssueAssigneePhoneNumberText: assignee_phone_number => {
+        setIssueAssigneePhoneNumberText(assignee_phone_number);
+      },
+    });
+  };
+>>>>>>> 7e885e3 (Issue store to PGSQL)
 
   const attachmentAddHandler = async image => {
     const imageUri = image.uri;
@@ -163,7 +192,7 @@ const IssueScreen = ({ navigation, route }) => {
           case 0: // cancel action
             break;
           case 1:
-            launchCamera({ mediaType: 'photo', saveToPhotos: true }, res => {
+            launchCamera({mediaType: 'photo', saveToPhotos: true}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
                 return;
@@ -175,7 +204,7 @@ const IssueScreen = ({ navigation, route }) => {
             });
             break;
           case 2:
-            launchImageLibrary({ mediaType: 'photo' }, res => {
+            launchImageLibrary({mediaType: 'photo'}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
                 return;
@@ -217,7 +246,6 @@ const IssueScreen = ({ navigation, route }) => {
     );
   }, [item.image.uri]);
 
-  
   const issueStatusClickHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -252,19 +280,16 @@ const IssueScreen = ({ navigation, route }) => {
       setIssueLabels: labels => {
         setIssueLabels(labels);
       },
-    })
+    });
   };
 
-
-  function decideIssueTypes(violationType){
-  
-    for (i=0; i<ISSUE_TYPE[0].titles.length; i++){
-      if (violationType != ISSUE_TYPE[0].titles[i]){
+  function decideIssueTypes(violationType) {
+    for (i = 0; i < ISSUE_TYPE[0].titles.length; i++) {
+      if (violationType != ISSUE_TYPE[0].titles[i]) {
         //判斷是哪個type
-      }
-      else{
+      } else {
         //回傳缺失細頂
-        return ISSUE_TYPE[i+1].type
+        return ISSUE_TYPE[i + 1].type;
       }
     }
   }
@@ -272,17 +297,18 @@ const IssueScreen = ({ navigation, route }) => {
   const newIssueTypeClickHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: violationType?decideIssueTypes(violationType):['---請選取缺失類別---'],
+        options: violationType
+          ? decideIssueTypes(violationType)
+          : ['---請選取缺失類別---'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
-        if (buttonIndex == 0){ 
+        if (buttonIndex == 0) {
           // cancel action
-        }
-        else{
-          setIssueType(`${decideIssueTypes(violationType)[buttonIndex]}`)
+        } else {
+          setIssueType(`${decideIssueTypes(violationType)[buttonIndex]}`);
         }
       },
     );
@@ -291,32 +317,50 @@ const IssueScreen = ({ navigation, route }) => {
   const violationTypeClickHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '墜落', '機械', '物料', '感電', '防護具', '穿刺', '爆炸', '工作場所', '搬運', '其他'],
+        options: [
+          '取消',
+          '墜落',
+          '機械',
+          '物料',
+          '感電',
+          '防護具',
+          '穿刺',
+          '爆炸',
+          '工作場所',
+          '搬運',
+          '其他',
+        ],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
-        if (buttonIndex == 0){
+        if (buttonIndex == 0) {
           // cancel action
-        }
-        else{
-          setViolationType(ISSUE_TYPE[0].titles[buttonIndex-1])
-          setIssueType('')
+        } else {
+          setViolationType(ISSUE_TYPE[0].titles[buttonIndex - 1]);
+          setIssueType('');
         }
       },
     );
   };
 
   const responsibleCorporationclickHandler = async () => {
+<<<<<<< HEAD
     var options = await SqliteManager.getWorkItemsByProjectId(projectId)
     options.push({company:'取消'})
+=======
+    var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    options.push({company: '新增責任廠商'}, {company: '取消'});
+    console.log(options);
+>>>>>>> 7e885e3 (Issue store to PGSQL)
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options.map(item => item.company),
-        cancelButtonIndex :options.length-1,
-        userInterfaceStyle:'light',
+        cancelButtonIndex: options.length - 1,
+        userInterfaceStyle: 'light',
       },
+<<<<<<< HEAD
       (buttonIndex) => {
         if (buttonIndex == options.length-1){
           setResponsibleCorporation(responsibleCorporation)
@@ -343,17 +387,32 @@ const IssueScreen = ({ navigation, route }) => {
           setIssueTaskText(issueTaskText)
         }else{
           setIssueTaskText(options[buttonIndex].name)
+=======
+      buttonIndex => {
+        if (buttonIndex == options.length - 1) {
+          setResponsibleCorporation(responsibleCorporation);
+        } else if (buttonIndex == options.length - 2) {
+          navigation.navigate('WorkItemAdd', {
+            name: 'Create new workitem',
+            projectId: projectId,
+          });
+        } else {
+          setResponsibleCorporation(options[buttonIndex].company);
+          setIssueAssigneeText(options[buttonIndex].manager);
+          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number);
+>>>>>>> 7e885e3 (Issue store to PGSQL)
         }
-      }
-    )
-  }
+      },
+    );
+  };
 
   const IssueLocationListHandler = async () => {
-    navigation.navigate('IssueLocationList', { 
+    navigation.navigate('IssueLocationList', {
       project: route.params.project,
       projectId: route.params.projectId,
-      setIssueLocationText,  
-    })};  
+      setIssueLocationText,
+    });
+  };
 
   // const issueLocationClickHandler = async () => {
   //   console.log(await SqliteManager.getIssueLocationsByProjectId(projectId))
@@ -420,14 +479,13 @@ const IssueScreen = ({ navigation, route }) => {
   // }
 
   const issueCreateHandler = React.useCallback(async () => {
-
     const transformedIssue = {
       image_uri: item.image.uri.replace('file://', ''),
       image_width: item.image.width,
       image_height: item.image.height,
       tracking: item.tracking,
       location: item.location,
-      responsible_corporation:item.responsible_corporation,
+      responsible_corporation: item.responsible_corporation,
       activity: item.activity,
       assignee: item.assignee,
       assignee_phone_number: item.assignee_phone_number,
@@ -459,7 +517,7 @@ const IssueScreen = ({ navigation, route }) => {
       tracking: issueTrack,
       location: issueLocationText,
       activity: issueTaskText,
-      responsible_corporation:responsibleCorporation,
+      responsible_corporation: responsibleCorporation,
       assignee: issueAssigneeText,
       assignee_phone_number: issueAssigneePhoneNumberText,
       safety_manager: issueSafetyManagerText,
@@ -467,7 +525,7 @@ const IssueScreen = ({ navigation, route }) => {
       type: issueType,
       type_remark: issueTypeRemark,
       project_id: projectId,
-      status: issueStatus
+      status: issueStatus,
     };
     await SqliteManager.updateIssue(issueId, transformedIssue);
   }, [
@@ -490,26 +548,27 @@ const IssueScreen = ({ navigation, route }) => {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', async () => {
       const issues = await SqliteManager.getIssuesByProjectId(projectId);
-      let projectStatus =  CalculateProjectStatus(issues);
+      let projectStatus = CalculateProjectStatus(issues);
       await SqliteManager.updateProject(projectId, {status: projectStatus});
     });
 
     return unsubscribe;
   }, [navigation]);
 
-  const CalculateProjectStatus = (issues) => {
-      let sum = 0;
-      issues.map(i => sum+= (getIssueStatusById(i.status)? getIssueStatusById(i.status).value:0) );
-      let risk = Math.ceil(sum/issues.length);
-      if(risk==1)
-        return PROJECT_STATUS.lowRisk.id;
-      else if(risk==2)
-        return PROJECT_STATUS.mediumRisk.id;
-      else if(risk==3)
-        return PROJECT_STATUS.highRisk.id;
-      else
-        return PROJECT_STATUS.lowRisk.id;
-  }
+  const CalculateProjectStatus = issues => {
+    let sum = 0;
+    issues.map(
+      i =>
+        (sum += getIssueStatusById(i.status)
+          ? getIssueStatusById(i.status).value
+          : 0),
+    );
+    let risk = Math.ceil(sum / issues.length);
+    if (risk == 1) return PROJECT_STATUS.lowRisk.id;
+    else if (risk == 2) return PROJECT_STATUS.mediumRisk.id;
+    else if (risk == 3) return PROJECT_STATUS.highRisk.id;
+    else return PROJECT_STATUS.lowRisk.id;
+  };
 
   useEffect(() => {
     action === 'create new issue' && issueCreateHandler();
@@ -562,22 +621,41 @@ const IssueScreen = ({ navigation, route }) => {
       headerLeft: () => (
         <Button
           title="完成"
-          onPress={() => {
+          onPress={async (req, res) => {
             if (!violationType) {
               Alert.alert('請點選缺失類別');
               return;
-            }else if(!issueType){
+            } else if (!issueType) {
               Alert.alert('請點選缺失項目');
               return;
-            }else if(!issueLocationText){
+            } else if (!issueLocationText) {
               Alert.alert('請點選缺失地點');
               return;
-            }else if(!responsibleCorporation){
+            } else if (!responsibleCorporation) {
               Alert.alert('請點選責任廠商');
               return;
-            }else if(!issueSafetyManagerText){
+            } else if (!issueSafetyManagerText) {
               Alert.alert('請填寫記錄人員');
               return;
+            } else {
+              axios
+                .post(`${BASE_URL}/issues`, {
+                  violationType,
+                  issueType,
+                  issueTrack,
+                  issueLocationText,
+                  responsibleCorporation,
+                  issueAssigneeText,
+                  issueStatus,
+                })
+                .then(async (req, res) => {
+                  console.log(res);
+                  let issue_data = res.data;
+                  console.log(issue_data);
+                })
+                .catch(e => {
+                  console.log(`add new issue error: ${e}`);
+                });
             }
             navigation.goBack();
           }}
@@ -585,7 +663,7 @@ const IssueScreen = ({ navigation, route }) => {
       ),
     });
   }, [
-    imageExportHandler, 
+    imageExportHandler,
     navigation,
     issueTrack,
     violationType,
@@ -609,16 +687,16 @@ const IssueScreen = ({ navigation, route }) => {
             <TouchableOpacity
               style={[
                 styles.image,
-                { width: item.image.width, height: item.image.height },
+                {width: item.image.width, height: item.image.height},
               ]}
               onPress={() => issueImageClickHandler()}
             />
           </View>
           <View style={styles.group}>
-          <TouchableOpacity onPress={() => violationTypeClickHandler()}>
+            <TouchableOpacity onPress={() => violationTypeClickHandler()}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失類別</Text>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{flexDirection: 'row'}}>
                   <Text style={styles.description}>
                     {violationType ? violationType : '選取缺失類別'}
                   </Text>
@@ -630,12 +708,12 @@ const IssueScreen = ({ navigation, route }) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            {violationType != "其他" ?
-              (<React.Fragment>
+            {violationType != '其他' ? (
+              <React.Fragment>
                 <TouchableOpacity onPress={() => newIssueTypeClickHandler()}>
                   <View style={styles.item}>
                     <Text style={styles.title}>缺失項目</Text>
-                    <View style={{ flexDirection: 'row' }}>
+                    <View style={{flexDirection: 'row'}}>
                       <Text style={styles.description}>
                         {issueType ? issueType : '選取缺失項目'}
                       </Text>
@@ -648,13 +726,12 @@ const IssueScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
                 <Separator />
               </React.Fragment>
-              ) : undefined
-            }
-            {violationType == "其他" ?
-              (<React.Fragment>
+            ) : undefined}
+            {violationType == '其他' ? (
+              <React.Fragment>
                 <View style={styles.item}>
                   <Text style={styles.title}></Text>
-                  <View style={{ flexDirection: 'row' }}>
+                  <View style={{flexDirection: 'row'}}>
                     <TextInput
                       style={styles.textInput}
                       onChangeText={setIssueTypeRemark}
@@ -664,11 +741,10 @@ const IssueScreen = ({ navigation, route }) => {
                 </View>
                 <Separator />
               </React.Fragment>
-              ) : undefined
-            }
+            ) : undefined}
             <View style={styles.item}>
               <Text style={styles.title}>追蹤缺失</Text>
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{flexDirection: 'row'}}>
                 <Switch
                   onValueChange={() => issueTrackToggleHandler()}
                   value={issueTrack}
@@ -680,13 +756,13 @@ const IssueScreen = ({ navigation, route }) => {
             <TouchableOpacity onPress={IssueLocationListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失地點</Text>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{flexDirection: 'row'}}>
                   <Text style={styles.textInput}>
-                   {!!issueLocationText? issueLocationText:undefined}
-                 </Text>
-                 <Ionicons
-                   style={styles.description}
-                   name={'ios-chevron-forward'}
+                    {!!issueLocationText ? issueLocationText : undefined}
+                  </Text>
+                  <Ionicons
+                    style={styles.description}
+                    name={'ios-chevron-forward'}
                   />
                 </View>
               </View>
@@ -695,18 +771,21 @@ const IssueScreen = ({ navigation, route }) => {
             <TouchableOpacity onPress={responsibleCorporationclickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>責任廠商</Text>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text style={styles.textInput}>
-                      {!!responsibleCorporation? responsibleCorporation:undefined}
-                    </Text>
-                    <Ionicons
-                      style={styles.description}
-                      name={'ios-chevron-forward'}
-                    />
-                  </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.textInput}>
+                    {!!responsibleCorporation
+                      ? responsibleCorporation
+                      : undefined}
+                  </Text>
+                  <Ionicons
+                    style={styles.description}
+                    name={'ios-chevron-forward'}
+                  />
+                </View>
               </View>
             </TouchableOpacity>
             <Separator />
+<<<<<<< HEAD
             <TouchableOpacity onPress={workItemclickHandler}>
             <View style={styles.item}>
               <Text style={styles.title}>工項</Text><Text style={{fontSize: 18, color:'#8C8C8C'}}>(選填)            </Text>
@@ -718,10 +797,25 @@ const IssueScreen = ({ navigation, route }) => {
                   style={styles.description}
                   name={'ios-chevron-forward'}
                 />
+=======
+            <TouchableOpacity onPress={WorkItemListHandler}>
+              <View style={styles.item}>
+                <Text style={styles.title}>工項</Text>
+                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填) </Text>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.textInput}>
+                    {!!issueTaskText ? issueTaskText : undefined}
+                  </Text>
+                  <Ionicons
+                    style={styles.description}
+                    name={'ios-chevron-forward'}
+                  />
+                </View>
+>>>>>>> 7e885e3 (Issue store to PGSQL)
               </View>
-            </View>
             </TouchableOpacity>
             <Separator />
+<<<<<<< HEAD
             {/* {issueTaskText?
               (<React.Fragment>
               <View style={styles.item}>
@@ -732,26 +826,42 @@ const IssueScreen = ({ navigation, route }) => {
                     onChangeText={setIssueAssigneeText}
                     defaultValue={issueAssigneeText}
                   />
+=======
+            {issueTaskText ? (
+              <React.Fragment>
+                <View style={styles.item}>
+                  <Text style={styles.title}>工項負責人</Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <TextInput
+                      style={styles.textInput}
+                      onChangeText={setIssueAssigneeText}
+                      defaultValue={issueAssigneeText}
+                    />
+                  </View>
+>>>>>>> 7e885e3 (Issue store to PGSQL)
                 </View>
-              </View>
-              <Separator />
-              <View style={styles.item}>
-                <Text style={styles.title}>工項負責人電話</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <TextInput
-                    style={styles.textInput}
-                    onChangeText={setIssueAssigneePhoneNumberText}
-                    defaultValue={issueAssigneePhoneNumberText}
-                  />
+                <Separator />
+                <View style={styles.item}>
+                  <Text style={styles.title}>工項負責人電話</Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <TextInput
+                      style={styles.textInput}
+                      onChangeText={setIssueAssigneePhoneNumberText}
+                      defaultValue={issueAssigneePhoneNumberText}
+                    />
+                  </View>
                 </View>
-              </View>
-              <Separator />
+                <Separator />
               </React.Fragment>
+<<<<<<< HEAD
               ) : undefined
             } */}
+=======
+            ) : undefined}
+>>>>>>> 7e885e3 (Issue store to PGSQL)
             <View style={styles.item}>
               <Text style={styles.title}>記錄人員</Text>
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{flexDirection: 'row'}}>
                 <TextInput
                   style={styles.textInput}
                   onChangeText={setIssueSafetyManagerText}
@@ -763,9 +873,11 @@ const IssueScreen = ({ navigation, route }) => {
             <View style={styles.item}>
               <Text style={styles.title}>狀態</Text>
               <TouchableOpacity onPress={() => issueStatusClickHandler()}>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{flexDirection: 'row'}}>
                   <Text style={styles.textInput}>
-                    {!!getIssueStatusById(issueStatus)? getIssueStatusById(issueStatus).name:undefined}
+                    {!!getIssueStatusById(issueStatus)
+                      ? getIssueStatusById(issueStatus).name
+                      : undefined}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -773,33 +885,34 @@ const IssueScreen = ({ navigation, route }) => {
           </View>
 
           <View style={styles.group}>
-          {issueAttachments[0]? undefined:
-            <View style={styles.item}>
-              <Text style={styles.title}>缺失改善</Text>
-              <TouchableOpacity onPress={() => imageSelectHandler()}>
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ color: 'goldenrod', fontSize: 18 }}>
-                    新增已改善照片
+            {issueAttachments[0] ? undefined : (
+              <View style={styles.item}>
+                <Text style={styles.title}>缺失改善</Text>
+                <TouchableOpacity onPress={() => imageSelectHandler()}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={{color: 'goldenrod', fontSize: 18}}>
+                      新增已改善照片
                     </Text>
                     <Ionicons
-                    style={{ color: 'goldenrod', fontSize: 22 }}
-                    name={'ios-add-circle-outline'}
+                      style={{color: 'goldenrod', fontSize: 22}}
+                      name={'ios-add-circle-outline'}
                     />
-                </View>
-              </TouchableOpacity>
-            </View>}
+                  </View>
+                </TouchableOpacity>
+              </View>
+            )}
             {issueAttachments ? (
               issueAttachments.map((a, i) => {
                 return (
                   <View key={`issue_attachment_${i}`}>
-                    <View style={{ marginBottom: 15, ...styles.item }}>
+                    <View style={{marginBottom: 15, ...styles.item}}>
                       <Text style={styles.title}>已改善照片</Text>
                     </View>
                     <TouchableOpacity
                       onPress={() => attachmentDeleteHandler(i)}>
-                      <Image style={styles.itemImage} source={{ uri: a.image }} />
+                      <Image style={styles.itemImage} source={{uri: a.image}} />
                     </TouchableOpacity>
-                    <View style={{ marginBottom: 15, ...styles.item }}>
+                    <View style={{marginBottom: 15, ...styles.item}}>
                       <Text style={styles.title}>備註：</Text>
                       <TextInput
                         id={a.id}
@@ -811,13 +924,13 @@ const IssueScreen = ({ navigation, route }) => {
                       />
                     </View>
                   </View>
-                )
+                );
               })
             ) : (
               <></>
             )}
           </View>
-          <View style={{ marginBottom: keyboardOffset }} />
+          <View style={{marginBottom: keyboardOffset}} />
         </ScrollView>
       </SafeAreaView>
     </React.Fragment>

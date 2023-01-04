@@ -35,13 +35,15 @@ const ProjectAddScreen = ({navigation, route}) => {
   // console.log(route.params);
   // console.log(BASE_URL);
   let project = route.params.project;
-  const [thumbnail, setThumbnail] = useState(project? project.image:'');
-  const [name, setName] = useState(project? project.name:'');
-  const [address, setAddress] = useState(project? project.address:'');
-  const [manager, setManager] = useState(project? project.manager:'');
-  const [company, setCompany] = useState(project? project.company:'');
-  const [inspector, setInspector] = useState(project? project.inspector:userInfo.user.name);
-  const [email, setEmail] = useState(project? project.email:userInfo.user.email);
+  const [thumbnail, setThumbnail] = useState(project ? project.image : '');
+  const [name, setName] = useState(project ? project.name : '');
+  const [address, setAddress] = useState(project ? project.address : '');
+  const [manager, setManager] = useState(project ? project.manager : '');
+  const [company, setCompany] = useState(project ? project.company : '');
+  const [inspector, setInspector] = useState(
+    project ? project.inspector : userInfo.user.name,
+  );
+  const [email, setEmail] = useState(project ? project.email:userInfo.user.email);
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -66,14 +68,7 @@ const ProjectAddScreen = ({navigation, route}) => {
       status: PROJECT_STATUS.lowRisk.id,
     };
     // 將project內容存入地端資料庫
-    const projectAddToPGSQL = (
-      name,
-      address,
-      company,
-      manager,
-      inspector,
-      email,
-    ) => {
+    const projectAddToPGSQL = () => {
       console.log(name);
       console.log('try to store in PGSQL.');
       setIsLoading(true);
