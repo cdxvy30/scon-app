@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActionSheetIOS,
   Alert,
@@ -16,77 +16,86 @@ import {
 import Swipeout from 'react-native-swipeout';
 import Separator from '../../components/Separator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Badge, Icon } from 'react-native-elements';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import {Badge, Icon} from 'react-native-elements';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import SqliteManager from '../../services/SqliteManager';
 import RNFetchBlob from 'rn-fetch-blob';
 import Share from 'react-native-share';
-import { useIsFocused } from '@react-navigation/native';
-import { transformIssues, transformExportIssues } from '../../util/sqliteHelper';
-import { ISSUE_STATUS , getIssueStatusById } from './IssueEnum';
-import { Document, Packer } from "docx";
-import { issueReportGenerator, improveReportGenerator, FongYuImproveReportGenerator } from './OutputTable';
+import {useIsFocused} from '@react-navigation/native';
+import {transformIssues, transformExportIssues} from '../../util/sqliteHelper';
+import {ISSUE_STATUS, getIssueStatusById} from './IssueEnum';
+import {Document, Packer} from 'docx';
+import {
+  issueReportGenerator,
+  improveReportGenerator,
+  FongYuImproveReportGenerator,
+} from './OutputTable';
 import IssueAttachment from '../../models/IssueAttachment';
-import { ISSUE_ATTACHMENT } from '../../data/issueAttachment';
-import { getIssuesByProjectId } from '../../services/SqliteManager'
+import {ISSUE_ATTACHMENT} from '../../data/issueAttachment';
+import {getIssuesByProjectId} from '../../services/SqliteManager';
 import axios from 'axios';
 
 // import { MobileModel, Image } from "react-native-pytorch-core";
 
 const determineStatusColor = item => {
   let color = 'grey';
-  if(item.status==0)
-    color = 'limegreen';
-  if(item.status==1)
-    color = 'gold';
-  if(item.status==2)
-    color = 'orangered';
+  if (item.status == 0) color = 'limegreen';
+  if (item.status == 1) color = 'gold';
+  if (item.status == 2) color = 'orangered';
 
   return color;
 };
 
-const IssueListScreen = ({ navigation, route }) => {
+const IssueListScreen = ({navigation, route}) => {
   // const axios = require('axios');
   const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
   const [selectedIssueList, setSelectedIssueList] = useState(issueList);
   const [selectedIssueId, setSelectedIssueId] = useState(null);
-  const [ selectedStartDate, setSelectedStartDate ] = useState(null);
-  const [ selectedEndDate , setSelectedEndDate ] = useState(null)
-  const [ isDedecting , setIsDedecting ] = useState(false)
-  const [ isExporting , setIsExporting ] = useState(false)
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [isDedecting, setIsDedecting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const isFocused = useIsFocused();
 
-  function issuesFiller (sortedIssues) {
-    var a = []
-    for (i=0; i<sortedIssues.length; i++){
-      if (new Date(selectedEndDate).getTime()+43200000>=new Date(sortedIssues[i].timestamp).getTime() && new Date(selectedStartDate).getTime()-43200000<=new Date(sortedIssues[i].timestamp).getTime()){
-        a.push(sortedIssues[i])
+  function issuesFiller(sortedIssues) {
+    var a = [];
+    for (i = 0; i < sortedIssues.length; i++) {
+      if (
+        new Date(selectedEndDate).getTime() + 43200000 >=
+          new Date(sortedIssues[i].timestamp).getTime() &&
+        new Date(selectedStartDate).getTime() - 43200000 <=
+          new Date(sortedIssues[i].timestamp).getTime()
+      ) {
+        a.push(sortedIssues[i]);
       }
     }
-    return a
+    return a;
   }
 
   const issueDeleteHandler = async () => {
-    Alert.alert(
-      "刪除議題",
-      "真的要刪除議題嗎？",
-      [
-        {
-          text: "取消",
-          onPress: () => {console.log("Cancel delete issue")},
-          style: "cancel"
+    Alert.alert('刪除議題', '真的要刪除議題嗎？', [
+      {
+        text: '取消',
+        onPress: () => {
+          console.log('Cancel delete issue');
         },
-        {
-          text: "確定", onPress: async () => {
-            await SqliteManager.deleteIssue(selectedIssueId);
-            (selectedEndDate?setSelectedIssueList(issueList.filter(i => i.id !== selectedIssueId)):setIssueList(issueList.filter(i => i.id !== selectedIssueId)));
-          },
-          style: "destructive"
-        }
-      ]
-    );
+        style: 'cancel',
+      },
+      {
+        text: '確定',
+        onPress: async () => {
+          await SqliteManager.deleteIssue(selectedIssueId);
+          selectedEndDate
+            ? setSelectedIssueList(
+                issueList.filter(i => i.id !== selectedIssueId),
+              )
+            : setIssueList(issueList.filter(i => i.id !== selectedIssueId));
+        },
+        style: 'destructive',
+      },
+    ]);
   };
 
   const issueSelectHandler = item => {
@@ -105,7 +114,7 @@ const IssueListScreen = ({ navigation, route }) => {
     </View>;
   };
 
-  const detectViolationTypeThenSwitchToIssueScreen = async (imagee) => {
+  const detectViolationTypeThenSwitchToIssueScreen = async imagee => {
     console.log('Send image detect request');
     setIsDedecting(true);
     var bodyFormData = new FormData();
@@ -115,7 +124,7 @@ const IssueListScreen = ({ navigation, route }) => {
       uri: image.uri,
       name: image.fileName,
       type: 'image/jpg',
-    }); 
+    });
     axios({
       method: 'post',
       url: 'http://34.80.209.101:8000/predict',
@@ -212,18 +221,27 @@ const IssueListScreen = ({ navigation, route }) => {
             await Share.open(shareImageOption);
             break;
           case 3:
-            setIsExporting(true)
+            setIsExporting(true);
             const doc = new Document({
-              sections: issueReportGenerator(projectName, project, selectedEndDate, selectedStartDate, selectedIssueList, issueList, fs),
-          });
+              sections: issueReportGenerator(
+                projectName,
+                project,
+                selectedEndDate,
+                selectedStartDate,
+                selectedIssueList,
+                issueList,
+                fs,
+              ),
+            });
 
-            await Packer.toBase64String(doc).then((base64) => {
-              fs.writeFile(`${docPath}/${projectName}-缺失記錄表.docx`, 
-              base64,
-              'base64'
+            await Packer.toBase64String(doc).then(base64 => {
+              fs.writeFile(
+                `${docPath}/${projectName}-缺失記錄表.docx`,
+                base64,
+                'base64',
               );
-              setIsExporting(false)
-          });
+              setIsExporting(false);
+            });
 
             const shareDataTableOption = {
               title: 'MyApp',
@@ -235,26 +253,32 @@ const IssueListScreen = ({ navigation, route }) => {
 
             await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
             break;
-        
+
           case 4:
-            setIsExporting(true)
+            setIsExporting(true);
             const doc_2 = new Document({
               sections: [
-                  {
-                      properties: {},
-                      children: improveReportGenerator((selectedEndDate?selectedIssueList:issueList),fs,project,projectName),
-                  },
+                {
+                  properties: {},
+                  children: improveReportGenerator(
+                    selectedEndDate ? selectedIssueList : issueList,
+                    fs,
+                    project,
+                    projectName,
+                  ),
+                },
               ],
-          });
+            });
 
-            await Packer.toBase64String(doc_2).then((base64) => {
-              console.log('exporting Roport')
-              fs.writeFile(`${docPath}/${projectName}-缺失改善前後記錄表.docx`, 
-              base64,
-              'base64'
+            await Packer.toBase64String(doc_2).then(base64 => {
+              console.log('exporting Roport');
+              fs.writeFile(
+                `${docPath}/${projectName}-缺失改善前後記錄表.docx`,
+                base64,
+                'base64',
               );
-              setIsExporting(false)
-          });
+              setIsExporting(false);
+            });
 
             const shareDataTableOption_2 = {
               title: 'MyApp',
@@ -284,17 +308,33 @@ const IssueListScreen = ({ navigation, route }) => {
           case 0:
             break; // cancel action
           case 1:
-            (selectedEndDate? selectedIssueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)):issueList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
-            (selectedEndDate?setSelectedIssueList([...selectedIssueList]):setIssueList([...issueList]));
+            selectedEndDate
+              ? selectedIssueList.sort(
+                  (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+                )
+              : issueList.sort(
+                  (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+                );
+            selectedEndDate
+              ? setSelectedIssueList([...selectedIssueList])
+              : setIssueList([...issueList]);
             break;
           case 2:
-            (selectedEndDate? selectedIssueList.sort((a, b) => b.attachments.length - a.attachments.length):issueList.sort((a, b) => b.attachments.length - a.attachments.length));
-            (selectedEndDate?setSelectedIssueList([...selectedIssueList]):setIssueList([...issueList]));
+            selectedEndDate
+              ? selectedIssueList.sort(
+                  (a, b) => b.attachments.length - a.attachments.length,
+                )
+              : issueList.sort(
+                  (a, b) => b.attachments.length - a.attachments.length,
+                );
+            selectedEndDate
+              ? setSelectedIssueList([...selectedIssueList])
+              : setIssueList([...issueList]);
             break;
         }
       },
     );
-  }
+  };
 
   const issueOptionHandler = React.useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
@@ -309,15 +349,14 @@ const IssueListScreen = ({ navigation, route }) => {
           case 0:
             break; // cancel action
           case 1:
-            await navigation.navigate('DateSelector',{
+            await navigation.navigate('DateSelector', {
               setSelectedStartDate,
               setSelectedEndDate,
-            })
-
+            });
         }
       },
     );
-  }, [(selectedEndDate? selectedIssueList:issueList), route.params.name]);
+  }, [selectedEndDate ? selectedIssueList : issueList, route.params.name]);
 
   const imageSelectHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
@@ -332,21 +371,30 @@ const IssueListScreen = ({ navigation, route }) => {
           case 0: // cancel action
             break;
           case 1:
-            launchCamera({ quality:0.1, mediaType: 'photo', saveToPhotos: true }, res => {
-              //includeBase64: true --> return base64Image
-              if (res.errorMessage !== undefined) {
-                console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
-                return;
-              }
+            launchCamera(
+              {quality: 0.1, mediaType: 'photo', saveToPhotos: true},
+              res => {
+                //includeBase64: true --> return base64Image
+                if (res.errorMessage !== undefined) {
+                  console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
+                  return;
+                }
 
-              if (!res.didCancel) {
-                const image = res.assets[0];
-                detectViolationTypeThenSwitchToIssueScreen(image)
-              }
-            });
+                if (!res.didCancel) {
+                  const image = res.assets[0];
+                  detectViolationTypeThenSwitchToIssueScreen(image);
+                  // navigation.navigate('Issue', {
+                  //   projectId: projectId,
+                  //   project: project,
+                  //   action: 'create new issue',
+                  //   item: CreateItemByImage(image),
+                  // });
+                }
+              },
+            );
             break;
           case 2:
-            launchImageLibrary({ quality:0.1, mediaType: 'photo' },res => {
+            launchImageLibrary({quality: 0.1, mediaType: 'photo'}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
                 return;
@@ -354,7 +402,13 @@ const IssueListScreen = ({ navigation, route }) => {
 
               if (!res.didCancel) {
                 const image = res.assets[0];
-                detectViolationTypeThenSwitchToIssueScreen(image)
+                detectViolationTypeThenSwitchToIssueScreen(image);
+                // navigation.navigate('Issue', {
+                //   projectId: projectId,
+                //   project: project,
+                //   action: 'create new issue',
+                //   item: CreateItemByImage(image),
+                // });
               }
             });
             break;
@@ -378,13 +432,13 @@ const IssueListScreen = ({ navigation, route }) => {
       setIssueList(sortedIssues);
       setProjectId(project.id);
       setProject(project);
-      setSelectedIssueList(issuesFiller(sortedIssues))
+      setSelectedIssueList(issuesFiller(sortedIssues));
     };
 
     if (isFocused) {
       fetchIssues();
-    }selectedIssueList
-  
+    }
+    selectedIssueList;
   }, [route.params.name, issueReportGenerator, isFocused]);
 
   React.useLayoutEffect(() => {
@@ -415,7 +469,6 @@ const IssueListScreen = ({ navigation, route }) => {
             onPress={() => outputReportHandler()}
           />
         </React.Fragment>
-
       ),
     });
   }, [issueOptionHandler, navigation]);
@@ -452,106 +505,109 @@ const IssueListScreen = ({ navigation, route }) => {
     };
   };
 
-  const Item = ({ item, onPress, backgroundColor, textColor }) => (
-      <TouchableOpacity
-        onPress={onPress}
-        style={[styles.item, backgroundColor]}>
-        <View style={styles.panelLeftContainer}>
-          <Image style={styles.image} source={{ uri: item.image.uri.replace('file://', '') }} />
-          {
-            item.tracking ? (<Badge
-              status="primary"
-              containerStyle={styles.badge}
-              value={item.attachments.length}
-            />) : undefined
-          }
+  const Item = ({item, onPress, backgroundColor, textColor}) => (
+    <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+      <View style={styles.panelLeftContainer}>
+        <Image
+          style={styles.image}
+          source={{uri: item.image.uri.replace('file://', '')}}
+        />
+        {item.tracking ? (
+          <Badge
+            status="primary"
+            containerStyle={styles.badge}
+            value={item.attachments.length}
+          />
+        ) : undefined}
+      </View>
+      <View style={styles.panelRightContainer}>
+        <View style={styles.timestampContainer}>
+          <Ionicons
+            style={styles.status}
+            name={'ios-ellipse'}
+            size={16}
+            color={determineStatusColor(item)}
+          />
+          <Text style={[styles.timestampText, textColor]}>
+            {new Date(item.timestamp).toLocaleString()}
+          </Text>
         </View>
-        <View style={styles.panelRightContainer}>
-          <View style={styles.timestampContainer}>
-            <Ionicons
-              style={styles.status}
-              name={'ios-ellipse'}
-              size={16}
-              color={determineStatusColor(item)}
-            />
-            <Text style={[styles.timestampText, textColor]}>
-              {new Date(item.timestamp).toLocaleString()}
-            </Text>
-          </View>
-          <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:(item.violation_type!=''?`(${item.violation_type})\n${item.title}`:'')}</Text>
-          <View style={styles.objLabelAreaContainer}>
-            {Array.isArray(item.labels) ? (
-              item.labels.map((label, i) => {
-                return (
-                  <View
-                    key={`item_object_${i}`}
-                    style={styles.objLabelContainer}>
-                    <Text style={styles.objLabelTxt}>{label.name}</Text>
-                  </View>
-                );
-              })
-            ) : (
-              <></>
-            )}
-          </View>
+        <Text style={[styles.descriptionText, textColor]}>
+          {item.violation_type == '其他'
+            ? `[${item.violation_type}]\n${item.type_remark}`
+            : item.violation_type != ''
+            ? `(${item.violation_type})\n${item.title}`
+            : ''}
+        </Text>
+        <View style={styles.objLabelAreaContainer}>
+          {Array.isArray(item.labels) ? (
+            item.labels.map((label, i) => {
+              return (
+                <View key={`item_object_${i}`} style={styles.objLabelContainer}>
+                  <Text style={styles.objLabelTxt}>{label.name}</Text>
+                </View>
+              );
+            })
+          ) : (
+            <></>
+          )}
         </View>
-      </TouchableOpacity>
-  
+      </View>
+    </TouchableOpacity>
   );
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
 
     return (
       <React.Fragment>
         <Swipeout
-        key={item.id}
-        right={swipeBtns}
-        onOpen={() => setSelectedIssueId(item.id)}>
+          key={item.id}
+          right={swipeBtns}
+          onOpen={() => setSelectedIssueId(item.id)}>
           <Item
             key={`${item.id}`}
             item={item}
             onPress={() => issueSelectHandler(item)}
-            backgroundColor={{ backgroundColor }}
-            textColor={{ color }}
+            backgroundColor={{backgroundColor}}
+            textColor={{color}}
           />
         </Swipeout>
         <Separator key={`seperator_${item.id}`} />
       </React.Fragment>
     );
   };
-  if (isExporting == true){
+  if (isExporting == true) {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
           <View style={styles.loading_container}>
-            <ActivityIndicator size='large' color="#000000" />
+            <ActivityIndicator size="large" color="#000000" />
             <Text style={[styles.loading_text]}>缺失表單生成中...</Text>
           </View>
         </SafeAreaView>
       </React.Fragment>
-    )
+    );
   }
-  if (isDedecting == true){
+  if (isDedecting == true) {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
           <View style={styles.loading_container}>
-            <ActivityIndicator size='large' color="#000000" />
+            <ActivityIndicator size="large" color="#000000" />
             <Text style={[styles.loading_text]}>缺失類別辨識中...</Text>
           </View>
         </SafeAreaView>
       </React.Fragment>
-    )
-  }
-  else{
+    );
+  } else {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
           <FlatList
             ListHeaderComponent={<Separator />}
-            data={selectedEndDate? selectedIssueList:issueList}
+            data={selectedEndDate ? selectedIssueList : issueList}
             renderItem={renderItem}
             keyExtractor={item => item.id}
             extraData={selectedIssueId}
@@ -563,15 +619,14 @@ const IssueListScreen = ({ navigation, route }) => {
               type="ionicon"
               color="dodgerblue"
               size={32}
-              iconStyle={{ fontSize: 52, marginLeft: 4 }}
+              iconStyle={{fontSize: 52, marginLeft: 4}}
               onPress={() => imageSelectHandler()}
             />
           </View>
         </SafeAreaView>
       </React.Fragment>
-    )
+    );
   }
-  ;
 };
 
 const styles = StyleSheet.create({
@@ -645,20 +700,20 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(0, 0, 0, 0.3)',
     shadowOpacity: 0.8,
     shadowRadius: 13,
-    shadowOffset: { width: 3, height: 8 },
+    shadowOffset: {width: 3, height: 8},
   },
   loading_container: {
     position: 'absolute',
     alignItems: 'center',
-    alignSelf:'center',
+    alignSelf: 'center',
     display: 'flex',
-    marginTop:300,
+    marginTop: 300,
   },
-  loading_text:{
-    fontSize:32,
+  loading_text: {
+    fontSize: 32,
     color: 'white',
-    backgroundColor: 'gray'
-  }
+    backgroundColor: 'gray',
+  },
 });
 
 export default IssueListScreen;

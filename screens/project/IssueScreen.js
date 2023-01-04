@@ -91,18 +91,6 @@ const IssueScreen = ({navigation, route}) => {
     setIssueTrack(previousState => !previousState);
   };
 
-<<<<<<< HEAD
-  // const WorkItemListHandler = async () => {
-  //   navigation.navigate('WorkItemList', { 
-  //     project: route.params.project,
-  //     projectId: route.params.projectId,
-  //     setIssueTaskText, 
-  //     setIssueAssigneeText, 
-  //     setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
-      
-  //   })};
-
-=======
   const WorkItemListHandler = async () => {
     navigation.navigate('WorkItemList', {
       project: route.params.project,
@@ -114,7 +102,17 @@ const IssueScreen = ({navigation, route}) => {
       },
     });
   };
->>>>>>> 7e885e3 (Issue store to PGSQL)
+
+  // const WorkItemListHandler = async () => {
+  //   navigation.navigate('WorkItemList', { 
+  //     project: route.params.project,
+  //     projectId: route.params.projectId,
+  //     setIssueTaskText, 
+  //     setIssueAssigneeText, 
+  //     setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
+      
+  //   })};
+
 
   const attachmentAddHandler = async image => {
     const imageUri = image.uri;
@@ -346,21 +344,29 @@ const IssueScreen = ({navigation, route}) => {
   };
 
   const responsibleCorporationclickHandler = async () => {
-<<<<<<< HEAD
-    var options = await SqliteManager.getWorkItemsByProjectId(projectId)
-    options.push({company:'取消'})
-=======
     var options = await SqliteManager.getWorkItemsByProjectId(projectId);
     options.push({company: '新增責任廠商'}, {company: '取消'});
     console.log(options);
->>>>>>> 7e885e3 (Issue store to PGSQL)
+    var options = await SqliteManager.getWorkItemsByProjectId(projectId)
+    options.push({company:'取消'})
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options.map(item => item.company),
         cancelButtonIndex: options.length - 1,
         userInterfaceStyle: 'light',
       },
-<<<<<<< HEAD
+      buttonIndex => {
+        if (buttonIndex == options.length - 1) {
+          setResponsibleCorporation(responsibleCorporation);
+        } else if (buttonIndex == options.length - 2) {
+          navigation.navigate('WorkItemAdd', {
+            name: 'Create new workitem',
+            projectId: projectId,
+          });
+        } else {
+          setResponsibleCorporation(options[buttonIndex].company);
+          setIssueAssigneeText(options[buttonIndex].manager);
+          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number);
       (buttonIndex) => {
         if (buttonIndex == options.length-1){
           setResponsibleCorporation(responsibleCorporation)
@@ -387,20 +393,6 @@ const IssueScreen = ({navigation, route}) => {
           setIssueTaskText(issueTaskText)
         }else{
           setIssueTaskText(options[buttonIndex].name)
-=======
-      buttonIndex => {
-        if (buttonIndex == options.length - 1) {
-          setResponsibleCorporation(responsibleCorporation);
-        } else if (buttonIndex == options.length - 2) {
-          navigation.navigate('WorkItemAdd', {
-            name: 'Create new workitem',
-            projectId: projectId,
-          });
-        } else {
-          setResponsibleCorporation(options[buttonIndex].company);
-          setIssueAssigneeText(options[buttonIndex].manager);
-          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number);
->>>>>>> 7e885e3 (Issue store to PGSQL)
         }
       },
     );
@@ -649,7 +641,7 @@ const IssueScreen = ({navigation, route}) => {
                   issueStatus,
                 })
                 .then(async (req, res) => {
-                  console.log(res);
+                  console.log(req);
                   let issue_data = res.data;
                   console.log(issue_data);
                 })
@@ -785,19 +777,6 @@ const IssueScreen = ({navigation, route}) => {
               </View>
             </TouchableOpacity>
             <Separator />
-<<<<<<< HEAD
-            <TouchableOpacity onPress={workItemclickHandler}>
-            <View style={styles.item}>
-              <Text style={styles.title}>工項</Text><Text style={{fontSize: 18, color:'#8C8C8C'}}>(選填)            </Text>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={styles.textInput}>
-                  {!!issueTaskText? issueTaskText:undefined}
-                </Text>
-                <Ionicons
-                  style={styles.description}
-                  name={'ios-chevron-forward'}
-                />
-=======
             <TouchableOpacity onPress={WorkItemListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>工項</Text>
@@ -811,22 +790,22 @@ const IssueScreen = ({navigation, route}) => {
                     name={'ios-chevron-forward'}
                   />
                 </View>
->>>>>>> 7e885e3 (Issue store to PGSQL)
               </View>
+            <TouchableOpacity onPress={workItemclickHandler}>
+            <View style={styles.item}>
+              <Text style={styles.title}>工項</Text><Text style={{fontSize: 18, color:'#8C8C8C'}}>(選填)            </Text>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={styles.textInput}>
+                  {!!issueTaskText? issueTaskText:undefined}
+                </Text>
+                <Ionicons
+                  style={styles.description}
+                  name={'ios-chevron-forward'}
+                />
+              </View>
+            </View>
             </TouchableOpacity>
             <Separator />
-<<<<<<< HEAD
-            {/* {issueTaskText?
-              (<React.Fragment>
-              <View style={styles.item}>
-                <Text style={styles.title}>工項負責人</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <TextInput
-                    style={styles.textInput}
-                    onChangeText={setIssueAssigneeText}
-                    defaultValue={issueAssigneeText}
-                  />
-=======
             {issueTaskText ? (
               <React.Fragment>
                 <View style={styles.item}>
@@ -838,7 +817,6 @@ const IssueScreen = ({navigation, route}) => {
                       defaultValue={issueAssigneeText}
                     />
                   </View>
->>>>>>> 7e885e3 (Issue store to PGSQL)
                 </View>
                 <Separator />
                 <View style={styles.item}>
@@ -852,13 +830,34 @@ const IssueScreen = ({navigation, route}) => {
                   </View>
                 </View>
                 <Separator />
+            {/* {issueTaskText?
+              (<React.Fragment>
+              <View style={styles.item}>
+                <Text style={styles.title}>工項負責人</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={setIssueAssigneeText}
+                    defaultValue={issueAssigneeText}
+                  />
+                </View>
+              </View>
+              <Separator />
+              <View style={styles.item}>
+                <Text style={styles.title}>工項負責人電話</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={setIssueAssigneePhoneNumberText}
+                    defaultValue={issueAssigneePhoneNumberText}
+                  />
+                </View>
+              </View>
+              <Separator />
               </React.Fragment>
-<<<<<<< HEAD
+            ) : undefined}
               ) : undefined
             } */}
-=======
-            ) : undefined}
->>>>>>> 7e885e3 (Issue store to PGSQL)
             <View style={styles.item}>
               <Text style={styles.title}>記錄人員</Text>
               <View style={{flexDirection: 'row'}}>
