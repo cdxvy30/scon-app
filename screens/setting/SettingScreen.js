@@ -64,10 +64,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 157,
     height: 157,
-    borderRadius: 157/2,
+    borderRadius: 157 / 2,
     borderColor: 'black',
     borderWidth: 2,
-
   },
   corporation: {
     marginTop: 10,

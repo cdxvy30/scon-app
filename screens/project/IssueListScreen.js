@@ -29,6 +29,7 @@ import { issueReportGenerator, improveReportGenerator, FongYuImproveReportGenera
 import IssueAttachment from '../../models/IssueAttachment';
 import { ISSUE_ATTACHMENT } from '../../data/issueAttachment';
 import { getIssuesByProjectId } from '../../services/SqliteManager'
+import axios from 'axios';
 
 // import { MobileModel, Image } from "react-native-pytorch-core";
 
@@ -45,7 +46,7 @@ const determineStatusColor = item => {
 };
 
 const IssueListScreen = ({ navigation, route }) => {
-  const axios = require('axios');
+  // const axios = require('axios');
   const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
@@ -90,56 +91,59 @@ const IssueListScreen = ({ navigation, route }) => {
 
   const issueSelectHandler = item => {
     setSelectedIssueId(item.id);
-    navigation.navigate(
-      'Issue', {
-        projectId: projectId,
-        project: project,
-        action: 'update existing issue',
-        item,
-      }
-    );
+    navigation.navigate('Issue', {
+      projectId: projectId,
+      project: project,
+      action: 'update existing issue',
+      item,
+    });
+  };
 
+  const loading = () => {
+    <View style={[styles.loading_container, styles.loading_horizontal]}>
+      <ActivityIndicator size="large" color="#00ff00" />
+    </View>;
   };
 
   const detectViolationTypeThenSwitchToIssueScreen = async (imagee) => {
-    console.log("Send image detect request");
-    setIsDedecting(true)
+    console.log('Send image detect request');
+    setIsDedecting(true);
     var bodyFormData = new FormData();
     let image = imagee;
-    image.uri = 'file://' + image.uri.replace("file://", "");
+    image.uri = 'file://' + image.uri.replace('file://', '');
     bodyFormData.append('file', {
       uri: image.uri,
       name: image.fileName,
-      type: "image/jpg"
+      type: 'image/jpg',
     }); 
     axios({
-      method: "post",
-      url: "http://34.80.209.101:8000/predict",
+      method: 'post',
+      url: 'http://34.80.209.101:8000/predict',
       data: bodyFormData,
-      headers: { "Content-Type": "multipart/form-data" },
-      timeout: 5000
+      headers: {'Content-Type': 'multipart/form-data'},
+      timeout: 5000,
     })
       .then(async function (response) {
         //handle success
         //console.log(response.data);
-        setIsDedecting(false)
+        setIsDedecting(false);
         navigation.navigate('Issue', {
           projectId: projectId,
           project: project,
           action: 'create new issue',
-          violation_type:response.data.violation_type,
+          violation_type: response.data.violation_type,
           item: CreateItemByImage(image),
         });
       })
       .catch(function (response) {
         //handle error
-        setIsDedecting(false)
+        setIsDedecting(false);
         console.log(response);
         navigation.navigate('Issue', {
           projectId: projectId,
           project: project,
           action: 'create new issue',
-          violation_type:'',
+          violation_type: '',
           item: CreateItemByImage(image),
         });
       });
@@ -148,7 +152,13 @@ const IssueListScreen = ({ navigation, route }) => {
   const outputReportHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '匯出專案資訊', '匯出專案圖片', '匯出缺失記錄表', '匯出缺失改善前後記錄表'],
+        options: [
+          '取消',
+          '匯出專案資訊',
+          '匯出專案圖片',
+          '匯出缺失記錄表',
+          '匯出缺失改善前後記錄表',
+        ],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
@@ -165,7 +175,11 @@ const IssueListScreen = ({ navigation, route }) => {
           case 1:
             await fs.writeFile(
               `${docPath}/${projectName}-data.json`,
-              JSON.stringify(transformExportIssues(selectedEndDate?selectedIssueList:issueList)),
+              JSON.stringify(
+                transformExportIssues(
+                  selectedEndDate ? selectedIssueList : issueList,
+                ),
+              ),
               'utf8',
             );
 
@@ -180,8 +194,10 @@ const IssueListScreen = ({ navigation, route }) => {
             await Share.open(shareDataOption); // ...after the file is saved, send it to a system share intent
             break;
           case 2:
-            let urls = (selectedEndDate?selectediIssueList:issueList).map(issue => 'file://' + issue.image.uri);
-            (selectedEndDate?selectedIssueList:issueList).map(issue =>
+            let urls = (selectedEndDate ? selectedIssueList : issueList).map(
+              issue => 'file://' + issue.image.uri,
+            );
+            (selectedEndDate ? selectedIssueList : issueList).map(issue =>
               issue.attachments.map(
                 att => (urls = urls.concat('file://' + att.image)),
               ),
@@ -440,7 +456,6 @@ const IssueListScreen = ({ navigation, route }) => {
       activity: '',
       assignee: '',
       assignee_phone_number: '',
-      responsible_corporation: '',
       safetyManager: project.inspector,
       attachments: [],
       labels: [],
@@ -471,7 +486,7 @@ const IssueListScreen = ({ navigation, route }) => {
               color={determineStatusColor(item)}
             />
             <Text style={[styles.timestampText, textColor]}>
-              {new Date(item.timestamp).toLocaleString()}
+              {new Date(item.timestamp).toISOString()}
             </Text>
           </View>
           <Text style={[styles.descriptionText, textColor]}>{item.violation_type == '其他'? `[${item.violation_type}]\n${item.type_remark}`:(item.violation_type!=''?`(${item.violation_type})\n${item.title}`:'')}</Text>
