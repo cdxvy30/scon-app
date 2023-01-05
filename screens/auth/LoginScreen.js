@@ -41,13 +41,23 @@ const LoginScreen = ({navigation}) => {
         <Button
           title="登入"
           onPress={() => {
-            login(email, password);
+            login('cdxvy30@gmail.com', '123');
           }}
         />
 
+        {/* <Button
+          title="登入"
+          onPress={() => {
+            navigation.navigate('Register');
+          }}
+        /> */}
+
         <View style={{flexDirection: 'row', marginTop: 20}}>
           <Text>還沒有帳號嗎？ </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Register');
+            }}>
             <Text style={styles.link}>註冊一個</Text>
           </TouchableOpacity>
         </View>
