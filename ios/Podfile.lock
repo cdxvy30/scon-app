@@ -281,6 +281,8 @@ PODS:
     - React
   - react-native-date-picker (4.2.6):
     - React-Core
+  - react-native-geolocation (3.0.4):
+    - React-Core
   - react-native-image-picker (4.7.3):
     - React-Core
   - react-native-orientation (3.1.3):
@@ -422,6 +424,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-blur (from `../node_modules/react-native-blur`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
+  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-orientation (from `../node_modules/react-native-orientation`)
   - react-native-pytorch-core (from `../node_modules/react-native-pytorch-core`)
@@ -505,6 +508,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blur"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
+  react-native-geolocation:
+    :path: "../node_modules/@react-native-community/geolocation"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-orientation:
@@ -588,6 +593,7 @@ SPEC CHECKSUMS:
   React-logger: 23de8ea0f44fa00ee77e96060273225607fd4d78
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
   react-native-date-picker: 93e43b3084cea595b4d68b1405d6d99849663bd6
+  react-native-geolocation: 3ed60c3d7f613c36b777b9fd0bc3453214e1b0d5
   react-native-image-picker: 4e6008ad8c2321622affa2c85432a5ebd02d480c
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pytorch-core: 4efde3400545709c75fdb9c65db40464b86479d4

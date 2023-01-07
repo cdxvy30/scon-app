@@ -47,6 +47,7 @@ import {WorkItemList} from './WorkItemListScreen';
 import {ButtonGroup} from 'react-native-elements';
 import { BASE_URL } from '../../configs/authConfig';
 import axios from 'axios';
+import Geolocation from '@react-native-community/geolocation';
 
 const IssueScreen = ({navigation, route}) => {
   // const axios = require('axios');
@@ -233,6 +234,17 @@ const IssueScreen = ({navigation, route}) => {
   }, [item.image.uri]);
 
   const issueStatusClickHandler = () => {
+    Geolocation.getCurrentPosition(  //gps測試用
+      success= (
+        info => Alert.alert(`${info.coords.altitude}`)),
+      error= (
+        error => error.message=="User denied access to location services."?Alert.alert('未允許使用位置'):console.log(error)),
+      options= {
+          timeout: 0,
+          maximumAge: 0,
+          enableHighAccuracy: true
+      }
+    ),
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['取消', '無風險', '有風險，須改善', '有風險，須立即改善'],
@@ -334,6 +346,28 @@ const IssueScreen = ({navigation, route}) => {
   const responsibleCorporationclickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId);
     options.push({company:'取消'})
+    options.length == 1 ?
+    Alert.alert("未新增任何協力廠商",'請選擇',
+            [
+              {
+                text: "返回",
+                style:'cancel',
+                onPress: () => {
+                  return
+                }
+              },
+              {
+                text: "新增",
+                onPress: () => {
+                  navigation.navigate('CorporationAdd', { 
+                    name: 'Create new corporation' ,
+                    projectId: projectId
+                  });
+                }
+              }
+            ],
+            'light',
+          ):
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options.map(item => item.company),
@@ -378,70 +412,6 @@ const IssueScreen = ({navigation, route}) => {
       setIssueLocationText,
     });
   };
-
-  // const issueLocationClickHandler = async () => {
-  //   console.log(await SqliteManager.getIssueLocationsByProjectId(projectId))
-  //   var options = (
-  //     await SqliteManager.getIssueLocationsByProjectId(projectId)
-  //   ).map(item => {return {location:item.location, id:item.id}})
-  //   options.sort((a, b) => {
-  //     if (parseFloat(a.location) != NaN && parseFloat(b.location) != NaN){
-  //       return(parseInt(a.location.replace(/[^\d]/g, "")) - parseInt(b.location.replace(/[^\d]/g, "")))
-  //     }else if(parseFloat(b.location)!= NaN && parseFloat(a.location) == NaN){
-  //       return 1
-  //     }else if(parseFloat(a.location)!= NaN && parseFloat(b.location) == NaN){
-  //       return -1
-  //     }else{
-  //       return 0
-  //     }
-  //   }).push({location:'取消'})
-  //   ActionSheetIOS.showActionSheetWithOptions(
-  //     {
-  //       options: options.map(item => item.location),
-  //       cancelButtonIndex :options.length-1,
-  //       userInterfaceStyle:'light',
-  //     },
-  //     async (buttonIndex) => {
-  //       if (buttonIndex == options.length-1){
-  //         setIssueLocationText(issueLocationText)
-  //       }
-  //       // else if(buttonIndex == options.length-2){
-  //       //   Alert.prompt(
-  //       //     '請輸入缺失位置',
-  //       //     '(如: 2F西側)',
-  //       //     async (location) => {
-  //       //       setIssueLocationText(location),
-  //       //       await SqliteManager.createIssueLocation({
-  //       //         project_id: projectId,
-  //       //         location: location,
-  //       //       });
-  //       //     },
-  //       //   )
-  //       // }
-  //       else{
-  //         Alert.alert(`目前選擇: ${options[buttonIndex].location}`,"刪除／點選",
-  //           [
-  //             {
-  //               text: "刪除地點",
-  //               style:'destructive',
-  //               onPress: async () => {
-  //                 await SqliteManager.deleteIssueLocation(options[buttonIndex].id);
-  //                 setIssueLocationText('')
-  //               }
-  //             },
-  //             {
-  //               text: "確定",
-  //               onPress: async () => {
-  //                 setIssueLocationText(options[buttonIndex].location);
-  //               }
-  //             }
-  //           ],
-  //           'light',
-  //         )
-  //       }
-  //     }
-  //   )
-  // }
 
   const issueCreateHandler = React.useCallback(async () => {
     const transformedIssue = {
@@ -750,21 +720,6 @@ const IssueScreen = ({navigation, route}) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            {/* <TouchableOpacity onPress={WorkItemListHandler}>
-              <View style={styles.item}>
-                <Text style={styles.title}>工項</Text>
-                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填) </Text>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.textInput}>
-                    {!!issueTaskText ? issueTaskText : undefined}
-                  </Text>
-                  <Ionicons
-                    style={styles.description}
-                    name={'ios-chevron-forward'}
-                  />
-                </View>
-              </View>
-            </TouchableOpacity> */}
             <TouchableOpacity onPress={workItemClickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>工項</Text>
@@ -781,34 +736,6 @@ const IssueScreen = ({navigation, route}) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            {/* {issueTaskText?
-              (<React.Fragment>
-              <View style={styles.item}>
-                <Text style={styles.title}>工項負責人</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <TextInput
-                    style={styles.textInput}
-                    onChangeText={setIssueAssigneeText}
-                    defaultValue={issueAssigneeText}
-                  />
-                </View>
-              </View>
-              <Separator />
-              <View style={styles.item}>
-                <Text style={styles.title}>工項負責人電話</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <TextInput
-                    style={styles.textInput}
-                    onChangeText={setIssueAssigneePhoneNumberText}
-                    defaultValue={issueAssigneePhoneNumberText}
-                  />
-                </View>
-              </View>
-              <Separator />
-              </React.Fragment>
-            ) : undefined}
-              ) : undefined
-            } */}
             <View style={styles.item}>
               <Text style={styles.title}>記錄人員</Text>
               <View style={{flexDirection: 'row'}}>
