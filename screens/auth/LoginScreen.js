@@ -1,19 +1,13 @@
 import React, {useContext, useState} from 'react';
-import {
-  Button,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from 'react-native';
+import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {AuthContext} from '../../context/AuthContext';
+import {Input, Icon, Button} from 'react-native-elements';
+import Separator from '../../components/Separator';
 
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
-
   const {isLoading, login} = useContext(AuthContext);
 
   return (
@@ -23,28 +17,26 @@ const LoginScreen = ({navigation}) => {
         <Text style={styles.caption_top}>
           營建工地智慧視覺監視與自動報告系統
         </Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          placeholder="輸入信箱"
+        <Separator />
+        <Input
+          placeholder="請輸入信箱"
           onChangeText={text => setEmail(text)}
+          value={email}
+          leftIcon={<Icon name="envelope" type="font-awesome" size={24} />}
         />
-
-        <TextInput
-          style={styles.input}
-          value={password}
-          placeholder="輸入密碼"
+        <Input
+          placeholder="請輸入密碼"
           onChangeText={text => setPassword(text)}
+          value={password}
+          leftIcon={<Icon name="key" type="font-awesome" size={24} />}
           secureTextEntry
         />
-
         <Button
           title="登入"
           onPress={() => {
             login(email, password);
           }}
         />
-
         <View style={{flexDirection: 'row', marginTop: 20}}>
           <Text>還沒有帳號嗎？ </Text>
           <TouchableOpacity
@@ -70,18 +62,6 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     width: '80%',
-  },
-  input: {
-    marginTop: 14,
-    paddingVertical: 8,
-    borderWidth: 4,
-    borderColor: '#20232a',
-    borderRadius: 6,
-    backgroundColor: '#61dafb',
-    color: '#20232a',
-    textAlign: 'center',
-    fontSize: 30,
-    fontWeight: 'bold',
   },
   link: {
     color: 'blue',

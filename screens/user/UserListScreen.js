@@ -35,7 +35,7 @@ const UserListScreen = ({navigation}) => {
           setUserList(users);
         })
         .catch(e => {
-          console.log(`${e}`);
+          console.log(`List Users Error: ${e}`);
         });
     };
     if (isFocused) {
