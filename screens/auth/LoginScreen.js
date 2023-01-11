@@ -3,7 +3,7 @@ import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {AuthContext} from '../../context/AuthContext';
 import {Input, Icon, Button} from 'react-native-elements';
-import Separator from '../../components/Separator';
+import ToastManager, {Toast} from 'toastify-react-native';
 
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState(null);
@@ -17,7 +17,6 @@ const LoginScreen = ({navigation}) => {
         <Text style={styles.caption_top}>
           營建工地智慧視覺監視與自動報告系統
         </Text>
-        <Separator />
         <Input
           placeholder="請輸入信箱"
           onChangeText={text => setEmail(text)}

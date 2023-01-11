@@ -29,7 +29,7 @@ export const AuthProvider = ({children}) => {
         console.log(userInfo);
       })
       .catch(e => {
-        console.info(e);
+        console.info(e.response.data);
         console.log(`register error : ${e}`);
         setIsLoading(false);
       });
@@ -50,6 +50,7 @@ export const AuthProvider = ({children}) => {
         setIsLoading(false);
       })
       .catch(e => {
+        console.log(e.response.data);
         console.log(`login error : ${e}`);
         setIsLoading(false);
       });
@@ -68,13 +69,14 @@ export const AuthProvider = ({children}) => {
       },
     })
       .then(async res => {
-        let data = await res.data;
-        console.log(data);
+        let status = await res.data;
+        console.log(status);
         AsyncStorage.removeItem('userInfo');
         setUserInfo({});
         setIsLoading(false);
       })
       .catch(e => {
+        console.log(e.response.data);
         console.log(`logout error ${e}`);
         setIsLoading(false);
       });

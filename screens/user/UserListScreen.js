@@ -28,7 +28,9 @@ const UserListScreen = ({navigation}) => {
   useEffect(() => {
     const fetchUsers = () => {
       axios
-        .get(`${BASE_URL}/users/all`)
+        .get(`${BASE_URL}/users/all`, {
+          // 帶token上去要
+        })
         .then(async res => {
           let users = await res.data.rows;
           console.log(users);
@@ -60,8 +62,8 @@ const UserListScreen = ({navigation}) => {
 
   const [selectedId, setSelectedId] = useState(null);
 
-  const renderItem = ({ item }) => {
-    const backgroundColor = item.id === selectedId ? "#600000" : "#ffffff";
+  const renderItem = ({item}) => {
+    const backgroundColor = item.id === selectedId ? '#600000' : '#ffffff';
     const color = item.id === selectedId ? 'white' : 'black';
 
     return (
@@ -79,7 +81,7 @@ const UserListScreen = ({navigation}) => {
       <FlatList
         data={userList}
         renderItem={renderItem}
-        keyExtractor={(item) => item.user_id}
+        keyExtractor={item => item.user_id}
         extraData={selectedId}
       />
     </SafeAreaView>
