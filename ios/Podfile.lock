@@ -293,8 +293,6 @@ PODS:
     - React-callinvoker
     - React-Core
     - SwiftyJSON (~> 5.0)
-  - react-native-quick-base64 (2.0.5):
-    - React-Core
   - react-native-safe-area-context (3.4.1):
     - React-Core
   - react-native-sqlite-storage (6.0.1):
@@ -430,7 +428,6 @@ DEPENDENCIES:
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-orientation (from `../node_modules/react-native-orientation`)
   - react-native-pytorch-core (from `../node_modules/react-native-pytorch-core`)
-  - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-sqlite-storage (from `../node_modules/react-native-sqlite-storage`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -519,8 +516,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-orientation"
   react-native-pytorch-core:
     :path: "../node_modules/react-native-pytorch-core"
-  react-native-quick-base64:
-    :path: "../node_modules/react-native-quick-base64"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-sqlite-storage:
@@ -602,7 +597,6 @@ SPEC CHECKSUMS:
   react-native-image-picker: 4e6008ad8c2321622affa2c85432a5ebd02d480c
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pytorch-core: 4efde3400545709c75fdb9c65db40464b86479d4
-  react-native-quick-base64: e657e9197e61b60a9dec49807843052b830da254
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
   react-native-sqlite-storage: f6d515e1c446d1e6d026aa5352908a25d4de3261
   React-perflogger: 3c9bb7372493e49036f07a82c44c8cf65cbe88db

@@ -496,24 +496,5 @@ export function improveReportGenerator (issueList,fs,project,projectName) {
 
 export function issueExcelGenerator(){
   
-  var data = [{
-    "name": "John",
-    "city": "Seattle"
-  },
-  {
-    "name": "Mike",
-    "city": "Los Angeles"
-  },
-  {
-    "name": "Zach",
-    "city": "New York"
-  }];
-  var ws = XLSX.utils.json_to_sheet(data);
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Cities");
-  const wbout = XLSX.write(wb, {
-    type: 'base64',
-    bookType: "xlsx"
-  });
-  return(wbout)
+
 }

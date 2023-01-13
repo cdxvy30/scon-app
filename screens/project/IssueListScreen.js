@@ -293,21 +293,6 @@ const IssueListScreen = ({navigation, route}) => {
 
           case 5:
             console.log('exporting Roport');
-            fs.writeFile(
-              `${docPath}/${projectName}-缺失改善前後記錄表.xlsx`,
-              issueExcelGenerator(),
-              'base64',
-            );
-
-            const shareDataTableOption_excel = {
-              title: 'MyApp',
-              message: `${projectName}-缺失改善前後記錄表`,
-              url: `file://${docPath}/${projectName}-缺失改善前後記錄表.xlsx`,
-              type: 'application/xlsx',
-              subject: `${projectName}-缺失改善前後記錄表`, // for email
-            };
-
-            await Share.open(shareDataTableOption_excel); // ...after the file is saved, send it to a system share intent
             break;
         }
       },
