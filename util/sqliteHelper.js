@@ -101,7 +101,7 @@ export const transformIssue = issue => {
     objects: [...new Set(objects)],
     attachments: issue.issue_attachment,
     labels: issue.issue_label,
-    timestamp: new Date(issue.created_at).toISOString(),
+    timestamp: new Date(issue.created_at).toLocaleString(),
   };
 };
 
@@ -154,3 +154,17 @@ export const transformExportIssue = issue => {
 
 export const transformExportIssues = issues =>
   issues.map(issue => transformExportIssue(issue));
+
+export const transformExportIssue_excel = issue => {
+  const {title, objects, image, labels, attachments, ...issueRestProps} = issue;
+  return {
+    ...issueRestProps,
+    image: issue.image.uri,
+    attachment_image: issue.attachments[0].image,
+    attachment_timestamp:new Date(issue.attachments[0].created_at).toLocaleString(),
+    }
+  }
+;
+
+export const transformExportIssues_excel = issues =>
+  issues.map(issue => transformExportIssue_excel(issue));

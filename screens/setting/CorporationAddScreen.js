@@ -33,8 +33,17 @@ const WorkItemAddScreen = ({navigation, route}) => {
   const projectId = route.params.projectId;
 
   const workitemAddHandler = React.useCallback(async () => {
-    if (!name) {
-      Alert.alert('請填入工項');
+    if (!company) {
+      Alert.alert('請填入廠商名稱');
+      return;
+    }else if(!manager){
+      Alert.alert('請填入負責人');
+      return;
+    }else if(!phone_number){
+      Alert.alert('請填入手機號碼');
+      return;
+    }else if(!name){
+      Alert.alert('請填入負責工項');
       return;
     }
 
@@ -56,8 +65,17 @@ const WorkItemAddScreen = ({navigation, route}) => {
   ]);
 
   const workitemUpdateHandler = React.useCallback(async () => {
-    if (!name) {
-      Alert.alert('請填入工項');
+    if (!company) {
+      Alert.alert('請填入廠商名稱');
+      return;
+    }else if(!manager){
+      Alert.alert('請填入負責人');
+      return;
+    }else if(!phone_number){
+      Alert.alert('請填入手機號碼');
+      return;
+    }else if(!name){
+      Alert.alert('請填入負責工項');
       return;
     }
 

@@ -10,6 +10,7 @@ import ObjectTypeSelectorScreen from '../screens/project/selector/ObjectTypeSele
 import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelectorScreen';
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
 import IssueLocationListScreen from '../screens/project/IssueLocationScreen'
+import CorporationAddScreen from '../screens/setting/CorporationAddScreen'
 
 const Stack = createNativeStackNavigator();
 
@@ -53,6 +54,11 @@ const ProjectNavigation = ({navigation}) => {
           name="IssueTypeSelector"
           component={IssueTypeSelectorScreen}
           options={{title: '缺失項目'}}
+        />
+        <Stack.Screen
+          name="CorporationAdd"
+          component={CorporationAddScreen}
+          options={{title: '廠商資訊'}}
         />
         <Stack.Group screenOptions={{presentation: 'formSheet'}}>
         <Stack.Screen

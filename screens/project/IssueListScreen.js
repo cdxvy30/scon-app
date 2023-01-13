@@ -22,17 +22,14 @@ import SqliteManager from '../../services/SqliteManager';
 import RNFetchBlob from 'rn-fetch-blob';
 import Share from 'react-native-share';
 import {useIsFocused} from '@react-navigation/native';
-import {transformIssues, transformExportIssues} from '../../util/sqliteHelper';
-import {ISSUE_STATUS, getIssueStatusById} from './IssueEnum';
+import {transformIssues, transformExportIssues, transformExportIssues_excel} from '../../util/sqliteHelper';
+import {ISSUE_STATUS} from './IssueEnum';
 import {Document, Packer} from 'docx';
 import {
   issueReportGenerator,
   improveReportGenerator,
-  FongYuImproveReportGenerator,
+  issueExcelGenerator
 } from './OutputTable';
-import IssueAttachment from '../../models/IssueAttachment';
-import {ISSUE_ATTACHMENT} from '../../data/issueAttachment';
-import {getIssuesByProjectId} from '../../services/SqliteManager';
 import axios from 'axios';
 
 // import { MobileModel, Image } from "react-native-pytorch-core";
@@ -167,6 +164,7 @@ const IssueListScreen = ({navigation, route}) => {
           '匯出專案圖片',
           '匯出缺失記錄表',
           '匯出缺失改善前後記錄表',
+          '匯出XML'
         ],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
@@ -180,6 +178,9 @@ const IssueListScreen = ({navigation, route}) => {
         // const base64 = RNFetchBlob.base64;
         switch (buttonIndex) {
           case 0: // cancel action
+            console.log(transformExportIssues_excel(
+              issueList
+            ))
             break;
           case 1:
             await fs.writeFile(
@@ -228,8 +229,7 @@ const IssueListScreen = ({navigation, route}) => {
                 project,
                 selectedEndDate,
                 selectedStartDate,
-                selectedIssueList,
-                issueList,
+                selectedEndDate ? selectedIssueList : issueList,
                 fs,
               ),
             });
@@ -289,6 +289,25 @@ const IssueListScreen = ({navigation, route}) => {
             };
 
             await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
+            break;
+
+          case 5:
+            console.log('exporting Roport');
+            fs.writeFile(
+              `${docPath}/${projectName}-缺失改善前後記錄表.xlsx`,
+              issueExcelGenerator(),
+              'base64',
+            );
+
+            const shareDataTableOption_excel = {
+              title: 'MyApp',
+              message: `${projectName}-缺失改善前後記錄表`,
+              url: `file://${docPath}/${projectName}-缺失改善前後記錄表.xlsx`,
+              type: 'application/xlsx',
+              subject: `${projectName}-缺失改善前後記錄表`, // for email
+            };
+
+            await Share.open(shareDataTableOption_excel); // ...after the file is saved, send it to a system share intent
             break;
         }
       },
@@ -489,7 +508,7 @@ const IssueListScreen = ({navigation, route}) => {
       safetyManager: project.inspector,
       attachments: [],
       labels: [],
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toLocaleString(),
     };
   };
 
