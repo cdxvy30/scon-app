@@ -154,4 +154,4 @@ const styles = StyleSheet.create({
   },
 });
   
-  export default IssueLocationListScreen;
+export default IssueLocationListScreen;

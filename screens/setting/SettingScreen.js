@@ -7,6 +7,7 @@ import UserManagementScreen from '../user/UserListScreen';
 
 const SettingScreen = ({navigation}) => {
   const {userInfo, isLoading, getUsers, logout} = useContext(AuthContext);
+  console.log(userInfo);
 
   const UserManagementHandler = async () => {
     navigation.navigate('UserListScreen');
@@ -26,8 +27,13 @@ const SettingScreen = ({navigation}) => {
             style={styles.icon}
             source={require('../../configs/icon.png')}
           />
-          <Text style={styles.corporation}>{userInfo.user.corporation}</Text>
-          <Text style={styles.permission}>{userInfo.user.permission}</Text>
+          <Text style={styles.corporation}>
+            公司: {userInfo.user.corporation}
+          </Text>
+          <Text style={styles.permission}>
+            權限: {userInfo.user.permission}
+          </Text>
+          <Text style={styles.job}>職稱: {userInfo.user.job}</Text>
           <TouchableOpacity
             onPress={UserManagementHandler}
             style={[styles.group]}>
@@ -92,7 +98,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 34,
     color: 'rgba(0, 0, 0, 0.4)',
-    marginBottom: 60,
+  },
+  job: {
+    alignSelf: 'center',
+    height: 34,
+    fontStyle: 'normal',
+    fontSize: 28,
+    lineHeight: 34,
+    color: 'rgba(0, 0, 0, 0.4)',
+    marginBottom: 20,
   },
   group: {
     marginBottom: 20,

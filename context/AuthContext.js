@@ -10,8 +10,9 @@ export const AuthProvider = ({children}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [splashLoading, setSplashLoading] = useState(false);
 
-  const register = (name, corporation, email, password, permission) => {
-    // console.log(children);
+  console.log(`AuthProvider: ${isLoading}`);
+
+  const register = (name, corporation, email, password) => {
     setIsLoading(true);
     axios
       .post(`${BASE_URL}/auth/register`, {
@@ -19,7 +20,6 @@ export const AuthProvider = ({children}) => {
         corporation,
         email,
         password,
-        permission,
       })
       .then(async res => {
         let userInfo = await res.data;
@@ -29,7 +29,7 @@ export const AuthProvider = ({children}) => {
         console.log(userInfo);
       })
       .catch(e => {
-        console.info(e);
+        console.info(e.response.data);
         console.log(`register error : ${e}`);
         setIsLoading(false);
       });
@@ -37,64 +37,49 @@ export const AuthProvider = ({children}) => {
 
   const login = (email, password) => {
     setIsLoading(true);
-
-    // 簡化前端開發流程，不用每次都要與後端溝通登入(暫時性)
-    // let userInfo = {
-    //   token:
-    //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjQzY2FlMGQtMmQ1OS00ZTZmLTg3YTYtYmNjMDRjYWVjNzdiIiwiaWF0IjoxNjcwMjIwMTQ0LCJleHAiOjE2NzAyMjM3NDR9.rNpZlcNt6cHWZsq421y9worQA5HC7yegYkkQFtzXkDI',
-    //   user: {
-    //     name: '林之謙',
-    //     email: 'jechian@gmail.com',
-    //     corporation: '臺大土木',
-    //     permission: 'admin',
-    //   },
-    // };
-    // console.log(userInfo);
-    // setUserInfo(userInfo);
-    // AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-    // setIsLoading(false);
-
     axios
       .post(`${BASE_URL}/auth/login`, {
         email,
         password,
       })
       .then(async res => {
-        let userInfo = await res.data;  // token與email, name資訊
+        let userInfo = await res.data; // token與email, name資訊
         console.log(userInfo);
         setUserInfo(userInfo);
         AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
         setIsLoading(false);
       })
       .catch(e => {
+        console.log(e.response.data);
         console.log(`login error : ${e}`);
         setIsLoading(false);
       });
   };
 
   const logout = () => {
-    setIsLoading(true);
-    AsyncStorage.removeItem('userInfo');
-    setUserInfo({});
-    setIsLoading(false);
-    // axios  // 之後應該要改成這個方式，否則從其他地方只要有token還是可以登入，需再測試
-    //   .post(
-    //     `${BASE_URL}/auth/logout`,
-    //     {},
-    //     {
-    //       headers: {Authorization: `Bearer ${userInfo.token}`},
-    //     },
-    //   )
-    //   .then(res => {
-    //     console.log(res.data);
-    //     AsyncStorage.removeItem('userInfo');
-    //     setUserInfo({});
-    //     setIsLoading(false);
-    //   })
-    //   .catch(e => {
-    //     console.log(`logout error ${e}`);
-    //     setIsLoading(false);
-    //   });
+    // setIsLoading(true);
+    axios({
+      method: 'post',
+      url: `${BASE_URL}/auth/logout`,
+      data: {
+        uuid: userInfo.user.uuid,
+      },
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    })
+      .then(async res => {
+        let status = await res.data;
+        console.log(status);
+        AsyncStorage.removeItem('userInfo');
+        setUserInfo({});
+        setIsLoading(false);
+      })
+      .catch(e => {
+        console.log(e.response.data);
+        console.log(`logout error ${e}`);
+        setIsLoading(false);
+      });
   };
 
   const isLoggedIn = async () => {
@@ -140,6 +125,7 @@ export const AuthProvider = ({children}) => {
     <AuthContext.Provider
       value={{
         isLoading,
+        isLoggedIn,
         userInfo,
         splashLoading,
         register,

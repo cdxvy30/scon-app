@@ -1,6 +1,6 @@
 import React, {useState, useContext} from 'react';
 import {launchImageLibrary} from 'react-native-image-picker';
-import { AuthContext } from '../../context/AuthContext';
+import {AuthContext} from '../../context/AuthContext';
 
 import {
   ActionSheetIOS,
@@ -14,18 +14,10 @@ import {
   TouchableOpacity,
   View,
   Alert,
-  // Dimensions,
-  // Keyboard,
-  // KeyboardAvoidingView,
-  // SectionList,
-  // StatusBar,
-  // Switch,
-  // TouchableWithoutFeedback,
-  // useColorScheme,
 } from 'react-native';
 import SqliteManager from '../../services/SqliteManager';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { PROJECT_STATUS } from './ProjectEnum';
+import {PROJECT_STATUS} from './ProjectEnum';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
 
@@ -46,14 +38,13 @@ const ProjectAddScreen = ({navigation, route}) => {
   const [email, setEmail] = useState(project ? project.email:userInfo.user.email);
   const [isLoading, setIsLoading] = useState(false);
 
-
   const projectAddHandler = React.useCallback(async () => {
     if (!name) {
       Alert.alert('請填入工地名稱');
       return;
     }
 
-    const users = await SqliteManager.getAllUsers();  // 改成從遠端伺服器fetch
+    const users = await SqliteManager.getAllUsers(); // 改成從遠端伺服器fetch
     const newProject = {
       name,
       address,
@@ -73,7 +64,7 @@ const ProjectAddScreen = ({navigation, route}) => {
       console.log('try to store in PGSQL.');
       setIsLoading(true);
       axios
-        .post(`${BASE_URL}/projects`, {
+        .post(`${BASE_URL}/projects/new`, {
           name,
           address,
           company,

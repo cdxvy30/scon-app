@@ -94,44 +94,55 @@ const PhotoScreen = ({ navigation, route }) => {
     var bodyFormData = new FormData();
     let image = route.params.image;
     const windowWidth = Dimensions.get('window').width;
-    const imageScaleRatio = windowWidth/image.width
-    image.uri = 'file://' + image.uri.replace("file://", "");
+    const imageScaleRatio = windowWidth / image.width;
+    image.uri = 'file://' + image.uri.replace('file://', '');
     bodyFormData.append('file', {
       uri: image.uri,
       name: image.fileName,
-      type: "image/jpg"
-    }); 
+      type: 'image/jpg',
+    });
     let labels = boxObjects;
     axios({
-      method: "post",
-      url: "http://34.80.209.101:8000/predict",
+      method: 'post',
+      url: 'http://34.80.209.101:8000/predict',
       data: bodyFormData,
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: {'Content-Type': 'multipart/form-data'},
     })
       .then(async function (response) {
         //handle success
         //console.log(response.data);
         let predictions = response.data;
-        for(let i=0; i<predictions.labels.length; ++i){
+        for (let i = 0; i < predictions.labels.length; ++i) {
           let name = predictions.labels[i];
           let box = predictions.boxes[i];
           let score = predictions.scores[i];
-          let violation_type = predictions.violation_type
+          let violation_type = predictions.violation_type;
           console.log(box);
           console.log(name);
           console.log(score);
-          console.log(violation_type)
-          if(score>=DETECTION_THRESHOLD){
+          console.log(violation_type);
+          if (score >= DETECTION_THRESHOLD) {
             let label = {
-              box: {maxX: box[2]*imageScaleRatio, maxY: box[3]*imageScaleRatio, minX: box[0]*imageScaleRatio, minY: box[1]*imageScaleRatio},
-              mode: "box",
+              box: {
+                maxX: box[2] * imageScaleRatio,
+                maxY: box[3] * imageScaleRatio,
+                minX: box[0] * imageScaleRatio,
+                minY: box[1] * imageScaleRatio,
+              },
+              mode: 'box',
               name: name,
               type: violation_type,
-              path: {"drawer": null, "path": null, "size": null}
-            }
-            const newBoxObj = await labelAddHandler(label.box, label.name, label.mode, label.path, label.type);
+              path: {drawer: null, path: null, size: null},
+            };
+            const newBoxObj = await labelAddHandler(
+              label.box,
+              label.name,
+              label.mode,
+              label.path,
+              label.type,
+            );
             labels.push(newBoxObj);
-          } 
+          }
         }
         setBoxObjects(labels);
         setIssueLabels(labels);
@@ -144,14 +155,13 @@ const PhotoScreen = ({ navigation, route }) => {
       });
   };
 
-
   useEffect(() => {
     Orientation.lockToPortrait();
     const image = route.params.image;
     const windowSize = Dimensions.get('window');
     const canvasHeight = (image.height * windowSize.width) / image.width;
     if (canvasHeight) {
-      const style = { height: canvasHeight, width: windowSize.width };
+      const style = {height: canvasHeight, width: windowSize.width};
       setCanvasContainerStyle(style);
     }
   }, [route.params.image]);
