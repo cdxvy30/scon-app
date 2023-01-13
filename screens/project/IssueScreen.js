@@ -379,8 +379,8 @@ const IssueScreen = ({navigation, route}) => {
           setResponsibleCorporation(responsibleCorporation)
         } else {
           setResponsibleCorporation(options[buttonIndex].company)
-          // setIssueAssigneeText(options[buttonIndex].manager)
-          // setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number)
+          setIssueAssigneeText(options[buttonIndex].manager)
+          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number)
         }
       }
     )
@@ -560,7 +560,7 @@ const IssueScreen = ({navigation, route}) => {
             if (!violationType) {
               Alert.alert('請點選缺失類別');
               return;
-            } else if (!issueType) {
+            } else if (!issueType && !issueTypeRemark) {
               Alert.alert('請點選缺失項目');
               return;
             } else if (!issueLocationText) {
@@ -723,7 +723,7 @@ const IssueScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={workItemClickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>工項</Text>
-                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填) </Text>
+                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填)            </Text>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={styles.textInput}>
                     {!!issueTaskText ? issueTaskText : undefined}
