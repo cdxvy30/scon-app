@@ -65,7 +65,7 @@ const PhotoScreen = ({ navigation, route }) => {
   }, [boxObjects, isImageDetect, navigation]);
 
   const imageDetect = async () => {
-    console.log("Send image detect request");
+    console.log('Send image detect request');
     setIsImageDetect(true);
 
     // axios.get('http://54.191.231.100:5000/ping')

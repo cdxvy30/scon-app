@@ -30,6 +30,7 @@ export const AuthProvider = ({children}) => {
       })
       .catch(e => {
         console.info(e.response.data);
+        console.log(e.response.status);
         console.log(`register error : ${e}`);
         setIsLoading(false);
       });
@@ -51,6 +52,7 @@ export const AuthProvider = ({children}) => {
       })
       .catch(e => {
         console.log(e.response.data);
+        console.log(e.response.status);
         console.log(`login error : ${e}`);
         setIsLoading(false);
       });

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {
   ActionSheetIOS,
   Alert,
@@ -19,20 +19,31 @@ import Separator from '../../components/Separator';
 import {useIsFocused} from '@react-navigation/native';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
+import {AuthContext} from '../../context/AuthContext';
 
 const UserListScreen = ({navigation}) => {
+  const {userInfo} = useContext(AuthContext);
   const [userList, setUserList] = useState([]);
+  const [fetchRoute, setFetchRoute] = useState('');
   const [selectedUserId, setSelectedUserId] = useState(null);
   const isFocused = useIsFocused(); // not sure why using this
 
   useEffect(() => {
+    if (userInfo.user.permission == '管理員') {
+      setFetchRoute(`${BASE_URL}/users/all`);
+    } else if (userInfo.user.permission == '專案管理員') {
+      setFetchRoute(`${BASE_URL}/users/${userInfo.user.corporation}`);
+    }
+    // console.log(fetchRoute);
     const fetchUsers = () => {
       axios
-        .get(`${BASE_URL}/users/all`, {
-          // 帶token上去要
+        .get(fetchRoute, {
+          headers: {
+            Authorization: `Bearer ` + `${userInfo.token}`,
+          },
         })
         .then(async res => {
-          let users = await res.data.rows;
+          let users = await res.data;
           console.log(users);
           setUserList(users);
         })
@@ -43,33 +54,39 @@ const UserListScreen = ({navigation}) => {
     if (isFocused) {
       fetchUsers();
     }
-  }, [isFocused]);
+  }, [isFocused, userInfo, fetchRoute]);
 
   const UserManageHandler = async user => {
-    //導向user權限管理的頁面
     setSelectedUserId(user.id);
+    console.log(user);
     await navigation.navigate('UserManagementScreen', {
-      name: user.name,
+      username: user.user_name,
+      permission: user.user_permission,
+      job: user.user_job,
     });
   };
 
   const Item = ({item, onPress, backgroundColor, textColor}) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-      <Text style={[styles.title, textColor]}>{item.user_name}</Text>
-      <Text style={[styles.title, textColor]}>{item.user_corporation}</Text>
+      <Text style={[styles.title, textColor]}>
+        {item.user_name}
+        {item.user_corporation}
+        {item.user_permission}
+        {item.user_job}
+      </Text>
+      {/* <Text style={[styles.title, textColor]}>{item.user_corporation}</Text>
+      <Text style={[styles.title, textColor]}>{item.user_job}</Text> */}
     </TouchableOpacity>
   );
 
-  const [selectedId, setSelectedId] = useState(null);
-
   const renderItem = ({item}) => {
-    const backgroundColor = item.id === selectedId ? '#600000' : '#ffffff';
-    const color = item.id === selectedId ? 'white' : 'black';
+    const backgroundColor = item.id === setSelectedUserId ? '#600000' : '#ffffff';
+    const color = item.id === setSelectedUserId ? 'white' : 'black';
 
     return (
       <Item
         item={item}
-        onPress={() => UserManageHandler(item.user_name)}
+        onPress={() => UserManageHandler(item)}
         backgroundColor={{backgroundColor}}
         textColor={{color}}
       />
@@ -82,7 +99,7 @@ const UserListScreen = ({navigation}) => {
         data={userList}
         renderItem={renderItem}
         keyExtractor={item => item.user_id}
-        extraData={selectedId}
+        extraData={selectedUserId}
       />
     </SafeAreaView>
   );
@@ -108,8 +125,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   title: {
-    marginLeft: 12,
-    fontSize: 24,
+    marginLeft: 8,
+    fontSize: 20,
     width: 250,
     alignSelf: 'center',
   },

@@ -8,7 +8,6 @@ import WorkItem from '../models/WorkItem';
 import sampleData from '../data';
 import {hydrateIssue, hydrateProject, hydrateUser} from '../util/sqliteHelper';
 
-
 export default class SqliteManager {
   static dbInit = async () => {
     try {
@@ -19,7 +18,7 @@ export default class SqliteManager {
       await IssueLabel.createTable();
       await WorkItem.createTable();
       await IssueLocation.createTable();
-      
+
       // await User.destroyAll();
       // await Project.destroyAll();
       // await Issue.destroyAll();
@@ -105,7 +104,6 @@ export default class SqliteManager {
         }),
       );
       await Promise.all(workitemPromises);
-
 
       console.log('[Sqlite] Sample data import succeeded.');
     } catch (error) {
@@ -248,7 +246,8 @@ export default class SqliteManager {
   static createIssueAttachment = props =>
     this.createInstance(IssueAttachment, props, []);
   static createIssueLabel = props => this.createInstance(IssueLabel, props, []);
-  static createIssueLocation = props => this.createInstance(IssueLocation, props, []);
+  static createIssueLocation = props =>
+    this.createInstance(IssueLocation, props, []);
   static createWorkItem = props => this.createInstance(WorkItem, props, []);
 
   static updateUser = (id, props) =>
@@ -257,8 +256,7 @@ export default class SqliteManager {
     this.updateInstance(Project, id, props, []);
   static updateProjectStatus = (id, props) =>
     this.updateInstance(Project, id, props, ['status']);
-  static updateIssue = (id, props) => 
-    this.updateInstance(Issue, id, props, []);
+  static updateIssue = (id, props) => this.updateInstance(Issue, id, props, []);
   static updateIssueAttachment = (id, props) =>
     this.updateInstance(IssueAttachment, id, props, []);
   static updateIssueLabel = (id, props) =>
@@ -283,7 +281,7 @@ export default class SqliteManager {
       this.deleteInstance(WorkItem, workitem.id),
     );
     await Promise.all(workitemDeletePromises);
-    
+
     const issueLocations = await this.getIssueLocationsByProjectId(id);
     const issueLocationDeletePromises = issueLocations.map(issueLocation =>
       this.deleteInstance(IssueLocation, issueLocation.id),
@@ -326,7 +324,6 @@ export default class SqliteManager {
   static deleteAllIssueAttachments = () =>
     this.deleteAllInstances(IssueAttachment);
   static deleteAllIssueLabels = () => this.deleteAllInstances(IssueLabel);
-
 
   static getUser = id => this.getInstanceById(User, id);
   static getProject = id => this.getInstanceById(Project, id);

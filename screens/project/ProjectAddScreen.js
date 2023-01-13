@@ -1,7 +1,6 @@
 import React, {useState, useContext} from 'react';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {AuthContext} from '../../context/AuthContext';
-
 import {
   ActionSheetIOS,
   Button,
@@ -20,22 +19,26 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {PROJECT_STATUS} from './ProjectEnum';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
+import {Dropdown} from 'react-native-element-dropdown';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const ProjectAddScreen = ({navigation, route}) => {
   const {userInfo} = useContext(AuthContext);
-  // console.log(route);
-  // console.log(route.params);
-  // console.log(BASE_URL);
   let project = route.params.project;
+  console.log(project);
   const [thumbnail, setThumbnail] = useState(project ? project.image : '');
   const [name, setName] = useState(project ? project.name : '');
   const [address, setAddress] = useState(project ? project.address : '');
   const [manager, setManager] = useState(project ? project.manager : '');
-  const [company, setCompany] = useState(project ? project.company : '');
+  const [company, setCompany] = useState(
+    project ? project.company : userInfo.user.corporation,
+  );
   const [inspector, setInspector] = useState(
     project ? project.inspector : userInfo.user.name,
   );
-  const [email, setEmail] = useState(project ? project.email:userInfo.user.email);
+  const [email, setEmail] = useState(
+    project ? project.email : userInfo.user.email,
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const projectAddHandler = React.useCallback(async () => {
@@ -303,6 +306,14 @@ const styles = StyleSheet.create({
     // paddingBottom: 3,
     // paddingTop: 8,
     // padding: 10,
+  },
+  dropdown: {
+    marginTop: 10,
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
   },
   title: {
     color: 'gray',

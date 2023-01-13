@@ -21,7 +21,6 @@ const SettingScreen = ({navigation}) => {
     <React.Fragment>
       <View style={styles.container}>
         <View style={styles.wrapper}>
-          <Spinner visible={isLoading} />
           <Text style={styles.name}>{userInfo.user.name}</Text>
           <Image
             style={styles.icon}

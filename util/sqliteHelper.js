@@ -62,19 +62,19 @@ export const transformProjects = projects =>
   projects.map(project => transformProject(project));
 
 export const transformWorkItem = workitem => {
-    return {
-      id: workitem.id,
-      name: workitem.name,
-      manager: workitem.manager,
-      phone_number: workitem.phone_number,
-      company: workitem.company,
-      project_id: workitem.project_id,
-      timestamp: new Date(workitem.created_at).toISOString(),
-    };
+  return {
+    id: workitem.id,
+    name: workitem.name,
+    manager: workitem.manager,
+    phone_number: workitem.phone_number,
+    company: workitem.company,
+    project_id: workitem.project_id,
+    timestamp: new Date(workitem.created_at).toISOString(),
   };
-  
+};
+
 export const transformWorkItems = workitems =>
-    workitems.map(workitem => transformWorkItem(workitem));
+  workitems.map(workitem => transformWorkItem(workitem));
 
 export const transformIssue = issue => {
   const objects = issue.issue_label.map(label => label.object);
@@ -82,7 +82,7 @@ export const transformIssue = issue => {
   return {
     id: issue.id,
     title: issue.type,
-    violation_type:issue.violation_type,
+    violation_type: issue.violation_type,
     type: issue.type,
     type_remark: issue.type_remark,
     image: {
@@ -119,7 +119,7 @@ export const transformLabel = label => {
     },
     mode: label.mode,
     name: label.name,
-    path: label.path
+    path: label.path,
   };
 };
 

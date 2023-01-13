@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {Input, Icon, Button} from 'react-native-elements';
-import {SelectList} from 'react-native-dropdown-select-list';
 import {AuthContext} from '../../context/AuthContext';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
