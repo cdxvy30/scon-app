@@ -31,10 +31,11 @@ const UserListScreen = ({navigation}) => {
   useEffect(() => {
     if (userInfo.user.permission == '管理員') {
       setFetchRoute(`${BASE_URL}/users/all`);
-    } else if (userInfo.user.permission == '專案管理員') {
+    } else if (userInfo.user.permission == '公司負責人') {
       setFetchRoute(`${BASE_URL}/users/${userInfo.user.corporation}`);
     }
-    // console.log(fetchRoute);
+
+    console.log(fetchRoute);
     const fetchUsers = () => {
       axios
         .get(fetchRoute, {

@@ -100,8 +100,20 @@ const WorkItemAddScreen = ({navigation, route}) => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Button title="完成" onPress={workitem? workitemUpdateHandler : workitemAddHandler} />,
-      headerLeft: () => <Button title="取消" onPress={() => {navigation.goBack();}} />
+      headerRight: () => (
+        <Button
+          title="完成"
+          onPress={workitem ? workitemUpdateHandler : workitemAddHandler}
+        />
+      ),
+      headerLeft: () => (
+        <Button
+          title="取消"
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+      ),
     });
   }, [workitemAddHandler, navigation]);
 

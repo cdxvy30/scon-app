@@ -17,7 +17,7 @@ import {Button} from 'react-native-elements';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import axios from 'axios';
-import { BASE_URL } from '../../configs/authConfig';
+import {BASE_URL} from '../../configs/authConfig';
 
 const UserManagementScreen = ({navigation, route}) => {
   console.log(route.params);
@@ -63,7 +63,12 @@ const UserManagementScreen = ({navigation, route}) => {
           onPress={async (permission) => {
             axios.post(`${BASE_URL}/manage`, {
               permission,
-            }).then()
+            }).then(async (res) => {
+              let data = res.data;
+              console.log(data);
+            }).catch((e) => {
+              concole.log(`${e}`);
+            });
           }}
         /> */}
       </View>

@@ -1,6 +1,7 @@
 import React, {useState, useContext} from 'react';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {AuthContext} from '../../context/AuthContext';
+// import RNFetchBlob from 'rn-fetch-blob';
 import {
   ActionSheetIOS,
   Button,
@@ -22,10 +23,11 @@ import {BASE_URL} from '../../configs/authConfig';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
+// const Blob = RNFetchBlob.polyfill.Blob;
+
 const ProjectAddScreen = ({navigation, route}) => {
   const {userInfo} = useContext(AuthContext);
   let project = route.params.project;
-  console.log(project);
   const [thumbnail, setThumbnail] = useState(project ? project.image : '');
   const [name, setName] = useState(project ? project.name : '');
   const [address, setAddress] = useState(project ? project.address : '');
@@ -66,15 +68,38 @@ const ProjectAddScreen = ({navigation, route}) => {
       console.log(name);
       console.log('try to store in PGSQL.');
       setIsLoading(true);
-      axios
-        .post(`${BASE_URL}/projects/new`, {
-          name,
-          address,
-          company,
-          manager,
-          inspector,
-          email,
-        })
+
+      const data = {
+        name: name,
+        address: address,
+        company: company,
+        manager: manager,
+        inspector: inspector,
+        email: email,
+      };
+      const metadata = JSON.stringify(data);
+      var bodyFormData = new FormData();
+      bodyFormData.append('metadata', metadata);
+      bodyFormData.append('project_thumbnail', {
+        uri: thumbnail.uri,
+        name: thumbnail.fileName,
+        // type: 'image/jpg',
+      });
+      axios({
+        method: 'post',
+        url: `${BASE_URL}/projects/add`,
+        data: bodyFormData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ` + `${userInfo.token}`,
+        },
+      })
+        // .post(`${BASE_URL}/projects/add`, {
+        //   headers: {
+        //     Authorization: `Bearer ` + `${userInfo.token}`,
+        //     'Content-Type': 'multipart/form-data',
+        //   },
+        // })
         .then(async res => {
           let project_data = await res.data;
           console.log(project_data);
@@ -84,10 +109,9 @@ const ProjectAddScreen = ({navigation, route}) => {
           console.log(`add new project error: ${e}`);
         });
     };
-    projectAddToPGSQL();
-    
-    await SqliteManager.createProject(newProject);
-    navigation.goBack();
+    await projectAddToPGSQL();
+    // await SqliteManager.createProject(newProject);
+    // navigation.goBack();
   }, [
     name,
     address,
@@ -95,8 +119,9 @@ const ProjectAddScreen = ({navigation, route}) => {
     manager,
     inspector,
     email,
-    thumbnail,
-    navigation,
+    thumbnail.uri,
+    // navigation,
+    userInfo.token,
   ]);
 
   const projectUpdateHandler = React.useCallback(async () => {

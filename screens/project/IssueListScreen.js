@@ -44,9 +44,10 @@ const determineStatusColor = item => {
 };
 
 const IssueListScreen = ({navigation, route}) => {
-  // const axios = require('axios');
+  console.log(route.params);
+  const project = route.params;
   const [projectId, setProjectId] = useState(null);
-  const [project, setProject] = useState(route.params.project);
+  // const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
   const [selectedIssueList, setSelectedIssueList] = useState(issueList);
   const [selectedIssueId, setSelectedIssueId] = useState(null);
@@ -141,7 +142,7 @@ const IssueListScreen = ({navigation, route}) => {
           item: CreateItemByImage(image),
         });
       })
-      .catch(function (response) {
+      .then(function (response) {
         //handle error
         setIsDedecting(false);
         console.log(response);
@@ -152,6 +153,9 @@ const IssueListScreen = ({navigation, route}) => {
           violation_type: '',
           item: CreateItemByImage(image),
         });
+      })
+      .catch(e => {
+        console.log(e);
       });
   };
 

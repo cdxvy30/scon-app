@@ -21,9 +21,7 @@ const TabNavigation = ({}) => {
             } else if (route.name === '設定') {
               iconName = focused ? 'ios-settings' : 'ios-settings-outline';
             } else if (route.name === '通知') {
-              iconName = focused
-                ? 'notifications'
-                : 'notifications-outline';
+              iconName = focused ? 'notifications' : 'notifications-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
