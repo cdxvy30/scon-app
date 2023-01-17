@@ -23,8 +23,6 @@ import {BASE_URL} from '../../configs/authConfig';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-// const Blob = RNFetchBlob.polyfill.Blob;
-
 const ProjectAddScreen = ({navigation, route}) => {
   const {userInfo} = useContext(AuthContext);
   let project = route.params.project;
@@ -63,7 +61,7 @@ const ProjectAddScreen = ({navigation, route}) => {
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVZ5Jn3h_R2_PdWnYoXgOqjwFKT5C4JTODvCjfDwaleOsM6AxT8L1DBhRi4FeGP7ua7F8&usqp=CAU',
       status: PROJECT_STATUS.lowRisk.id,
     };
-    // 將project內容存入地端資料庫
+
     const projectAddToPGSQL = () => {
       console.log(name);
       console.log('try to store in PGSQL.');
@@ -94,12 +92,6 @@ const ProjectAddScreen = ({navigation, route}) => {
           Authorization: `Bearer ` + `${userInfo.token}`,
         },
       })
-        // .post(`${BASE_URL}/projects/add`, {
-        //   headers: {
-        //     Authorization: `Bearer ` + `${userInfo.token}`,
-        //     'Content-Type': 'multipart/form-data',
-        //   },
-        // })
         .then(async res => {
           let project_data = await res.data;
           console.log(project_data);
@@ -111,7 +103,7 @@ const ProjectAddScreen = ({navigation, route}) => {
     };
     await projectAddToPGSQL();
     // await SqliteManager.createProject(newProject);
-    // navigation.goBack();
+    navigation.goBack();
   }, [
     name,
     address,
@@ -120,7 +112,8 @@ const ProjectAddScreen = ({navigation, route}) => {
     inspector,
     email,
     thumbnail.uri,
-    // navigation,
+    thumbnail.fileName,
+    navigation,
     userInfo.token,
   ]);
 
