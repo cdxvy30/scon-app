@@ -1,6 +1,7 @@
 import React, {useState, useContext} from 'react';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {AuthContext} from '../../context/AuthContext';
+// import RNFetchBlob from 'rn-fetch-blob';
 import {
   ActionSheetIOS,
   Button,
@@ -25,7 +26,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 const ProjectAddScreen = ({navigation, route}) => {
   const {userInfo} = useContext(AuthContext);
   let project = route.params.project;
-  console.log(project);
   const [thumbnail, setThumbnail] = useState(project ? project.image : '');
   const [name, setName] = useState(project ? project.name : '');
   const [address, setAddress] = useState(project ? project.address : '');
@@ -61,20 +61,37 @@ const ProjectAddScreen = ({navigation, route}) => {
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVZ5Jn3h_R2_PdWnYoXgOqjwFKT5C4JTODvCjfDwaleOsM6AxT8L1DBhRi4FeGP7ua7F8&usqp=CAU',
       status: PROJECT_STATUS.lowRisk.id,
     };
-    // 將project內容存入地端資料庫
+
     const projectAddToPGSQL = () => {
       console.log(name);
       console.log('try to store in PGSQL.');
       setIsLoading(true);
-      axios
-        .post(`${BASE_URL}/projects/new`, {
-          name,
-          address,
-          company,
-          manager,
-          inspector,
-          email,
-        })
+
+      const data = {
+        name: name,
+        address: address,
+        company: company,
+        manager: manager,
+        inspector: inspector,
+        email: email,
+      };
+      const metadata = JSON.stringify(data);
+      var bodyFormData = new FormData();
+      bodyFormData.append('metadata', metadata);
+      bodyFormData.append('project_thumbnail', {
+        uri: thumbnail.uri,
+        name: thumbnail.fileName,
+        // type: 'image/jpg',
+      });
+      axios({
+        method: 'post',
+        url: `${BASE_URL}/projects/add`,
+        data: bodyFormData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ` + `${userInfo.token}`,
+        },
+      })
         .then(async res => {
           let project_data = await res.data;
           console.log(project_data);
@@ -84,9 +101,8 @@ const ProjectAddScreen = ({navigation, route}) => {
           console.log(`add new project error: ${e}`);
         });
     };
-    projectAddToPGSQL();
-    
-    await SqliteManager.createProject(newProject);
+    await projectAddToPGSQL();
+    // await SqliteManager.createProject(newProject);
     navigation.goBack();
   }, [
     name,
@@ -95,8 +111,10 @@ const ProjectAddScreen = ({navigation, route}) => {
     manager,
     inspector,
     email,
-    thumbnail,
+    thumbnail.uri,
+    thumbnail.fileName,
     navigation,
+    userInfo.token,
   ]);
 
   const projectUpdateHandler = React.useCallback(async () => {

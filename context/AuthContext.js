@@ -105,23 +105,23 @@ export const AuthProvider = ({children}) => {
     isLoggedIn();
   }, []);
 
-  const getUsers = () => {
-    setIsLoading(true);
-    console.log('getUsers');
+  // const getUsers = () => {
+  //   setIsLoading(true);
+  //   console.log('getUsers');
 
-    axios
-      .get(`${BASE_URL}/users/all`)
-      .then(async res => {
-        let users = await res.data.rows;
-        console.log(users);
-        setIsLoading(false);
-      })
-      .catch(e => {
-        console.info(e);
-        console.log(`Get users error : ${e}`);
-        setIsLoading(false);
-      });
-  };
+  //   axios
+  //     .get(`${BASE_URL}/users/all`)
+  //     .then(async res => {
+  //       let users = await res.data.rows;
+  //       console.log(users);
+  //       setIsLoading(false);
+  //     })
+  //     .catch(e => {
+  //       console.info(e);
+  //       console.log(`Get users error : ${e}`);
+  //       setIsLoading(false);
+  //     });
+  // };
 
   return (
     <AuthContext.Provider
@@ -133,7 +133,7 @@ export const AuthProvider = ({children}) => {
         register,
         login,
         logout,
-        getUsers,
+        // getUsers,
       }}>
       {children}
     </AuthContext.Provider>

@@ -45,7 +45,7 @@ import {PROJECT_STATUS} from './ProjectEnum';
 import {transformIssues} from '../../util/sqliteHelper';
 import {WorkItemList} from './WorkItemListScreen';
 import {ButtonGroup} from 'react-native-elements';
-import { BASE_URL } from '../../configs/authConfig';
+import {BASE_URL} from '../../configs/authConfig';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -93,15 +93,14 @@ const IssueScreen = ({navigation, route}) => {
   };
 
   // const WorkItemListHandler = async () => {
-  //   navigation.navigate('WorkItemList', { 
+  //   navigation.navigate('WorkItemList', {
   //     project: route.params.project,
   //     projectId: route.params.projectId,
-  //     setIssueTaskText, 
-  //     setIssueAssigneeText, 
+  //     setIssueTaskText,
+  //     setIssueAssigneeText,
   //     setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
-      
-  //   })};
 
+  //   })};
 
   const attachmentAddHandler = async image => {
     const imageUri = image.uri;
@@ -282,7 +281,7 @@ const IssueScreen = ({navigation, route}) => {
   };
 
   function decideIssueTypes(violationType) {
-    for (i = 0; i < ISSUE_TYPE[0].titles.length; i++) {
+    for (let i = 0; i < ISSUE_TYPE[0].titles.length; i++) {
       if (violationType != ISSUE_TYPE[0].titles[i]) {
         //判斷是哪個type
       } else {
@@ -345,46 +344,50 @@ const IssueScreen = ({navigation, route}) => {
 
   const responsibleCorporationclickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId);
-    options.push({company:'取消'})
-    options.length == 1 ?
-    Alert.alert("未新增任何協力廠商",'請選擇',
-            [
-              {
-                text: "返回",
-                style:'cancel',
-                onPress: () => {
-                  return
-                }
+    options.push({company: '取消'});
+    options.length == 1
+      ? Alert.alert(
+          '未新增任何協力廠商',
+          '請選擇',
+          [
+            {
+              text: '返回',
+              style: 'cancel',
+              onPress: () => {
+                return;
               },
-              {
-                text: "新增",
-                onPress: () => {
-                  navigation.navigate('CorporationAdd', { 
-                    name: 'Create new corporation' ,
-                    projectId: projectId
-                  });
-                }
-              }
-            ],
-            'light',
-          ):
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: options.map(item => item.company),
-        cancelButtonIndex: options.length - 1,
-        userInterfaceStyle: 'light',
-      },
-      (buttonIndex) => {
-        if (buttonIndex == options.length-1){
-          setResponsibleCorporation(responsibleCorporation)
-        } else {
-          setResponsibleCorporation(options[buttonIndex].company)
-          setIssueAssigneeText(options[buttonIndex].manager)
-          setIssueAssigneePhoneNumberText(options[buttonIndex].phone_number)
-        }
-      }
-    )
-  }
+            },
+            {
+              text: '新增',
+              onPress: () => {
+                navigation.navigate('CorporationAdd', {
+                  name: 'Create new corporation',
+                  projectId: projectId,
+                });
+              },
+            },
+          ],
+          'light',
+        )
+      : ActionSheetIOS.showActionSheetWithOptions(
+          {
+            options: options.map(item => item.company),
+            cancelButtonIndex: options.length - 1,
+            userInterfaceStyle: 'light',
+          },
+          buttonIndex => {
+            if (buttonIndex == options.length - 1) {
+              setResponsibleCorporation(responsibleCorporation);
+            } else {
+              setResponsibleCorporation(options[buttonIndex].company);
+              setIssueAssigneeText(options[buttonIndex].manager);
+              setIssueAssigneePhoneNumberText(
+                options[buttonIndex].phone_number,
+              );
+            }
+          },
+        );
+  };
 
   const workItemClickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId)
@@ -411,17 +414,18 @@ const IssueScreen = ({navigation, route}) => {
             ],
             'light',
           ): 
+
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options.map(item => `${item.company} ${item.name}`),
         cancelButtonIndex: options.length - 1,
         userInterfaceStyle: 'light',
       },
-      (buttonIndex) => {
-        if (buttonIndex == options.length - 1){
-          setIssueTaskText(issueTaskText)
-        }else{
-          setIssueTaskText(options[buttonIndex].name)
+      buttonIndex => {
+        if (buttonIndex == options.length - 1) {
+          setIssueTaskText(issueTaskText);
+        } else {
+          setIssueTaskText(options[buttonIndex].name);
         }
       },
     );
@@ -595,8 +599,21 @@ const IssueScreen = ({navigation, route}) => {
               Alert.alert('請填寫記錄人員');
               return;
             } else {
+              const data = {
+                violationType,
+                issueType,
+                issueTrack,
+                issueLocationText,
+                responsibleCorporation,
+                issueAssigneeText,
+                issueStatus,
+              };
+              const metadata = JSON.stringify(data);
+              var bodyFormData = new FormData();
+              bodyFormData.append('metadata', metadata);
+              
               axios
-                .post(`${BASE_URL}/issues`, {
+                .post(`${BASE_URL}/add/issues`, {
                   violationType,
                   issueType,
                   issueTrack,
@@ -745,7 +762,7 @@ const IssueScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={workItemClickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>工項</Text>
-                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填)            </Text>
+                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填) </Text>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={styles.textInput}>
                     {!!issueTaskText ? issueTaskText : undefined}
