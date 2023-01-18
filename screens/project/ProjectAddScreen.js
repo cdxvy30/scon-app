@@ -218,7 +218,7 @@ const ProjectAddScreen = ({navigation, route}) => {
                 style={styles.input}
               />
             </View>
-            <Text style={styles.title}>地址</Text>
+            <Text style={styles.title}>工地地址</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}
@@ -228,7 +228,7 @@ const ProjectAddScreen = ({navigation, route}) => {
                 style={styles.input}
               />
             </View>
-            <Text style={styles.title}>負責人</Text>
+            <Text style={styles.title}>工地負責人</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}
@@ -238,7 +238,7 @@ const ProjectAddScreen = ({navigation, route}) => {
                 style={styles.input}
               />
             </View>
-            <Text style={styles.title}>廠商名稱</Text>
+            <Text style={styles.title}>公司名稱</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}

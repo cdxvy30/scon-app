@@ -234,17 +234,17 @@ const IssueScreen = ({navigation, route}) => {
   }, [item.image.uri]);
 
   const issueStatusClickHandler = () => {
-    Geolocation.getCurrentPosition(  //gps測試用
-      success= (
-        info => Alert.alert(`${info.coords.altitude}`)),
-      error= (
-        error => error.message=="User denied access to location services."?Alert.alert('未允許使用位置'):console.log(error)),
-      options= {
-          timeout: 0,
-          maximumAge: 0,
-          enableHighAccuracy: true
-      }
-    ),
+    // Geolocation.getCurrentPosition(  //gps測試用
+    //   success= (
+    //     info => console.log(info)),
+    //   error= (
+    //     error => error.message=="User denied access to location services."?Alert.alert('未允許使用位置'):console.log(error)),
+    //   options= {
+    //       timeout: 0,
+    //       maximumAge: 0,
+    //       enableHighAccuracy: true
+    //   }
+    // ),
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['取消', '無風險', '有風險，須改善', '有風險，須立即改善'],
@@ -389,6 +389,28 @@ const IssueScreen = ({navigation, route}) => {
   const workItemClickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId)
     options.push({company:'', name:'取消'})
+    options.length ==1 ?
+    Alert.alert("未新增任何協力廠商",'請選擇',
+            [
+              {
+                text: "返回",
+                style:'cancel',
+                onPress: () => {
+                  return
+                }
+              },
+              {
+                text: "新增",
+                onPress: () => {
+                  navigation.navigate('CorporationAdd', { 
+                    name: 'Create new corporation' ,
+                    projectId: projectId
+                  });
+                }
+              }
+            ],
+            'light',
+          ): 
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: options.map(item => `${item.company} ${item.name}`),

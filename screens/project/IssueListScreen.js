@@ -28,7 +28,7 @@ import {Document, Packer} from 'docx';
 import {
   issueReportGenerator,
   improveReportGenerator,
-  issueExcelGenerator
+  issueHtmlGenerator
 } from './OutputTable';
 import axios from 'axios';
 
@@ -105,12 +105,6 @@ const IssueListScreen = ({navigation, route}) => {
     });
   };
 
-  const loading = () => {
-    <View style={[styles.loading_container, styles.loading_horizontal]}>
-      <ActivityIndicator size="large" color="#00ff00" />
-    </View>;
-  };
-
   const detectViolationTypeThenSwitchToIssueScreen = async imagee => {
     console.log('Send image detect request');
     setIsDedecting(true);
@@ -127,7 +121,7 @@ const IssueListScreen = ({navigation, route}) => {
       url: 'http://34.80.209.101:8000/predict',
       data: bodyFormData,
       headers: {'Content-Type': 'multipart/form-data'},
-      timeout: 5000,
+      timeout: 3000,
     })
       .then(async function (response) {
         //handle success
@@ -144,6 +138,7 @@ const IssueListScreen = ({navigation, route}) => {
       .catch(function (response) {
         //handle error
         setIsDedecting(false);
+        Alert.alert('辨識失敗');
         console.log(response);
         navigation.navigate('Issue', {
           projectId: projectId,
@@ -163,8 +158,8 @@ const IssueListScreen = ({navigation, route}) => {
           '匯出專案資訊',
           '匯出專案圖片',
           '匯出缺失記錄表',
-          '匯出缺失改善前後記錄表',
-          '匯出XML'
+          '匯出缺失改善前後記錄表(WORD)',
+          '匯出缺失改善前後記錄表(HTML)'
         ],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
@@ -178,9 +173,6 @@ const IssueListScreen = ({navigation, route}) => {
         // const base64 = RNFetchBlob.base64;
         switch (buttonIndex) {
           case 0: // cancel action
-            console.log(transformExportIssues_excel(
-              issueList
-            ))
             break;
           case 1:
             await fs.writeFile(
@@ -292,7 +284,26 @@ const IssueListScreen = ({navigation, route}) => {
             break;
 
           case 5:
-            console.log('exporting Roport');
+            const issue_web = issueHtmlGenerator(
+              selectedEndDate ? selectedIssueList : issueList,
+              fs,
+              project,
+              projectName,
+            )
+              await fs.writeFile(
+                `${docPath}/${projectName}-缺失改善前後錄表.html`,
+                issue_web.html,
+                'utf8'
+              );
+            const shareDataOption_3 = {
+              title: 'MyApp',
+              message: `${projectName}-缺失改善前後錄表`,
+              url: `file://${docPath}/${projectName}-缺失改善前後錄表.html`,
+              type: 'application/html',
+              subject: `${projectName}-缺失改善前後錄表`, // for email
+            };
+
+            await Share.open(shareDataOption_3); // ...after the file is saved, send it to a system share intent
             break;
         }
       },
@@ -521,7 +532,7 @@ const IssueListScreen = ({navigation, route}) => {
             color={determineStatusColor(item)}
           />
           <Text style={[styles.timestampText, textColor]}>
-            {new Date(item.timestamp).toLocaleString()}
+            {item.timestamp}
           </Text>
         </View>
         <Text style={[styles.descriptionText, textColor]}>
