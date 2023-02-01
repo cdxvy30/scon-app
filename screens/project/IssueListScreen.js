@@ -22,15 +22,21 @@ import SqliteManager from '../../services/SqliteManager';
 import RNFetchBlob from 'rn-fetch-blob';
 import Share from 'react-native-share';
 import {useIsFocused} from '@react-navigation/native';
-import {transformIssues, transformExportIssues, transformExportIssues_excel} from '../../util/sqliteHelper';
+import {
+  transformIssues,
+  transformExportIssues,
+  transformExportIssues_excel,
+} from '../../util/sqliteHelper';
 import {ISSUE_STATUS} from './IssueEnum';
 import {Document, Packer} from 'docx';
 import {
   issueReportGenerator,
   improveReportGenerator,
-  issueHtmlGenerator
+  issueHtmlGenerator,
 } from './OutputTable';
 import axios from 'axios';
+import FastImage from 'react-native-fast-image';
+import { BASE_URL } from '../../configs/authConfig';
 
 // import { MobileModel, Image } from "react-native-pytorch-core";
 
@@ -45,9 +51,9 @@ const determineStatusColor = item => {
 
 const IssueListScreen = ({navigation, route}) => {
   console.log(route.params);
-  const project = route.params;
+  // const project = route.params;
   const [projectId, setProjectId] = useState(null);
-  // const [project, setProject] = useState(route.params.project);
+  const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
   const [selectedIssueList, setSelectedIssueList] = useState(issueList);
   const [selectedIssueId, setSelectedIssueId] = useState(null);
@@ -57,7 +63,7 @@ const IssueListScreen = ({navigation, route}) => {
   const [isExporting, setIsExporting] = useState(false);
   const isFocused = useIsFocused();
 
-  function issuesFiller(sortedIssues) {
+  function issuesFilter(sortedIssues) {
     var a = [];
     for (let i = 0; i < sortedIssues.length; i++) {
       if (
@@ -136,7 +142,7 @@ const IssueListScreen = ({navigation, route}) => {
           item: CreateItemByImage(image),
         });
       })
-      .then(function (response) {
+      .catch(e => {
         //handle error
         setIsDedecting(false);
         Alert.alert('辨識失敗');
@@ -148,8 +154,6 @@ const IssueListScreen = ({navigation, route}) => {
           violation_type: '',
           item: CreateItemByImage(image),
         });
-      })
-      .catch(e => {
         console.log(e);
       });
   };
@@ -163,7 +167,7 @@ const IssueListScreen = ({navigation, route}) => {
           '匯出專案圖片',
           '匯出缺失記錄表',
           '匯出缺失改善前後記錄表(WORD)',
-          '匯出缺失改善前後記錄表(HTML)'
+          '匯出缺失改善前後記錄表(HTML)',
         ],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
@@ -293,12 +297,12 @@ const IssueListScreen = ({navigation, route}) => {
               fs,
               project,
               projectName,
-            )
-              await fs.writeFile(
-                `${docPath}/${projectName}-缺失改善前後錄表.html`,
-                issue_web.html,
-                'utf8'
-              );
+            );
+            await fs.writeFile(
+              `${docPath}/${projectName}-缺失改善前後錄表.html`,
+              issue_web.html,
+              'utf8',
+            );
             const shareDataOption_3 = {
               title: 'MyApp',
               message: `${projectName}-缺失改善前後錄表`,
@@ -439,7 +443,7 @@ const IssueListScreen = ({navigation, route}) => {
       setIssueList(sortedIssues);
       setProjectId(project.id);
       setProject(project);
-      setSelectedIssueList(issuesFiller(sortedIssues));
+      setSelectedIssueList(issuesFilter(sortedIssues));
     };
 
     if (isFocused) {
@@ -447,6 +451,25 @@ const IssueListScreen = ({navigation, route}) => {
     }
     selectedIssueList;
   }, [route.params.name, issueReportGenerator, isFocused]);
+
+  useEffect(() => {
+    const fetchIssues = async () => {
+      await axios
+        .get(`${BASE_URL}/issues/list/${project.project_id}`)
+        .then(async (res) => {
+          let issues = await res.data;
+          console.log(issues);
+          setIssueList(issues);
+        })
+        .catch((e) => {
+          console.log(`List issues error: ${e}`);
+        });
+    };
+
+    if (isFocused) {
+      fetchIssues();
+    }
+  }, [isFocused, project.project_id]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -515,9 +538,15 @@ const IssueListScreen = ({navigation, route}) => {
   const Item = ({item, onPress, backgroundColor, textColor}) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
       <View style={styles.panelLeftContainer}>
-        <Image
+        {/* <Image
           style={styles.image}
           source={{uri: item.image.uri.replace('file://', '')}}
+        /> */}
+        <FastImage
+          style={styles.image}
+          source={{
+            uri: `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`,
+          }}
         />
         {item.tracking ? (
           <Badge
@@ -540,9 +569,9 @@ const IssueListScreen = ({navigation, route}) => {
           </Text>
         </View>
         <Text style={[styles.descriptionText, textColor]}>
-          {item.violation_type == '其他'
+          {item.violation_type === '其他'
             ? `[${item.violation_type}]\n${item.type_remark}`
-            : item.violation_type != ''
+            : item.violation_type !== ''
             ? `(${item.violation_type})\n${item.title}`
             : ''}
         </Text>
@@ -585,7 +614,7 @@ const IssueListScreen = ({navigation, route}) => {
       </React.Fragment>
     );
   };
-  if (isExporting == true) {
+  if (isExporting === true) {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -597,7 +626,7 @@ const IssueListScreen = ({navigation, route}) => {
       </React.Fragment>
     );
   }
-  if (isDedecting == true) {
+  if (isDedecting === true) {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -614,7 +643,8 @@ const IssueListScreen = ({navigation, route}) => {
         <SafeAreaView style={styles.container}>
           <FlatList
             ListHeaderComponent={<Separator />}
-            data={selectedEndDate ? selectedIssueList : issueList}
+            // data={selectedEndDate ? selectedIssueList : issueList}
+            data={issueList}
             renderItem={renderItem}
             keyExtractor={item => item.id}
             extraData={selectedIssueId}

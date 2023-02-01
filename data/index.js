@@ -11,5 +11,5 @@ export default {
   issue: ISSUE,
   issue_attachment: ISSUE_ATTACHMENT,
   issue_label: ISSUE_LABEL,
-  workitem : WORKITEM,
+  workitem: WORKITEM,
 };

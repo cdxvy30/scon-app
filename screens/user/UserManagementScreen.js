@@ -22,12 +22,14 @@ import {BASE_URL} from '../../configs/authConfig';
 const UserManagementScreen = ({navigation, route}) => {
   console.log(route.params);
   let user = route.params;
-  const {userInfo} = useContext(AuthContext);
-  const [name, setName] = useState(user.username);
-  const [permission, setPermission] = useState(user.permission);
+  const {userInfo} = useContext(AuthContext); // for token
+  const [userId, setUserId] = useState(user.user_id);
+  const [name, setName] = useState(user.user_name);
+  const [permission, setPermission] = useState(user.user_permission);
   const [job, setJob] = useState(user.job);
 
   const permissionList = [
+    {label: '公司負責人', value: '公司負責人'},
     {label: '專案管理員', value: '專案管理員'},
     {label: '專案使用者', value: '專案使用者'},
     {label: '訪客', value: '訪客'},
@@ -58,19 +60,25 @@ const UserManagementScreen = ({navigation, route}) => {
             <AntDesign style={styles.icon} name="Safety" size={24} />
           )}
         />
-        {/* <Button
+        <Button
           title="更新"
-          onPress={async (permission) => {
-            axios.post(`${BASE_URL}/manage`, {
-              permission,
-            }).then(async (res) => {
-              let data = res.data;
-              console.log(data);
-            }).catch((e) => {
-              concole.log(`${e}`);
-            });
+          onPress={async () => {
+            axios
+              .post(`${BASE_URL}/permissions/manage`, {
+                userId,
+                permission,
+              })
+              .then(async res => {
+                let data = res.data;
+                console.log(data);
+                navigation.goBack();
+              })
+              .catch(e => {
+                console.log(`Update user permission error: ${e}`);
+                navigation.goBack();
+              });
           }}
-        /> */}
+        />
       </View>
     </View>
   );

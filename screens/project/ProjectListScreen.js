@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, { useEffect, useState, useContext } from "react";
 import {
   Alert,
   Button,
@@ -10,21 +10,21 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import Swipeout from 'react-native-swipeout';
-import Separator from '../../components/Separator';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import SqliteManager from '../../services/SqliteManager';
-import {useIsFocused} from '@react-navigation/native';
-import {transformProjects} from '../../util/sqliteHelper';
-import {VerticalAlign} from 'docx';
-import FastImage from 'react-native-fast-image';
-import {AuthContext} from '../../context/AuthContext';
-import {BASE_URL} from '../../configs/authConfig';
-import axios from 'axios';
+} from "react-native";
+import Swipeout from "react-native-swipeout";
+import Separator from "../../components/Separator";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import SqliteManager from "../../services/SqliteManager";
+import { useIsFocused } from "@react-navigation/native";
+import { transformProjects } from "../../util/sqliteHelper";
+import { VerticalAlign } from "docx";
+import FastImage from "react-native-fast-image";
+import { AuthContext } from "../../context/AuthContext";
+import { BASE_URL } from "../../configs/authConfig";
+import axios from "axios";
 
-const determineStatusColor = item => {
-  let color = 'grey';
+const determineStatusColor = (item) => {
+  let color = "grey";
   // if (item.status === 0) color = 'limegreen';
   // if (item.status === 1) color = 'gold';
   // if (item.status === 2) color = 'orangered';
@@ -32,8 +32,8 @@ const determineStatusColor = item => {
   return color;
 };
 
-const ProjectListScreen = ({navigation}) => {
-  const {userInfo} = useContext(AuthContext);
+const ProjectListScreen = ({ navigation }) => {
+  const { userInfo } = useContext(AuthContext);
   const [fetchRoute, setFetchRoute] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -56,14 +56,12 @@ const ProjectListScreen = ({navigation}) => {
   // }, [isFocused]);
 
   useEffect(() => {
-    if (userInfo.user.permission == '管理員')
+    if (userInfo.user.permission == "管理員")
       setFetchRoute(`${BASE_URL}/projects/list/all`);
-    else if (userInfo.user.permission == '公司負責人')
+    else if (userInfo.user.permission == "公司負責人")
       setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
-    else
-      return;
-    // else if (userInfo.user.permission == '專案管理員') //  僅list所屬id
-    //   setFetchRoute(`${BASE_URL}/list`);
+    else if (userInfo.user.permission == "專案管理員")
+      setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
 
     console.log(fetchRoute);
     const fetchProjects = async () => {
@@ -73,12 +71,12 @@ const ProjectListScreen = ({navigation}) => {
             Authorization: `Bearer ` + `${userInfo.token}`,
           },
         })
-        .then(async res => {
+        .then(async (res) => {
           let projects = await res.data;
           console.log(projects);
           setProjectList(projects);
         })
-        .catch(e => {
+        .catch((e) => {
           console.error(`List Projects Error: ${e}`);
         });
     };
@@ -89,40 +87,41 @@ const ProjectListScreen = ({navigation}) => {
   }, [isFocused, userInfo, fetchRoute]);
 
   const projectAddHandler = async () => {
-    navigation.navigate('ProjectAdd', {name: 'Create new project'});
+    navigation.navigate("ProjectAdd", { name: "Create new project" });
   };
 
   const projectDeleteHandler = async () => {
-    Alert.alert('刪除專案', '真的要刪除專案嗎？', [
+    Alert.alert("刪除專案", "真的要刪除專案嗎？", [
       {
-        text: '取消',
+        text: "取消",
         onPress: () => {
           console.log(projectList);
         },
-        style: 'cancel',
+        style: "cancel",
       },
       {
-        text: '確定',
+        text: "確定",
         onPress: async () => {
           await SqliteManager.deleteProject(selectedProjectId);
-          setProjectList(projectList.filter(p => p.id !== selectedProjectId));
+          setProjectList(projectList.filter((p) => p.id !== selectedProjectId));
         },
-        style: 'destructive',
+        style: "destructive",
       },
     ]);
   };
 
   const projectEditHandler = async () => {
     let project = await SqliteManager.getProject(selectedProjectId);
-    navigation.navigate('ProjectAdd', {
-      name: 'Create new project',
+    navigation.navigate("ProjectAdd", {
+      name: "Create new project",
       project: project,
     });
   };
 
-  const projectSelectHandler = async item => {
+  const projectSelectHandler = async (item) => {
     // setSelectedProjectId(item.project_id);
-    await navigation.navigate('IssueList', {
+    console.log(item);
+    await navigation.navigate("IssueList", {
       project: item,
       // project: await SqliteManager.getProject(selectedProjectId),
     });
@@ -130,22 +129,22 @@ const ProjectListScreen = ({navigation}) => {
 
   const swipeBtns = [
     {
-      text: <Ionicons name={'create-outline'} size={24} color={'white'} />,
-      backgroundColor: 'orange',
-      underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
+      text: <Ionicons name={"create-outline"} size={24} color={"white"} />,
+      backgroundColor: "orange",
+      underlayColor: "rgba(0, 0, 0, 1, 0.6)",
       onPress: () => projectEditHandler(),
     },
     {
-      text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
-      backgroundColor: 'red',
-      underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
+      text: <Ionicons name={"ios-trash"} size={24} color={"white"} />,
+      backgroundColor: "red",
+      underlayColor: "rgba(0, 0, 0, 1, 0.6)",
       onPress: () => projectDeleteHandler(),
     },
   ];
 
-  const Item = ({item, onPress, backgroundColor, textColor}) => (
+  const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-      <View style={{flex: 1, flexDirection: 'row'}}>
+      <View style={{ flex: 1, flexDirection: "row" }}>
         {/* <Image style={styles.thumbnail} source={{uri: item.thumbnail}} /> */}
         <FastImage
           style={styles.thumbnail}
@@ -157,31 +156,32 @@ const ProjectListScreen = ({navigation}) => {
       </View>
       <Ionicons
         style={styles.status}
-        name={'ios-ellipse'}
+        name={"ios-ellipse"}
         size={24}
         color={determineStatusColor(item)}
       />
     </TouchableOpacity>
   );
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     console.log(item);
     const backgroundColor =
-      item.project_id === selectedProjectId ? 'white' : 'white'; //"darkgrey" : "white";
-    const color = item.project_id === selectedProjectId ? 'black' : 'black'; //'white' : 'black';
+      item.project_id === selectedProjectId ? "white" : "white"; //"darkgrey" : "white";
+    const color = item.project_id === selectedProjectId ? "black" : "black"; //'white' : 'black';
 
     return (
       <React.Fragment>
         <Swipeout
           key={item.project_id}
           right={swipeBtns}
-          onOpen={() => setSelectedProjectId(item.project_id)}>
+          onOpen={() => setSelectedProjectId(item.project_id)}
+        >
           <Item
             item={item}
             key={item.project_id}
             onPress={() => projectSelectHandler(item)}
-            backgroundColor={{backgroundColor}}
-            textColor={{color}}
+            backgroundColor={{ backgroundColor }}
+            textColor={{ color }}
           />
         </Swipeout>
         <Separator />
@@ -197,14 +197,23 @@ const ProjectListScreen = ({navigation}) => {
           style={styles.flatList}
           data={projectList}
           renderItem={renderItem}
-          keyExtractor={item => item.project_id}
+          keyExtractor={(item) => item.project_id}
           extraData={selectedProjectId}
           ListFooterComponent={
-            <TouchableOpacity onPress={projectAddHandler} style={[styles.item]}>
-              <Text style={[styles.title, {marginTop: 0, color: 'dodgerblue'}]}>
-                {'新增專案'}
-              </Text>
-            </TouchableOpacity>
+            userInfo.user.permission === "管理員" || userInfo.user.permission === "公司負責人" ? (
+              <TouchableOpacity
+                onPress={projectAddHandler}
+                style={[styles.item]}
+              >
+                <Text
+                  style={[styles.title, { marginTop: 0, color: "dodgerblue" }]}
+                >
+                  {"新增專案"}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <></>
+            )
           }
         />
       </SafeAreaView>
@@ -218,13 +227,13 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   flatList: {
-    height: 'auto',
+    height: "auto",
   },
   item: {
     padding: 20,
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     // marginVertical: 8,
     // marginHorizontal: 16,
   },
@@ -237,7 +246,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 24,
     width: 250,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   status: {
     marginTop: 26,

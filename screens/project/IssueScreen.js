@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-trailing-spaces */
 import React, {
   useState,
   useRef,
@@ -50,14 +52,16 @@ import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 
 const IssueScreen = ({navigation, route}) => {
-  // const axios = require('axios');
+  console.log(route.params);
+  let project = route.params.project;
+  console.log(project.project_id);
+  const item = route.params.item;
+  const projectId = project.project_id;
   const {userInfo} = useContext(AuthContext);
   const isFocused = useIsFocused();
-  const item = route.params.item;
-  const projectId = route.params.projectId;
   const [action, setAction] = useState(route.params.action);
   const [issueId, setIssueId] = useState(item.id);
-  const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);
+  const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);   //
   const [violationType, setViolationType] = useState(
     route.params.violation_type
       ? route.params.violation_type
@@ -390,45 +394,46 @@ const IssueScreen = ({navigation, route}) => {
   };
 
   const workItemClickHandler = async () => {
-    var options = await SqliteManager.getWorkItemsByProjectId(projectId)
-    options.push({company:'', name:'取消'})
-    options.length ==1 ?
-    Alert.alert("未新增任何協力廠商",'請選擇',
-            [
-              {
-                text: "返回",
-                style:'cancel',
-                onPress: () => {
-                  return
-                }
+    var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    options.push({company: '', name: '取消'});
+    options.length == 1
+      ? Alert.alert(
+          '未新增任何協力廠商',
+          '請選擇',
+          [
+            {
+              text: '返回',
+              style: 'cancel',
+              onPress: () => {
+                return;
               },
-              {
-                text: "新增",
-                onPress: () => {
-                  navigation.navigate('CorporationAdd', { 
-                    name: 'Create new corporation' ,
-                    projectId: projectId
-                  });
-                }
-              }
-            ],
-            'light',
-          ): 
-
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: options.map(item => `${item.company} ${item.name}`),
-        cancelButtonIndex: options.length - 1,
-        userInterfaceStyle: 'light',
-      },
-      buttonIndex => {
-        if (buttonIndex == options.length - 1) {
-          setIssueTaskText(issueTaskText);
-        } else {
-          setIssueTaskText(options[buttonIndex].name);
-        }
-      },
-    );
+            },
+            {
+              text: '新增',
+              onPress: () => {
+                navigation.navigate('CorporationAdd', {
+                  name: 'Create new corporation',
+                  projectId: projectId,
+                });
+              },
+            },
+          ],
+          'light',
+        )
+      : ActionSheetIOS.showActionSheetWithOptions(
+          {
+            options: options.map(item => `${item.company} ${item.name}`),
+            cancelButtonIndex: options.length - 1,
+            userInterfaceStyle: 'light',
+          },
+          buttonIndex => {
+            if (buttonIndex == options.length - 1) {
+              setIssueTaskText(issueTaskText);
+            } else {
+              setIssueTaskText(options[buttonIndex].name);
+            }
+          },
+        );
   };
 
   const IssueLocationListHandler = async () => {
@@ -468,7 +473,23 @@ const IssueScreen = ({navigation, route}) => {
 
     setIssueId(latestIssue.id);
     setAction('update existing issue');
-  }, [item, projectId]);
+  }, [
+    item.activity,
+    item.assignee,
+    item.assignee_phone_number,
+    item.image.height,
+    item.image.uri,
+    item.image.width,
+    item.location,
+    item.responsible_corporation,
+    item.safetyManager,
+    item.status,
+    item.tracking,
+    item.type,
+    item.typeRemark,
+    projectId,
+    route.params.violation_type,
+  ]);
 
   const issueUpdateHandler = React.useCallback(async () => {
     const transformedIssue = {
@@ -514,7 +535,7 @@ const IssueScreen = ({navigation, route}) => {
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, projectId]);
 
   const CalculateProjectStatus = issues => {
     let sum = 0;
@@ -525,9 +546,9 @@ const IssueScreen = ({navigation, route}) => {
           : 0),
     );
     let risk = Math.ceil(sum / issues.length);
-    if (risk == 1) return PROJECT_STATUS.lowRisk.id;
-    else if (risk == 2) return PROJECT_STATUS.mediumRisk.id;
-    else if (risk == 3) return PROJECT_STATUS.highRisk.id;
+    if (risk === 1) return PROJECT_STATUS.lowRisk.id;
+    else if (risk === 2) return PROJECT_STATUS.mediumRisk.id;
+    else if (risk === 3) return PROJECT_STATUS.highRisk.id;
     else return PROJECT_STATUS.lowRisk.id;
   };
 
@@ -592,43 +613,48 @@ const IssueScreen = ({navigation, route}) => {
             } else if (!issueLocationText) {
               Alert.alert('請點選缺失地點');
               return;
-            } else if (!responsibleCorporation) {
+            } /*else if (!responsibleCorporation) {
               Alert.alert('請點選責任廠商');
               return;
-            } else if (!issueSafetyManagerText) {
+            } */ else if (!issueSafetyManagerText) {
               Alert.alert('請填寫記錄人員');
               return;
             } else {
               const data = {
-                violationType,
-                issueType,
-                issueTrack,
-                issueLocationText,
-                responsibleCorporation,
-                issueAssigneeText,
-                issueStatus,
+                violationType: violationType,
+                issueType: issueType,
+                issueTrack: issueTrack,
+                issueLocationText: issueLocationText,
+                responsibleCorporation: responsibleCorporation,
+                issueTaskText: issueTaskText,
+                issueAssigneeText: issueAssigneeText,
+                issueStatus: issueStatus,
+                projectId: projectId,
               };
               const metadata = JSON.stringify(data);
               var bodyFormData = new FormData();
               bodyFormData.append('metadata', metadata);
-              
-              axios
-                .post(`${BASE_URL}/add/issues`, {
-                  violationType,
-                  issueType,
-                  issueTrack,
-                  issueLocationText,
-                  responsibleCorporation,
-                  issueAssigneeText,
-                  issueStatus,
-                })
-                .then(async (req, res) => {
-                  console.log(req);
+              bodyFormData.append('issue', {
+                uri: item.image.uri,
+                name: item.image.fileName,
+              });
+
+              axios({
+                method: 'post',
+                url: `${BASE_URL}/issues/add`,
+                data: bodyFormData,
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                  Authorization: `Bearer ` + `${userInfo.token}`,
+                },
+              })
+                .then(async res => {
+                  console.log(res);
                   let issue_data = res.data;
                   console.log(issue_data);
                 })
                 .catch(e => {
-                  console.log(`add new issue error: ${e}`);
+                  console.log(`Add new issue error: ${e}`);
                 });
             }
             navigation.goBack();
@@ -636,21 +662,7 @@ const IssueScreen = ({navigation, route}) => {
         />
       ),
     });
-  }, [
-    imageExportHandler,
-    navigation,
-    issueTrack,
-    violationType,
-    issueType,
-    issueLocationText,
-    issueTaskText,
-    responsibleCorporation,
-    issueAssigneeText,
-    issueAssigneePhoneNumberText,
-    issueSafetyManagerText,
-    issueStatus,
-    issueTypeRemark,
-  ]);
+  }, [imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, issueTypeRemark, item.image.uri, item.image.fileName]);
 
   return (
     <React.Fragment>

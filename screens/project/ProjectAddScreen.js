@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {AuthContext} from '../../context/AuthContext';
 // import RNFetchBlob from 'rn-fetch-blob';
@@ -24,21 +24,23 @@ import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const ProjectAddScreen = ({navigation, route}) => {
-  const {userInfo} = useContext(AuthContext);
+  const { userInfo } = useContext(AuthContext);
   let project = route.params.project;
+  console.log(userInfo);
   const [thumbnail, setThumbnail] = useState(project ? project.image : '');
   const [name, setName] = useState(project ? project.name : '');
   const [address, setAddress] = useState(project ? project.address : '');
-  const [manager, setManager] = useState(project ? project.manager : '');
-  const [company, setCompany] = useState(
-    project ? project.company : userInfo.user.corporation,
+  // const [manager, setManager] = useState(project ? project.manager : '');
+  const [corporation, setCorporation] = useState(
+    project ? project.corporation : userInfo.user.corporation,
   );
-  const [inspector, setInspector] = useState(
-    project ? project.inspector : userInfo.user.name,
-  );
-  const [email, setEmail] = useState(
-    project ? project.email : userInfo.user.email,
-  );
+  // const [inspector, setInspector] = useState(
+  //   project ? project.inspector : userInfo.user.name,
+  // );
+  // const [email, setEmail] = useState(
+  //   project ? project.email : userInfo.user.email,
+  // );
+  // const [managerSource, setManagerSource] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const projectAddHandler = React.useCallback(async () => {
@@ -47,14 +49,11 @@ const ProjectAddScreen = ({navigation, route}) => {
       return;
     }
 
-    const users = await SqliteManager.getAllUsers(); // 改成從遠端伺服器fetch
+    const users = await SqliteManager.getAllUsers(); // 改成從伺服器fetch
     const newProject = {
       name,
       address,
-      company,
-      manager,
-      inspector,
-      email,
+      corporation,
       user_id: users[0].id,
       image:
         thumbnail.uri ??
@@ -70,10 +69,7 @@ const ProjectAddScreen = ({navigation, route}) => {
       const data = {
         name: name,
         address: address,
-        company: company,
-        manager: manager,
-        inspector: inspector,
-        email: email,
+        corporation: corporation,
       };
       const metadata = JSON.stringify(data);
       var bodyFormData = new FormData();
@@ -92,13 +88,13 @@ const ProjectAddScreen = ({navigation, route}) => {
           Authorization: `Bearer ` + `${userInfo.token}`,
         },
       })
-        .then(async res => {
+        .then(async (res) => {
           let project_data = await res.data;
           console.log(project_data);
           setIsLoading(false);
         })
-        .catch(e => {
-          console.log(`add new project error: ${e}`);
+        .catch((e) => {
+          console.log(`Add new project error: ${e}`);
         });
     };
     await projectAddToPGSQL();
@@ -107,10 +103,7 @@ const ProjectAddScreen = ({navigation, route}) => {
   }, [
     name,
     address,
-    company,
-    manager,
-    inspector,
-    email,
+    corporation,
     thumbnail.uri,
     thumbnail.fileName,
     navigation,
@@ -127,10 +120,7 @@ const ProjectAddScreen = ({navigation, route}) => {
     const newProject = {
       name,
       address,
-      company,
-      manager,
-      inspector,
-      email,
+      corporation,
       user_id: users[0].id,
       image:
         thumbnail.uri ??
@@ -141,11 +131,9 @@ const ProjectAddScreen = ({navigation, route}) => {
   }, [
     name,
     address,
-    company,
-    manager,
-    inspector,
-    email,
-    thumbnail,
+    corporation,
+    thumbnail.uri,
+    // route.params.project.id,
     navigation,
   ]);
 
@@ -182,6 +170,30 @@ const ProjectAddScreen = ({navigation, route}) => {
       },
     );
   };
+
+  // useEffect(() => {
+  //   if (userInfo.user.permission === "管理員") {
+  //     axios
+  //       .get(`${BASE_URL}/users/managers/all`)
+  //       .then(async (res) => {
+  //         let data = await res.data;
+  //         setManagerSource(data);
+  //       })
+  //       .catch((e) => {
+  //         console.log(`List available managers error: ${e}`);
+  //       });
+  //   } else if (userInfo.user.permission === "公司負責人") {
+  //     axios
+  //       .get(`${BASE_URL}/users/managers/${userInfo.user.corporation}`)
+  //       .then(async (res) => {
+  //         let data = await res.data;
+  //         setManagerSource(data);
+  //       })
+  //       .catch((e) => {
+  //         console.log(`List available managers error: ${e}`);
+  //       });
+  //   }
+  // }, [userInfo.user.corporation, userInfo.user.permission]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -246,8 +258,18 @@ const ProjectAddScreen = ({navigation, route}) => {
                 style={styles.input}
               />
             </View>
-            <Text style={styles.title}>工地負責人</Text>
-            <View style={styles.inputContainer}>
+            {/* <Text style={styles.title}>專案管理員</Text> */}
+            {/* <Dropdown
+              data={managerSource}
+              placeholder="選擇您的專案管理員"
+              labelField="label"
+              valueField="value"
+              value={manager}
+              onChange={item => {
+                setManager(item.value);
+              }}
+            /> */}
+            {/* <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
@@ -255,14 +277,14 @@ const ProjectAddScreen = ({navigation, route}) => {
                 value={manager}
                 style={styles.input}
               />
-            </View>
-            <Text style={styles.title}>公司名稱</Text>
+            </View> */}
+            {/* <Text style={styles.title}>公司名稱</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setCompany(text)}
-                value={company}
+                onChangeText={text => setCorporation(text)}
+                value={corporation}
                 style={styles.input}
               />
             </View>
@@ -285,7 +307,7 @@ const ProjectAddScreen = ({navigation, route}) => {
                 value={email}
                 style={styles.input}
               />
-            </View>
+            </View> */}
           </View>
           <View style={{height: 300}} />
         </ScrollView>

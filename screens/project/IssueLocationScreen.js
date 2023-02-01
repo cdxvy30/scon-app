@@ -1,26 +1,31 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, {useState, useRef, useEffect, useLayoutEffect} from 'react';
 import Separator from '../../components/Separator';
 import SqliteManager from '../../services/SqliteManager';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useIsFocused } from '@react-navigation/native';
-import { Icon } from 'react-native-elements';
-import { transformWorkItems } from '../../util/sqliteHelper';
+import {useIsFocused} from '@react-navigation/native';
+import {Icon} from 'react-native-elements';
+import {transformWorkItems} from '../../util/sqliteHelper';
 import Swipeout from 'react-native-swipeout';
 import {
-    Alert,
-    FlatList,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-  } from 'react-native';
+  Alert,
+  FlatList,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {BASE_URL} from '../../configs/authConfig';
+import axios from 'axios';
 
 const IssueLocationListScreen = ({navigation, route}) => {
+  console.log(route.params);
+  const SourceProject = route.params.project;
   const [issueLocationList, setIssueLocationList] = useState(null);
-  const [projectId, setProjectId] = useState(route.params.projectId);
-  const [project, setProject] = useState(route.params.project);
+  // const [projectId, setProjectId] = useState(route.params.projectId);
+  const [project, setProject] = useState(route.params.project); // 用不到
+  const [projectId, setProjectId] = useState(SourceProject.project_id);
   const isFocused = useIsFocused();
 
   React.useLayoutEffect(() => {
@@ -37,20 +42,31 @@ const IssueLocationListScreen = ({navigation, route}) => {
               Alert.prompt(
                 '請輸入缺失位置',
                 '(如: 2F西側)',
-                async (location) => {
+                async (location, projectId) => {
                   if (location == '') {
                     Alert.alert('未填寫任何位置');
-                  }else{
+                  } else {
                     route.params.setIssueLocationText(location);
+                    // navigation.goBack();
+                    // await SqliteManager.createIssueLocation({
+                    //   project_id: projectId,
+                    //   location: location,
+                    // });
+                    axios({
+                      method: 'post',
+                      url: `${BASE_URL}/locations/add`,
+                      data: {location, projectId},
+                    })
+                      .then(async (res) => {
+                        console.log(res.data);
+                      })
+                      .catch((e) => {
+                        console.log(e);
+                      });
                     navigation.goBack();
-                    await SqliteManager.createIssueLocation({
-                      project_id: projectId,
-                      location: location,
-                    });
                   }
-
                 },
-              )
+              );
             }}
           />
           <Icon
@@ -61,54 +77,55 @@ const IssueLocationListScreen = ({navigation, route}) => {
             onPress={() => {}}
           />
         </React.Fragment>
-
       ),
     });
-  }, [navigation]);
+  }, [navigation, projectId, route.params]);
 
   useEffect(() => {
     const fetchIssueLocations = async () => {
-      const issuelocations = await SqliteManager.getIssueLocationsByProjectId(project.id);
+      const issuelocations = await SqliteManager.getIssueLocationsByProjectId(
+        project.id,
+      );
       const sortedIssuelocations = issuelocations.sort(
         (a, b) => new Date(a.created_at) - new Date(b.created_at),
       );
-      
-      issueLocationList?issueLocationList:setIssueLocationList(sortedIssuelocations);
+
+      issueLocationList
+        ? issueLocationList
+        : setIssueLocationList(sortedIssuelocations);
       setProjectId(project.id);
-      setProject(project)
+      setProject(project);
     };
 
     if (isFocused) {
       fetchIssueLocations();
     }
-  }, [isFocused]);
+  }, [isFocused, issueLocationList, project]);
 
   const issueLocationSelectHandler = item => {
     route.params.setIssueLocationText(item.location);
     navigation.goBack();
   };
 
-  const Item = ({ item, onPress, backgroundColor, textColor }) => (
-      <TouchableOpacity
-        onPress={onPress}
-        style={[styles.item, backgroundColor]}>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          <Text style={[styles.title, textColor]}>{item.location}</Text>
-        </View>
-      </TouchableOpacity>
+  const Item = ({item, onPress, backgroundColor, textColor}) => (
+    <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+      <View style={{flex: 1, flexDirection: 'row'}}>
+        <Text style={[styles.title, textColor]}>{item.location}</Text>
+      </View>
+    </TouchableOpacity>
   );
 
-  const renderItem = ({ item }) => {
-    const backgroundColor = 'white'; 
-    const color = 'black' ; 
+  const renderItem = ({item}) => {
+    const backgroundColor = 'white';
+    const color = 'black';
     return (
       <React.Fragment>
         <Item
           item={item}
           key={item.id}
           onPress={() => issueLocationSelectHandler(item)}
-          backgroundColor={{ backgroundColor }}
-          textColor={{ color }}
+          backgroundColor={{backgroundColor}}
+          textColor={{color}}
         />
         <Separator />
       </React.Fragment>
@@ -124,12 +141,12 @@ const IssueLocationListScreen = ({navigation, route}) => {
           data={issueLocationList}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-          onDragEnd={({ data }) => setIssueLocationList(data)}
+          onDragEnd={({data}) => setIssueLocationList(data)}
         />
       </SafeAreaView>
     </React.Fragment>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -140,7 +157,7 @@ const styles = StyleSheet.create({
     height: 'auto',
   },
   item: {
-    height:70,
+    height: 70,
     padding: 20,
     flex: 1,
     flexDirection: 'row',
@@ -150,8 +167,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    alignItems:'center',
+    alignItems: 'center',
   },
 });
-  
+
 export default IssueLocationListScreen;

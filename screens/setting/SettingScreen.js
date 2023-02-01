@@ -17,6 +17,10 @@ const SettingScreen = ({navigation}) => {
     navigation.navigate('DataManageList');
   };
 
+  const ProjectManagementHandler = async () => {
+    navigation.navigate('ProjectManagementListScreen');
+  }
+
   return (
     <React.Fragment>
       <View style={styles.container}>
@@ -38,8 +42,10 @@ const SettingScreen = ({navigation}) => {
             style={[styles.group]}>
             <Text style={[styles.text]}>{'使用者管理'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={[styles.group]}>
-            <Text style={[styles.text]}>{'編輯個人資料'}</Text>
+          <TouchableOpacity
+            onPress={ProjectManagementHandler}
+            style={[styles.group]}>
+            <Text style={[styles.text]}>{'專案管理'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={dataManagementHandler}

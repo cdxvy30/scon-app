@@ -21,22 +21,23 @@ import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
 import {AuthContext} from '../../context/AuthContext';
 
-const UserListScreen = ({navigation}) => {
+const ProjectManagementListScreen = ({navigation}) => {
   const {userInfo} = useContext(AuthContext);
-  const [userList, setUserList] = useState([]);
+  const [projectList, setProjectList] = useState([]);
   const [fetchRoute, setFetchRoute] = useState('');
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const isFocused = useIsFocused(); // not sure why using this
-
+  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const isFocused = useIsFocused();
+  
   useEffect(() => {
-    if (userInfo.user.permission == '管理員') {
-      setFetchRoute(`${BASE_URL}/users/all`);
-    } else if (userInfo.user.permission == '公司負責人') {
-      setFetchRoute(`${BASE_URL}/users/${userInfo.user.corporation}`);
+    if (userInfo.user.permission === '管理員') {
+      setFetchRoute(`${BASE_URL}/projects/list/all`);
+    } else if (userInfo.user.permission === '公司負責人') {
+      setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
     }
 
     console.log(fetchRoute);
-    const fetchUsers = () => {
+
+    const fetchProjects = () => {
       axios
         .get(fetchRoute, {
           headers: {
@@ -44,50 +45,51 @@ const UserListScreen = ({navigation}) => {
           },
         })
         .then(async (res) => {
-          let users = await res.data;
-          console.log(users);
-          setUserList(users);
+          let projects = await res.data;
+          setProjectList(projects);
         })
         .catch((e) => {
-          console.log(`List users error: ${e}`);
+          console.log(`List projects error: ${e}`);
         });
     };
     if (isFocused) {
-      fetchUsers();
+      fetchProjects();
     }
   }, [isFocused, userInfo, fetchRoute]);
 
-  const UserManageHandler = async (user) => {
-    setSelectedUserId(user.id);
-    console.log(user);
-    await navigation.navigate('UserManagementScreen', {
-      user_name: user.user_name,
-      user_id: user.user_id,
-      user_permission: user.user_permission,
-      user_job: user.user_job,
-    });
+  const ProjectManagementHandler = async (project) => {
+    setSelectedProjectId(project.project_id);
+    console.log(project);
+    try {
+      await navigation.navigate('ProjectManagementScreen', {
+        project_id: project.project_id,
+        project_name: project.project_name,
+        project_corporation: project.project_corporation,
+      });
+    } catch (error) {
+      console.log(`Navigate to Project Management error: ${error}`);
+    }
   };
 
-  const Item = ({item, onPress, backgroundColor, textColor}) => (
-    <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-      <Text style={[styles.title, textColor]}>
-        {item.user_name} | {item.user_corporation} | {item.user_permission} |{' '}
-        {item.user_job}
-      </Text>
-      {/* <Text style={[styles.title, textColor]}>{item.user_corporation}</Text>
-      <Text style={[styles.title, textColor]}>{item.user_job}</Text> */}
-    </TouchableOpacity>
-  );
+  const Item = ({item, onPress, backgroundColor, textColor}) => {
+    return (
+      <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+        <Text style={[styles.title, textColor]}>
+          {item.project_name} | {item.project_manager ? item.project_manager : '未分配專案管理員'}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderItem = ({ item }) => {
     const backgroundColor =
-      item.id === setSelectedUserId ? '#600000' : '#ffffff';
-    const color = item.id === setSelectedUserId ? 'white' : 'black';
+      item.id === setSelectedProjectId ? "#600000" : "#ffffff";
+    const color = item.id === setSelectedProjectId ? 'white' : 'black';
 
     return (
       <Item
         item={item}
-        onPress={() => UserManageHandler(item)}
+        onPress={() => ProjectManagementHandler(item)}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
       />
@@ -97,10 +99,10 @@ const UserListScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={userList}
+        data={projectList}
         renderItem={renderItem}
-        keyExtractor={(item) => item.user_id}
-        extraData={selectedUserId}
+        keyExtractor={(item) => item.project_id}
+        extraData={selectedProjectId}
       />
     </SafeAreaView>
   );
@@ -136,4 +138,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserListScreen;
+export default ProjectManagementListScreen;
