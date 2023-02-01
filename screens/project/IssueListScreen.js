@@ -428,29 +428,29 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
-  useEffect(() => {
-    const fetchIssues = async () => {
-      const project = await SqliteManager.getProjectByName(route.params.name);
-      const issues = await SqliteManager.getIssuesByProjectId(project.id);
-      const getHydratedIssuePromises = issues.map(issue =>
-        SqliteManager.getHydratedIssue(issue.id),
-      );
-      const hydratedIssues = await Promise.all(getHydratedIssuePromises);
-      const transformedIssues = transformIssues(hydratedIssues);
-      const sortedIssues = transformedIssues.sort(
-        (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
-      );
-      setIssueList(sortedIssues);
-      setProjectId(project.id);
-      setProject(project);
-      setSelectedIssueList(issuesFilter(sortedIssues));
-    };
+  // useEffect(() => {
+  //   const fetchIssues = async () => {
+  //     const project = await SqliteManager.getProjectByName(route.params.name);
+  //     const issues = await SqliteManager.getIssuesByProjectId(project.id);
+  //     const getHydratedIssuePromises = issues.map(issue =>
+  //       SqliteManager.getHydratedIssue(issue.id),
+  //     );
+  //     const hydratedIssues = await Promise.all(getHydratedIssuePromises);
+  //     const transformedIssues = transformIssues(hydratedIssues);
+  //     const sortedIssues = transformedIssues.sort(
+  //       (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+  //     );
+  //     setIssueList(sortedIssues);
+  //     setProjectId(project.id);
+  //     setProject(project);
+  //     setSelectedIssueList(issuesFilter(sortedIssues));
+  //   };
 
-    if (isFocused) {
-      fetchIssues();
-    }
-    selectedIssueList;
-  }, [route.params.name, issueReportGenerator, isFocused]);
+  //   if (isFocused) {
+  //     fetchIssues();
+  //   }
+  //   selectedIssueList;
+  // }, [route.params.name, issueReportGenerator, isFocused]);
 
   useEffect(() => {
     const fetchIssues = async () => {
