@@ -57,6 +57,8 @@ const IssueScreen = ({navigation, route}) => {
   console.log(project.project_id);
   const item = route.params.item;
   const projectId = project.project_id;
+  const projectName = project.project_name;
+  const projectCorporation = project.project_corporation;
   const {userInfo} = useContext(AuthContext);
   const isFocused = useIsFocused();
   const [action, setAction] = useState(route.params.action);
@@ -630,6 +632,8 @@ const IssueScreen = ({navigation, route}) => {
                 issueAssigneeText: issueAssigneeText,
                 issueStatus: issueStatus,
                 projectId: projectId,
+                projectName: projectName,
+                projectCorporation: projectCorporation,
               };
               const metadata = JSON.stringify(data);
               var bodyFormData = new FormData();

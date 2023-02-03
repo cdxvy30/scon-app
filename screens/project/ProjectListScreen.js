@@ -60,8 +60,8 @@ const ProjectListScreen = ({ navigation }) => {
       setFetchRoute(`${BASE_URL}/projects/list/all`);
     else if (userInfo.user.permission == "公司負責人")
       setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
-    else if (userInfo.user.permission == "專案管理員")
-      setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
+    else if (userInfo.user.permission == "專案管理員")  // 要改成從works_on fetch
+      setFetchRoute(`${BASE_URL}/projects/works_on/${userInfo.user.uuid}`);
 
     console.log(fetchRoute);
     const fetchProjects = async () => {

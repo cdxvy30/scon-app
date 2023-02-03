@@ -565,15 +565,16 @@ const IssueListScreen = ({navigation, route}) => {
             color={determineStatusColor(item)}
           />
           <Text style={[styles.timestampText, textColor]}>
-            {item.timestamp}
+            {item.createat}
           </Text>
         </View>
         <Text style={[styles.descriptionText, textColor]}>
-          {item.violation_type === '其他'
+          {/* {item.violation_type === '其他'
             ? `[${item.violation_type}]\n${item.type_remark}`
             : item.violation_type !== ''
             ? `(${item.violation_type})\n${item.title}`
-            : ''}
+            : ''} */}
+            {item.issue_title}
         </Text>
         <View style={styles.objLabelAreaContainer}>
           {Array.isArray(item.labels) ? (
