@@ -23,14 +23,13 @@ import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../configs/authConfig";
 import axios from "axios";
 
-const determineStatusColor = (item) => {
-  let color = "grey";
-  // if (item.status === 0) color = 'limegreen';
-  // if (item.status === 1) color = 'gold';
-  // if (item.status === 2) color = 'orangered';
-
-  return color;
-};
+// const determineStatusColor = (item) => {
+//   let color = "grey";
+//   if (item.issue_status === '0') color = 'limegreen';
+//   if (item.issue_status === '1') color = 'gold';
+//   if (item.issue_status === '2') color = 'orangered';
+//   return color;
+// };
 
 const ProjectListScreen = ({ navigation }) => {
   const { userInfo } = useContext(AuthContext);
@@ -154,12 +153,12 @@ const ProjectListScreen = ({ navigation }) => {
         />
         <Text style={[styles.title, textColor]}>{item.project_name}</Text>
       </View>
-      <Ionicons
+      {/* <Ionicons
         style={styles.status}
         name={"ios-ellipse"}
         size={24}
         color={determineStatusColor(item)}
-      />
+      /> */}
     </TouchableOpacity>
   );
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   ActionSheetIOS,
   SafeAreaView,
@@ -13,24 +13,48 @@ import { useIsFocused } from '@react-navigation/native';
 import Separator from '../../components/Separator';
 import SqliteManager from '../../services/SqliteManager';
 import {OBJECT_TYPE} from '../../configs/objectTypeConfig';
+import { AuthContext } from "../../context/AuthContext";
+import { BASE_URL } from '../../configs/authConfig';
+import axios from 'axios';
 
 const DataManageListScreen = ({navigation}) => {
   const [projectList, setProjectList] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState([]);
+  const [fetchRoute, setFetchRoute] = useState([]);
   const isFocused = useIsFocused();
+  const { userInfo } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const projects = await SqliteManager.getAllProjects();
-      setProjectList(projects);
+    if (userInfo.user.permission == "管理員")
+      setFetchRoute(`${BASE_URL}/projects/list/all`);
+    else if (userInfo.user.permission == "公司負責人")
+      setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
+    else if (userInfo.user.permission == "專案管理員")  // 要改成從works_on fetch
+      setFetchRoute(`${BASE_URL}/projects/works_on/${userInfo.user.uuid}`);
+
+    const fetchProjects = async () => {
+      await axios
+        .get(fetchRoute, {
+          headers: {
+            Authorization: `Bearer ` + `${userInfo.token}`,
+          },
+        })
+        .then(async (res) => {
+          let projects = await res.data;
+          console.log(projects);
+          setProjectList(projects);
+        })
+        .catch((e) => {
+          console.error(`List Projects Error: ${e}`);
+        });
     };
+
     if (isFocused) {
-      fetchData();
+      fetchProjects();
     }
-  }, [isFocused]);
+  }, [isFocused, userInfo, fetchRoute]);
 
   projectListClickHandler = () => {
-    var options = projectList.map(item => item.name);
+    var options = projectList.map(item => item.project_name);
     options.push('取消');
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -42,8 +66,7 @@ const DataManageListScreen = ({navigation}) => {
         if (buttonIndex == options.length - 1) {
           return;
         } else {
-          setSelectedProjectId(projectList[buttonIndex].id);
-          await navigation.navigate('DataManage', { name: projectList[buttonIndex].name, project: await SqliteManager.getProject(selectedProjectId) });
+          await navigation.navigate('DataManage', { name: projectList[buttonIndex].project_name, project: projectList[buttonIndex] });
         }
       },
     );
@@ -71,7 +94,7 @@ const DataManageListScreen = ({navigation}) => {
               <React.Fragment>
                 <Separator />
                 <Text style={[styles.description, {marginVertical: 12}]} ellipsizeMode={'tail'} numberOfLines={1}>
-                  {projectList.map(o => `${o.name}  `)}
+                  {projectList.map(o => `${o.project_name}  `)}
                 </Text>
               </React.Fragment>
             ) : undefined}

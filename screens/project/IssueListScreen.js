@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
+import {AuthContext} from '../../context/AuthContext';
 import {
   ActionSheetIOS,
   Alert,
@@ -42,16 +43,17 @@ import { BASE_URL } from '../../configs/authConfig';
 
 const determineStatusColor = item => {
   let color = 'grey';
-  if (item.status === 0) color = 'limegreen';
-  if (item.status === 1) color = 'gold';
-  if (item.status === 2) color = 'orangered';
+  if (item.issue_status === '0') color = 'limegreen';
+  if (item.issue_status === '1') color = 'gold';
+  if (item.issue_status === '2') color = 'orangered';
 
   return color;
 };
 
 const IssueListScreen = ({navigation, route}) => {
-  console.log(route.params);
+  // console.log(route.params.project);
   // const project = route.params;
+  const { userInfo } = useContext(AuthContext)
   const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
@@ -63,16 +65,16 @@ const IssueListScreen = ({navigation, route}) => {
   const [isExporting, setIsExporting] = useState(false);
   const isFocused = useIsFocused();
 
-  function issuesFilter(sortedIssues) {
+  function issuesFilter(Issues) {
     var a = [];
-    for (let i = 0; i < sortedIssues.length; i++) {
+    for (let i = 0; i < Issues.length; i++) {
       if (
         new Date(selectedEndDate).getTime() + 43200000 >=
-          new Date(sortedIssues[i].timestamp).getTime() &&
+          new Date(Issues[i].createat).getTime() &&
         new Date(selectedStartDate).getTime() - 43200000 <=
-          new Date(sortedIssues[i].timestamp).getTime()
+          new Date(Issues[i].createat).getTime()
       ) {
-        a.push(sortedIssues[i]);
+        a.push(Issues[i]);
       }
     }
     return a;
@@ -174,7 +176,7 @@ const IssueListScreen = ({navigation, route}) => {
         userInterfaceStyle: 'light', //'dark'
       },
       async buttonIndex => {
-        const fs = RNFetchBlob.fs;
+        const { config, fs } = RNFetchBlob;
         const dirs = RNFetchBlob.fs.dirs;
         const docPath = dirs.DocumentDir;
         const projectName = route.params.name;
@@ -203,6 +205,7 @@ const IssueListScreen = ({navigation, route}) => {
 
             await Share.open(shareDataOption); // ...after the file is saved, send it to a system share intent
             break;
+
           case 2:
             let urls = (selectedEndDate ? selectedIssueList : issueList).map(
               issue => 'file://' + issue.image.uri,
@@ -215,113 +218,150 @@ const IssueListScreen = ({navigation, route}) => {
 
             const shareImageOption = {
               title: 'MyApp',
-              message: `${projectName}-image`,
+              message: `${project.project_name}-image`,
               urls,
-              subject: `${projectName}-image`, // for email
+              subject: `${project.project_name}-image`, // for email
             };
             await Share.open(shareImageOption);
             break;
+
           case 3:
-            setIsExporting(true);
-            const doc = new Document({
-              sections: issueReportGenerator(
-                projectName,
-                project,
-                selectedEndDate,
-                selectedStartDate,
-                selectedEndDate ? selectedIssueList : issueList,
-                fs,
-              ),
-            });
+            try{
+                setIsExporting(true);
 
-            await Packer.toBase64String(doc).then(base64 => {
-              fs.writeFile(
-                `${docPath}/${projectName}-缺失記錄表.docx`,
-                base64,
-                'base64',
-              );
-              setIsExporting(false);
-            });
-
-            const shareDataTableOption = {
-              title: 'MyApp',
-              message: `${projectName}-缺失記錄表`,
-              url: `file://${docPath}/${projectName}-缺失記錄表.docx`,
-              type: 'application/docx',
-              subject: `${projectName}-缺失記錄表`, // for email
-            };
-
-            await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
-            break;
-
-          case 4:
-            setIsExporting(true);
-            const doc_2 = new Document({
-              sections: [
-                {
-                  properties: {},
-                  children: improveReportGenerator(
+                let options = {
+                  session : 'output_image',
+                  fileCache: true,
+                }
+                for (let i = issueList.length - 1; i >= 0; i--){
+                  await RNFetchBlob.config(options)
+                    .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedEndDate ? selectedIssueList[i].issue_id : issueList[i].issue_id}`)
+                    .then(() => {
+                      console.log(RNFetchBlob.session('output_image').list().length)
+                    })
+                    .catch(err => {
+                      console.log(err)
+                    });
+                }
+                const doc = new Document({
+                  sections: issueReportGenerator(
+                    userInfo,
+                    project,
+                    selectedEndDate,
+                    selectedStartDate,
                     selectedEndDate ? selectedIssueList : issueList,
                     fs,
-                    project,
-                    projectName,
                   ),
+                });
+    
+                await Packer.toBase64String(doc).then(base64 => {
+                  fs.writeFile(
+                    `${docPath}/${project.project_name}-缺失記錄表.docx`,
+                    base64,
+                    'base64',
+                  );
+                });
+
+                const shareDataTableOption = {
+                  title: 'MyApp',
+                  message: `${project.project_name}-缺失記錄表`,
+                  url: `file://${docPath}/${project.project_name}-缺失記錄表.docx`,
+                  type: 'application/docx',
+                  subject: `${project.project_name}-缺失記錄表`, // for email
+                };
+    
+                await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
+
+                Alert.alert('匯出成功！', '', [
+                  {
+                    text: '返回',
+                    onPress: () => setIsExporting(false),
+                    style: 'cancel',
+                  },
+                ]);
+            }
+            catch(error){
+              Alert.alert('匯出取消或失敗', '', [
+                {
+                  text: '返回',
+                  onPress: () => setIsExporting(false),
+                  style: 'cancel',
                 },
-              ],
-            });
+              ]);
+            }
+            finally{
+              RNFetchBlob.session('output_image').dispose();
+            }
+              
+          case 4:
+              setIsExporting(true);
+              const doc_2 = new Document({
+                sections: [
+                  {
+                    properties: {},
+                    children: improveReportGenerator(
+                      selectedEndDate ? selectedIssueList : issueList,
+                      fs,
+                      config,
+                      project,
+                    ),
+                  },
+                ],
+              });
+  
+              await Packer.toBase64String(doc_2).then(base64 => {
+                console.log('exporting Roport');
+                fs.writeFile(
+                  `${docPath}/${project.project_name}-缺失改善前後記錄表.docx`,
+                  base64,
+                  'base64',
+                );
+              });
+  
+              const shareDataTableOption_2 = {
+                title: 'MyApp',
+                message: `${project.project_name}-缺失改善前後記錄表`,
+                url: `file://${docPath}/${project.project_name}-缺失改善前後記錄表.docx`,
+                type: 'application/docx',
+                subject: `${project.project_name}-缺失改善前後記錄表`, // for email
+              };
+  
+              await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
+              break;
 
-            await Packer.toBase64String(doc_2).then(base64 => {
-              console.log('exporting Roport');
-              fs.writeFile(
-                `${docPath}/${projectName}-缺失改善前後記錄表.docx`,
-                base64,
-                'base64',
-              );
-              setIsExporting(false);
-            });
+          // case 5:
+          //   const issue_web = issueHtmlGenerator(
+          //     selectedEndDate ? selectedIssueList : issueList,
+          //     fs,
+          //     config,
+          //     project,
+          //   );
+          //   await fs.writeFile(
+          //     `${docPath}/${project.project_name}-缺失改善前後錄表.html`,
+          //     issue_web.html,
+          //     'utf8',
+          //   );
+          //   const shareDataOption_3 = {
+          //     title: 'MyApp',
+          //     message: `${project.project_name}-缺失改善前後錄表`,
+          //     url: `file://${docPath}/${project.project_name}-缺失改善前後錄表.html`,
+          //     type: 'application/html',
+          //     subject: `${project.project_name}-缺失改善前後錄表`, // for email
+          //   };
 
-            const shareDataTableOption_2 = {
-              title: 'MyApp',
-              message: `${projectName}-缺失改善前後記錄表`,
-              url: `file://${docPath}/${projectName}-缺失改善前後記錄表.docx`,
-              type: 'application/docx',
-              subject: `${projectName}-缺失改善前後記錄表`, // for email
-            };
-
-            await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
-            break;
-
-          case 5:
-            const issue_web = issueHtmlGenerator(
-              selectedEndDate ? selectedIssueList : issueList,
-              fs,
-              project,
-              projectName,
-            );
-            await fs.writeFile(
-              `${docPath}/${projectName}-缺失改善前後錄表.html`,
-              issue_web.html,
-              'utf8',
-            );
-            const shareDataOption_3 = {
-              title: 'MyApp',
-              message: `${projectName}-缺失改善前後錄表`,
-              url: `file://${docPath}/${projectName}-缺失改善前後錄表.html`,
-              type: 'application/html',
-              subject: `${projectName}-缺失改善前後錄表`, // for email
-            };
-
-            await Share.open(shareDataOption_3); // ...after the file is saved, send it to a system share intent
-            break;
+          //   await Share.open(shareDataOption_3); // ...after the file is saved, send it to a system share intent
+          //   break;
         }
       },
     );
   };
 
   const issueSortHandler = () => {
+    console.log(isExporting)
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '依時間排序', '依追蹤缺失數量排序'],
+        options: ['取消', '依時間排序(由新到舊)', '依時間排序(由舊到新)'],
+        // options: ['取消', '依時間排序(由新到舊)', '依時間排序(由舊到新)', '依追蹤缺失數量排序'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
@@ -333,10 +373,10 @@ const IssueListScreen = ({navigation, route}) => {
           case 1:
             selectedEndDate
               ? selectedIssueList.sort(
-                  (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+                  (a, b) => new Date(b.createat) - new Date(a.createat),
                 )
               : issueList.sort(
-                  (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+                  (a, b) => new Date(b.createat) - new Date(a.createat),
                 );
             selectedEndDate
               ? setSelectedIssueList([...selectedIssueList])
@@ -345,15 +385,27 @@ const IssueListScreen = ({navigation, route}) => {
           case 2:
             selectedEndDate
               ? selectedIssueList.sort(
-                  (a, b) => b.attachments.length - a.attachments.length,
+                  (a, b) => new Date(a.createat) - new Date(b.createat),
                 )
               : issueList.sort(
-                  (a, b) => b.attachments.length - a.attachments.length,
+                  (a, b) => new Date(a.createat) - new Date(b.createat),
                 );
             selectedEndDate
               ? setSelectedIssueList([...selectedIssueList])
               : setIssueList([...issueList]);
-            break;
+            break;            
+          // case 3:
+          //   selectedEndDate
+          //     ? selectedIssueList.sort(
+          //         (a, b) => b.attachments.length - a.attachments.length,
+          //       )
+          //     : issueList.sort(
+          //         (a, b) => b.attachments.length - a.attachments.length,
+          //       );
+          //   selectedEndDate
+          //     ? setSelectedIssueList([...selectedIssueList])
+          //     : setIssueList([...issueList]);
+          //   break;
         }
       },
     );
@@ -362,7 +414,7 @@ const IssueListScreen = ({navigation, route}) => {
   const issueOptionHandler = React.useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['取消', '按日期篩選'],
+        options: ['取消', '按日期篩選', '恢復全部顯示'],
         // destructiveButtonIndex: [1,2],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'light', //'dark'
@@ -376,6 +428,10 @@ const IssueListScreen = ({navigation, route}) => {
               setSelectedStartDate,
               setSelectedEndDate,
             });
+            break;
+          case 2:
+            setSelectedStartDate(null);
+            setSelectedEndDate(null);
         }
       },
     );
@@ -460,12 +516,13 @@ const IssueListScreen = ({navigation, route}) => {
           let issues = await res.data;
           console.log(issues);
           setIssueList(issues);
+          setSelectedIssueList(issuesFilter(issues))
         })
         .catch((e) => {
           console.log(`List issues error: ${e}`);
         });
     };
-
+    
     if (isFocused) {
       fetchIssues();
     }
@@ -627,7 +684,7 @@ const IssueListScreen = ({navigation, route}) => {
       </React.Fragment>
     );
   }
-  if (isDedecting === true) {
+  else if (isDedecting === true) {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -644,8 +701,8 @@ const IssueListScreen = ({navigation, route}) => {
         <SafeAreaView style={styles.container}>
           <FlatList
             ListHeaderComponent={<Separator />}
-            // data={selectedEndDate ? selectedIssueList : issueList}
-            data={issueList}
+            data={selectedEndDate ? selectedIssueList : issueList}
+            // data={issueList}
             renderItem={renderItem}
             keyExtractor={item => item.id}
             extraData={selectedIssueId}

@@ -21,12 +21,11 @@ const DataManageScreen = ({navigation, route}) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
+    console.log(project)
     const fetchData = async () => {
-      const project = await SqliteManager.getProjectByName(route.params.name);
-      const corporations = await SqliteManager.getWorkItemsByProjectId(project.id);
-      setProjectId(project.id);
-      setProject(project);
-      setCorporationList(corporations);
+      // 等資料庫建責任廠商的table
+      // const corporations = await SqliteManager.getWorkItemsByProjectId(project.id);
+      // setCorporationList(corporations);
     };
     if (isFocused) {
       fetchData();
@@ -57,6 +56,30 @@ const DataManageScreen = ({navigation, route}) => {
                   <Text style={styles.description}>
                     {' '}
                     {corporationList.length}個{' '}
+                  </Text>
+                </View>
+              </View>
+            {corporationList.length > 0 ? (
+              <React.Fragment>
+                <Separator />
+                <Text style={[styles.description, {marginVertical: 12}]} ellipsizeMode={'tail'} numberOfLines={1}>
+                  {corporationList.map(o => `${o.company}  `)}
+                </Text>
+              </React.Fragment>
+            ) : undefined}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.group}>
+            <TouchableOpacity onPress={corporationClickHandler}>
+              <View style={styles.item}>
+                <Text style={styles.title}>
+                  <Ionicons style={styles.titleIcon} name={'ios-pricetags'} />{' '}
+                  地點
+                </Text>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.description}>
+                    {' '}
+                    {corporationList.length}個{' '} 
                   </Text>
                 </View>
               </View>
