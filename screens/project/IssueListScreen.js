@@ -526,7 +526,7 @@ const IssueListScreen = ({navigation, route}) => {
     if (isFocused) {
       fetchIssues();
     }
-  }, [isFocused, issuesFilter, project.project_id]);  // dependancy array
+  }, [isFocused, project.project_id]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
