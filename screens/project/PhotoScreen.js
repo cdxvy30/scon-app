@@ -57,9 +57,13 @@ const PhotoScreen = ({ navigation, route }) => {
       headerRight: () => (
         <React.Fragment>
           <Button title="辨識" disabled={isImageDetect} onPress={imageDetect} />
-          <Button title="完成" onPress={() => { navigation.goBack(); }} />
+          <Button
+            title="完成"
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
         </React.Fragment>
-
       ),
     });
   }, [boxObjects, isImageDetect, navigation]);
@@ -215,8 +219,9 @@ const PhotoScreen = ({ navigation, route }) => {
       issue_id: issueId,
       name: name,
       mode: mode,
-      path: path
+      path: path,
     };
+    console.log(newLabel);
     await SqliteManager.createIssueLabel(newLabel);
 
     const allLabels = await SqliteManager.getIssueLabelsByIssueId(issueId);
@@ -225,13 +230,12 @@ const PhotoScreen = ({ navigation, route }) => {
     );
     const latestLabels = sortedLabels[0];
 
-
     return {
       key: latestLabels.id,
       name: name,
       box: box,
       mode: mode,
-      path: path
+      path: path,
     };
   };
 

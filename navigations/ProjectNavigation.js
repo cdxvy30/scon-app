@@ -26,7 +26,7 @@ const ProjectNavigation = ({navigation}) => {
         <Stack.Screen
           name="IssueList"
           component={IssueListScreen}
-          options={({route}) => ({title: route.params.name})}
+          options={({route}) => ({title: route.params.project.project_name})}
         />
         <Stack.Screen
           name="Issue"
