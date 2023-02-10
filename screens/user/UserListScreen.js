@@ -85,18 +85,22 @@ const UserListScreen = ({navigation}) => {
     const color = item.id === setSelectedUserId ? 'white' : 'black';
 
     return (
-      <Item
-        item={item}
-        onPress={() => UserManageHandler(item)}
-        backgroundColor={{ backgroundColor }}
-        textColor={{ color }}
-      />
+      <View>
+        <Item
+          item={item}
+          onPress={() => UserManageHandler(item)}
+          backgroundColor={{ backgroundColor }}
+          textColor={{ color }}
+        />
+        <Separator key={`seperator_${item.id}`} />
+      </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
+        ListHeaderComponent={<Separator />}
         data={userList}
         renderItem={renderItem}
         keyExtractor={(item) => item.user_id}
@@ -128,11 +132,6 @@ const styles = StyleSheet.create({
   title: {
     marginLeft: 8,
     fontSize: 20,
-    width: 250,
-    alignSelf: 'center',
-  },
-  status: {
-    marginTop: 26,
   },
 });
 

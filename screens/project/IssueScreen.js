@@ -186,7 +186,7 @@ const IssueScreen = ({navigation, route}) => {
           case 1:
             launchCamera({mediaType: 'photo', saveToPhotos: true}, res => {
               if (res.errorMessage !== undefined) {
-                console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
+                console.error(`code: ${res.errorCode}: ${res.errorMessage}`);
                 return;
               }
 
@@ -198,7 +198,7 @@ const IssueScreen = ({navigation, route}) => {
           case 2:
             launchImageLibrary({mediaType: 'photo'}, res => {
               if (res.errorMessage !== undefined) {
-                console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
+                console.error(`code: ${res.errorCode}: ${res.errorMessage}`);
                 return;
               }
 
@@ -777,8 +777,7 @@ const IssueScreen = ({navigation, route}) => {
             <Separator />
             <TouchableOpacity onPress={workItemClickHandler}>
               <View style={styles.item}>
-                <Text style={styles.title}>工項</Text>
-                <Text style={{fontSize: 18, color: '#8C8C8C'}}>(選填) </Text>
+                <Text style={{fontSize: 18, color: '#8C8C8C'}}>工項(選填)</Text>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={styles.textInput}>
                     {!!issueTaskText ? issueTaskText : undefined}

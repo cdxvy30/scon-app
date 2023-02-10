@@ -87,18 +87,22 @@ const ProjectManagementListScreen = ({navigation}) => {
     const color = item.id === setSelectedProjectId ? 'white' : 'black';
 
     return (
-      <Item
-        item={item}
-        onPress={() => ProjectManagementHandler(item)}
-        backgroundColor={{ backgroundColor }}
-        textColor={{ color }}
-      />
+      <View>
+        <Item
+          item={item}
+          onPress={() => ProjectManagementHandler(item)}
+          backgroundColor={{ backgroundColor }}
+          textColor={{ color }}
+        />
+        <Separator key={`seperator_${item.id}`} />
+      </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
+        ListHeaderComponent={<Separator />}
         data={projectList}
         renderItem={renderItem}
         keyExtractor={(item) => item.project_id}

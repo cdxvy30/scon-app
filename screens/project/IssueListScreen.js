@@ -657,18 +657,18 @@ const IssueListScreen = ({navigation, route}) => {
     return (
       <React.Fragment>
         <Swipeout
-          key={item.id}
+          key={item.issue_id}
           right={swipeBtns}
           onOpen={() => setSelectedIssueId(item.id)}>
           <Item
-            key={`${item.id}`}
+            key={`${item.issue_id}`}
             item={item}
             onPress={() => issueSelectHandler(item)}
             backgroundColor={{backgroundColor}}
             textColor={{color}}
           />
         </Swipeout>
-        <Separator key={`seperator_${item.id}`} />
+        <Separator key={`seperator_${item.issue_id}`} />
       </React.Fragment>
     );
   };
@@ -704,7 +704,7 @@ const IssueListScreen = ({navigation, route}) => {
             data={selectedEndDate ? selectedIssueList : issueList}
             // data={issueList}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.issue_id}
             extraData={selectedIssueId}
           />
           <View style={styles.addPhotoBtn}>
