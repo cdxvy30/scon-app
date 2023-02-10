@@ -20,12 +20,15 @@ import {BASE_URL} from '../../configs/authConfig';
 import axios from 'axios';
 
 const IssueLocationListScreen = ({navigation, route}) => {
-  console.log(route.params);
-  const SourceProject = route.params.project;
+  // console.log(route.params);
+  const sourceProject = route.params.project;
+  // console.log('Source Project');
+  // console.log(sourceProject);
+  const projectId = sourceProject.project_id;
   const [issueLocationList, setIssueLocationList] = useState(null);
   // const [projectId, setProjectId] = useState(route.params.projectId);
   const [project, setProject] = useState(route.params.project); // 用不到
-  const [projectId, setProjectId] = useState(SourceProject.project_id);
+  // const [projectId, setProjectId] = useState(sourceProject.project_id);
   const isFocused = useIsFocused();
 
   React.useLayoutEffect(() => {
@@ -42,21 +45,16 @@ const IssueLocationListScreen = ({navigation, route}) => {
               Alert.prompt(
                 '請輸入缺失位置',
                 '(如: 2F西側)',
-                async (location, projectId) => {
+                async (location) => {
                   if (location == '') {
                     Alert.alert('未填寫任何位置');
                   } else {
                     route.params.setIssueLocationText(location);
-                    // navigation.goBack();
-                    // await SqliteManager.createIssueLocation({
-                    //   project_id: projectId,
-                    //   location: location,
-                    // });
-                    axios({
-                      method: 'post',
-                      url: `${BASE_URL}/locations/add`,
-                      data: {location, projectId},
-                    })
+                    axios
+                      .post(`${BASE_URL}/locations/add`, {
+                        location,
+                        projectId,
+                      })
                       .then(async (res) => {
                         console.log(res.data);
                       })
@@ -82,40 +80,53 @@ const IssueLocationListScreen = ({navigation, route}) => {
   }, [navigation, projectId, route.params]);
 
   useEffect(() => {
-    const fetchIssueLocations = async () => {
-      const issuelocations = await SqliteManager.getIssueLocationsByProjectId(
-        project.id,
-      );
-      const sortedIssuelocations = issuelocations.sort(
-        (a, b) => new Date(a.created_at) - new Date(b.created_at),
-      );
+    // const fetchIssueLocations = async () => {
+    //   const issuelocations = await SqliteManager.getIssueLocationsByProjectId(
+    //     project.id,
+    //   );
+    //   const sortedIssuelocations = issuelocations.sort(
+    //     (a, b) => new Date(a.created_at) - new Date(b.created_at),
+    //   );
 
-      issueLocationList
-        ? issueLocationList
-        : setIssueLocationList(sortedIssuelocations);
-      setProjectId(project.id);
-      setProject(project);
+    //   issueLocationList
+    //     ? issueLocationList
+    //     : setIssueLocationList(sortedIssuelocations);
+    //   setProjectId(project.id);
+    //   setProject(project);
+    // };
+
+    const fetchIssueLocations = async () => {
+      await axios
+        .get(`${BASE_URL}/locations/list/${projectId}`)
+        .then(async (res) => {
+          let data = await res.data;
+          setIssueLocationList(data);
+        })
+        .catch((e) => {
+          console.log(`list locations error: ${e}`);
+        });
     };
 
     if (isFocused) {
       fetchIssueLocations();
     }
-  }, [isFocused, issueLocationList, project]);
+  }, [isFocused, project, projectId]);
 
-  const issueLocationSelectHandler = item => {
-    route.params.setIssueLocationText(item.location);
+  const issueLocationSelectHandler = (item) => {
+    console.log(item);
+    route.params.setIssueLocationText(item.location_name);
     navigation.goBack();
   };
 
   const Item = ({item, onPress, backgroundColor, textColor}) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
       <View style={{flex: 1, flexDirection: 'row'}}>
-        <Text style={[styles.title, textColor]}>{item.location}</Text>
+        <Text style={[styles.title, textColor]}>{item.location_name}</Text>
       </View>
     </TouchableOpacity>
   );
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const backgroundColor = 'white';
     const color = 'black';
     return (

@@ -56,9 +56,12 @@ const IssueScreen = ({navigation, route}) => {
   let project = route.params.project;
   console.log(project.project_id);
   const item = route.params.item;
+  console.log(item);
+  // ID作為issue的FK, 同時綁專案名稱、公司
   const projectId = project.project_id;
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
+
   const {userInfo} = useContext(AuthContext);
   const isFocused = useIsFocused();
   const [action, setAction] = useState(route.params.action);
@@ -90,10 +93,11 @@ const IssueScreen = ({navigation, route}) => {
   const keyboardDidShowListener = useRef();
   const keyboardDidHideListener = useRef();
 
+  // 功用未知
   const onKeyboardShow = event =>
     setKeyboardOffset(event.endCoordinates.height);
   const onKeyboardHide = () => setKeyboardOffset(0);
-
+  // 更改issue追蹤狀態(Boolean)
   const issueTrackToggleHandler = () => {
     setIssueTrack(previousState => !previousState);
   };
@@ -108,6 +112,7 @@ const IssueScreen = ({navigation, route}) => {
 
   //   })};
 
+  // 不確定意義是什麼
   const attachmentAddHandler = async image => {
     const imageUri = image.uri;
     const transformedImageUri = imageUri.replace('file://', '');
@@ -279,7 +284,7 @@ const IssueScreen = ({navigation, route}) => {
     navigation.navigate('Photo', {
       issueId: issueId,
       image: item.image,
-      issueLabels: issueLabels,
+      issueLabels: issueLabels,   // 傳參
       setIssueLabels: labels => {
         setIssueLabels(labels);
       },
@@ -349,7 +354,19 @@ const IssueScreen = ({navigation, route}) => {
   };
 
   const responsibleCorporationclickHandler = async () => {
-    var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    // fetch協力廠商
+    // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    var options = [];
+    axios
+      .get(`${BASE_URL}/corporation/${projectId}`)
+      .then(async (res) => {
+        options = res.data;
+        console.log(options);    
+      })
+      .catch(e => {
+        console.log(`Fetch corporation error: ${e}`);
+      });
+
     options.push({company: '取消'});
     options.length == 1
       ? Alert.alert(
@@ -609,13 +626,13 @@ const IssueScreen = ({navigation, route}) => {
             if (!violationType) {
               Alert.alert('請點選缺失類別');
               return;
-            } else if (!issueType && !issueTypeRemark) {
+            } /*else if (!issueType && !issueTypeRemark) {
               Alert.alert('請點選缺失項目');
               return;
             } else if (!issueLocationText) {
               Alert.alert('請點選缺失地點');
               return;
-            } /*else if (!responsibleCorporation) {
+            } else if (!responsibleCorporation) {
               Alert.alert('請點選責任廠商');
               return;
             } */ else if (!issueSafetyManagerText) {
@@ -629,7 +646,7 @@ const IssueScreen = ({navigation, route}) => {
                 issueLocationText: issueLocationText,
                 responsibleCorporation: responsibleCorporation,
                 issueTaskText: issueTaskText,
-                issueAssigneeText: issueAssigneeText,
+                issueAssigneeText: issueSafetyManagerText,    // 變數名稱: issueSafetyManeger or issueAssigneeText
                 issueStatus: issueStatus,
                 projectId: projectId,
                 projectName: projectName,
@@ -666,7 +683,7 @@ const IssueScreen = ({navigation, route}) => {
         />
       ),
     });
-  }, [imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, issueTypeRemark, item.image.uri, item.image.fileName]);
+  }, [isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, issueTypeRemark, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token]);
 
   return (
     <React.Fragment>

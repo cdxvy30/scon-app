@@ -53,7 +53,7 @@ const determineStatusColor = item => {
 const IssueListScreen = ({navigation, route}) => {
   // console.log(route.params.project);
   // const project = route.params;
-  const { userInfo } = useContext(AuthContext)
+  const { userInfo } = useContext(AuthContext);
   const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
@@ -516,13 +516,13 @@ const IssueListScreen = ({navigation, route}) => {
           let issues = await res.data;
           console.log(issues);
           setIssueList(issues);
-          setSelectedIssueList(issuesFilter(issues))
+          setSelectedIssueList(issuesFilter(issues));
         })
         .catch((e) => {
           console.log(`List issues error: ${e}`);
         });
     };
-    
+
     if (isFocused) {
       fetchIssues();
     }
@@ -631,7 +631,7 @@ const IssueListScreen = ({navigation, route}) => {
             : item.violation_type !== ''
             ? `(${item.violation_type})\n${item.title}`
             : ''} */}
-            {item.issue_title}
+            {item.issue_title}{`\n`}{item.issue_type}
         </Text>
         <View style={styles.objLabelAreaContainer}>
           {Array.isArray(item.labels) ? (
