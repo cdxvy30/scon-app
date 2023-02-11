@@ -55,7 +55,7 @@ const IssueLocationAddScreen = ({navigation, route}) => {
             } else {
                   // axios
                   //   .post(`${BASE_URL}/locations/add`, { 
-                  //     location,這邊改成存floor和position
+                  //     location,    !!!!!(這邊改成存floor和position)!!!!!
                   //     projectId,
                   //   })
                   //   .then(async (res) => {
