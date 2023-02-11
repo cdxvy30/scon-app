@@ -46,11 +46,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
 
   //以下實驗用
   const [activeSections, setActiveSections] = useState([]);
-  const [collapsed, setCollapsed] = useState(true)
-  const toggleExpand = () => {
-    setCollapsed(!collapsed);
-  }
-
+  //預想是fetch出floor和position
   const CONTENT = [
     {
       title: '1F',
@@ -100,21 +96,6 @@ const IssueLocationListScreen = ({navigation, route}) => {
     }
   ]
 
-  // const SELECTORS = [
-  //   {title: '1F', value: 0},
-  //   {title: '2F', value: 1},
-  //   {title: '3F', value: 2},
-  //   {title: '4F', value: 3},
-  //   {title: '5F', value: 4},
-  //   {title: '6F', value: 5},
-  //   {title: '7F', value: 6},
-  //   {title: '8F', value: 7},
-  //   {title: '9F', value: 8},
-  //   {title: '10F', value: 9},
-  //   {title: '11F', value: 10},
-  //   {title: '12F', value: 11},
-  // ]
-
   const renderHeader = (section, _, isActive) => {
     return(
       <Animatable.View
@@ -145,8 +126,8 @@ const IssueLocationListScreen = ({navigation, route}) => {
       </View>
     )
   }
-
   //以上實驗用
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
