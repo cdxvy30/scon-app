@@ -1,19 +1,10 @@
 import React, {useState, useRef, useEffect} from 'react';
-import Separator from '../../components/Separator';
-import SqliteManager from '../../services/SqliteManager';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
-import {transformWorkItems} from '../../util/sqliteHelper';
-import Swipeout from 'react-native-swipeout';
 import {
-  Animated,
-  Alert,
-  FlatList,
   SafeAreaView,
-  Switch,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -24,7 +15,6 @@ import axios from 'axios';
 import * as Animatable from 'react-native-animatable'
 import Collapsible from 'react-native-collapsible';
 import Accordion from 'react-native-collapsible/Accordion'
-import { duration } from 'moment';
 
 const IssueLocationListScreen = ({navigation, route}) => {
   // console.log(route.params);
@@ -98,11 +88,31 @@ const IssueLocationListScreen = ({navigation, route}) => {
 
   const renderHeader = (section, _, isActive) => {
     return(
-      <Animatable.View
-      duration = {400}
-      style = {[styles.header, isActive ? styles.header_active : styles.header]}>
-        <Text style = {styles.headerText}> {section.title}</Text>
-      </Animatable.View>
+      <View>
+        <Animatable.View
+        duration = {400}
+        style = {[styles.header, isActive ? styles.header_active : styles.header]}>
+          <View style={{flex:1,flexDirection:'row',alignItems:'center'}}>
+            <Ionicons
+            style={{color: 'dodgerblue', fontSize: 40}}
+            name={'pin-outline'}
+            />
+            <Text style = {[styles.headerText, isActive ? styles.headerText_active : styles.headerText]}> {section.title}</Text>
+          </View>
+          {isActive?
+            <Ionicons
+            style={{color: 'dodgerblue', fontSize: 30}}
+            name={'chevron-down-outline'}
+            />
+            :
+            <Ionicons
+            style={{color: 'dodgerblue', fontSize: 30}}
+            name={'ios-chevron-forward'}
+            />
+          }
+        </Animatable.View>
+      </View>
+      
     )
   }
 
@@ -110,18 +120,23 @@ const IssueLocationListScreen = ({navigation, route}) => {
     return(
       <View>
         {section.content.map((item)=> (
-            <TouchableOpacity onPress={() => {issueLocationSelectHandler(section,item)}}>
+          <TouchableOpacity onPress={() => {issueLocationSelectHandler(section,item)}}>
             <Animatable.View
             duration = {400}
             style = {[styles.content, isActive ? styles.content_active : styles.content]}
             >
+              <Ionicons
+                style={{color: 'dodgerblue', fontSize: 40}}
+                name={'location-outline'}
+              />
               <Animatable.Text
               animation = {isActive ? 'bounceIn' : undefined}
-              style = {{textAlign:'center'}}>
+              style = {styles.contentText}>
                 {item}
               </Animatable.Text>
             </Animatable.View>
           </TouchableOpacity>
+          
         ))}
       </View>
     )
@@ -253,7 +268,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // marginTop: StatusBar.currentHeight || 0,
-    backgroundColor:'#F5FCFF',
+    padding:20,
   },
   flatList: {
     height: 'auto',
@@ -276,20 +291,38 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   header:{
-    backgroundColor:'#D9D9D9',
-    padding:20
+    marginVertical:5,
+    backgroundColor:'#FFFFFF',
+    justifyContent:'space-between',
+    flex:1,
+    flexDirection:'row',
+    alignItems:'center',
+    borderRadius:15,
+    borderWidth:1,
+    padding:10
   },
   headerText:{
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 26,
+    fontWeight: '400',
+  },
+  headerText_active:{
+    fontSize: 26,
+    fontWeight: '400',
+    color:'#FFFFFF'
   },
   content:{
-    padding:20,
-    backgroundColor:'#fff',
+    flex:0,
+    flexDirection:'row',
+    alignItems:'center',
+    paddingVertical:5,
+    marginHorizontal:30,
+  },
+  contentText:{
+    color:'#727272',
+    fontSize:20,
   },
   header_active:{
-    backgroundColor:'#A9A9A9'
+    backgroundColor:'#A9A9A9',
   },
   content_active:{
 

@@ -44,6 +44,10 @@ const UserManagementScreen = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <View style={styles.wrapper}>
+        <Image
+          style={styles.icon}
+          source={require('../../configs/icon.png')}
+        />
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.permission}>目前權限: {permission}</Text>
         <Dropdown
@@ -57,7 +61,7 @@ const UserManagementScreen = ({navigation, route}) => {
             setPermission(item.value);
           }}
           renderLeftIcon={() => (
-            <AntDesign style={styles.icon} name="Safety" size={24} />
+            <AntDesign name="Safety" size={24} />
           )}
         />
         <Button
@@ -92,6 +96,15 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     width: '80%',
+  },
+  icon: {
+    marginVertical:12,
+    alignSelf: 'center',
+    width: 157,
+    height: 157,
+    borderRadius: 157 / 2,
+    borderColor: 'black',
+    borderWidth: 2,
   },
   name: {
     alignSelf: 'center',
