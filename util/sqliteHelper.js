@@ -123,6 +123,7 @@ export const transformLabel = label => {
   };
 };
 
+// 將原陣列每個元素經callback function後return的集合
 export const transformLabels = labels =>
   labels.map(label => transformLabel(label));
 

@@ -1,3 +1,4 @@
+// 預設缺失類別與對應之缺失項目
 export const ISSUE_TYPE = [
   {
     titles: [

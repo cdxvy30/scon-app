@@ -38,9 +38,9 @@ import {
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
 import { BASE_URL } from '../../configs/authConfig';
-
 // import { MobileModel, Image } from "react-native-pytorch-core";
 
+// 定義缺失風險指標
 const determineStatusColor = item => {
   let color = 'grey';
   if (item.issue_status === '0') color = 'limegreen';
@@ -54,6 +54,7 @@ const IssueListScreen = ({navigation, route}) => {
   // console.log(route.params.project);
   // const project = route.params;
   const { userInfo } = useContext(AuthContext);
+
   const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
@@ -80,6 +81,7 @@ const IssueListScreen = ({navigation, route}) => {
     return a;
   }
 
+  // 處理刪除缺失動作
   const issueDeleteHandler = async () => {
     Alert.alert('刪除議題', '真的要刪除議題嗎？', [
       {
@@ -104,16 +106,23 @@ const IssueListScreen = ({navigation, route}) => {
     ]);
   };
 
+  // 處理更新缺失動作, 導入IssueScreen
+  // action為"update existing issue"
   const issueSelectHandler = item => {
-    setSelectedIssueId(item.id);
+    let issueId = item.issue_id;
+    setSelectedIssueId(item.issue_id);
+
     navigation.navigate('Issue', {
-      projectId: projectId,
       project: project,
+      projectId: projectId,
+      issueId: issueId,
       action: 'update existing issue',
       item,
     });
   };
 
+  // @!處理將照片送出並辨識動作, 並觸發CreateItemByImage, 導入IssueScreen
+  // action為"create new issue"
   const detectViolationTypeThenSwitchToIssueScreen = async imagee => {
     console.log('Send image detect request');
     setIsDedecting(true);
@@ -160,6 +169,7 @@ const IssueListScreen = ({navigation, route}) => {
       });
   };
 
+  // 處理缺失輸出動作
   const outputReportHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -356,6 +366,7 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
+  // 處理時間排序動作
   const issueSortHandler = () => {
     console.log(isExporting)
     ActionSheetIOS.showActionSheetWithOptions(
@@ -411,6 +422,7 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
+  // 處理日期篩選與還原動作
   const issueOptionHandler = React.useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -437,6 +449,7 @@ const IssueListScreen = ({navigation, route}) => {
     );
   }, [selectedEndDate ? selectedIssueList : issueList, route.params.name]);
 
+  // @!選取照片, 並觸發detectViolationTypeThenSwitchToIssueScreen(image)
   const imageSelectHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -484,6 +497,7 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
+  /*
   // useEffect(() => {
   //   const fetchIssues = async () => {
   //     const project = await SqliteManager.getProjectByName(route.params.name);
@@ -507,7 +521,10 @@ const IssueListScreen = ({navigation, route}) => {
   //   }
   //   selectedIssueList;
   // }, [route.params.name, issueReportGenerator, isFocused]);
+  */
 
+  // 向後端請求此project的issues list
+  // ******************** //
   useEffect(() => {
     const fetchIssues = async () => {
       await axios
@@ -527,7 +544,9 @@ const IssueListScreen = ({navigation, route}) => {
       fetchIssues();
     }
   }, [isFocused, project.project_id]);
+  // ******************** //
 
+  // 頂端列按鈕行為: 時間排序/依日期篩選/匯出缺失記錄表
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -560,6 +579,7 @@ const IssueListScreen = ({navigation, route}) => {
     });
   }, [issueOptionHandler, navigation]);
 
+  // 右滑刪除動作, 實作在Swipeout元件中
   const swipeBtns = [
     {
       text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
@@ -569,6 +589,7 @@ const IssueListScreen = ({navigation, route}) => {
     },
   ];
 
+  // 在detectViolationTypeThenSwitchToIssueScreen中觸發
   const CreateItemByImage = image => {
     image.uri = image.uri.replace('file://', '');
 
@@ -592,6 +613,7 @@ const IssueListScreen = ({navigation, route}) => {
     };
   };
 
+  // List中各單獨元件
   const Item = ({item, onPress, backgroundColor, textColor}) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
       <View style={styles.panelLeftContainer}>
@@ -651,6 +673,8 @@ const IssueListScreen = ({navigation, route}) => {
   );
 
   const renderItem = ({item}) => {
+    console.log('---render issues---');
+    console.log(item);
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
 
@@ -659,7 +683,7 @@ const IssueListScreen = ({navigation, route}) => {
         <Swipeout
           key={item.issue_id}
           right={swipeBtns}
-          onOpen={() => setSelectedIssueId(item.id)}>
+          onOpen={() => setSelectedIssueId(item.issue_id)}>
           <Item
             key={`${item.issue_id}`}
             item={item}
@@ -672,6 +696,8 @@ const IssueListScreen = ({navigation, route}) => {
       </React.Fragment>
     );
   };
+
+  // 缺失表單生成中, 顯示loading畫面
   if (isExporting === true) {
     return (
       <React.Fragment>
@@ -683,8 +709,7 @@ const IssueListScreen = ({navigation, route}) => {
         </SafeAreaView>
       </React.Fragment>
     );
-  }
-  else if (isDedecting === true) {
+  } else if (isDedecting === true) {  // 缺失類別辨識中, 顯示loading畫面
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
@@ -695,7 +720,7 @@ const IssueListScreen = ({navigation, route}) => {
         </SafeAreaView>
       </React.Fragment>
     );
-  } else {
+  } else {  // 正常顯示issueList情況
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>

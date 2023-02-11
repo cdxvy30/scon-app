@@ -23,7 +23,7 @@ const IssueLocationAddScreen = ({navigation, route}) => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.name}>請輸入以下資訊</Text>
       <View style={styles.wrapper}>
-        <View style={styles.item}>  
+        <View style={styles.item}>
           <Text style={styles.title}>樓層</Text>
             <TextInput
               style={styles.textInput}
