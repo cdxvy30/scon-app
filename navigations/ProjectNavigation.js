@@ -9,7 +9,8 @@ import PhotoScreen from '../screens/project/PhotoScreen';
 import ObjectTypeSelectorScreen from '../screens/project/selector/ObjectTypeSelectorScreen';
 import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelectorScreen';
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
-import IssueLocationListScreen from '../screens/project/IssueLocationScreen'
+import IssueLocationListScreen from '../screens/project/IssueLocationListScreen'
+import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen'
 import CorporationAddScreen from '../screens/setting/CorporationAddScreen'
 
 const Stack = createNativeStackNavigator();
@@ -66,12 +67,17 @@ const ProjectNavigation = ({navigation}) => {
           component={DateSelectorScreen}
           options={{title: '選取日期範圍'}}
         />
+        </Stack.Group>
         <Stack.Screen
           name="IssueLocationList"
           component={IssueLocationListScreen}
           options={{title: '缺失地點列表'}}
         />
-        </Stack.Group>
+        <Stack.Screen
+          name="IssueLocationAdd"
+          component={IssueLocationAddScreen}
+          options={{title: '新增缺失地點'}}
+        />
       </Stack.Navigator>
     </React.Fragment>
   );
