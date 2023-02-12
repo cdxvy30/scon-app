@@ -310,25 +310,31 @@ const PhotoScreen = ({ navigation, route }) => {
               console.log(' Stroke Changed');
             }}
             onStrokeEnd={async path => {
-              console.log(' Stroke End');
-              console.log(path);
-              const box = GetBoundingBoxByPath(path, canvasContainerStyle);
-              const newBoxObj = await labelAddHandler(
-                box,
-                currentLabelOption.name,
-                currentLabelMode,
-                path
-              );
+              try {
+                console.log(' Stroke End');
+                console.log(path);
+                const box = GetBoundingBoxByPath(path, canvasContainerStyle);
+                const newBoxObj = await labelAddHandler(
+                  box,
+                  currentLabelOption.name,
+                  currentLabelMode,
+                  path
+                );
 
-              setBoxObjects(boxObjects.concat([newBoxObj]));
-              setIssueLabels(boxObjects.concat([newBoxObj]));
-              setCanvasTouchEnable(false);
-              setCurrentLabelOption(undefined);
-              setCurrentLabelMode(undefined);
-              //canvas.deletePath(path.path.id);
-              currentLabelMode != 'brush'
-                ? canvas.deletePath(path.path.id)
-                : undefined;
+                setBoxObjects(boxObjects.concat([newBoxObj]));
+                setIssueLabels(boxObjects.concat([newBoxObj]));
+                setCanvasTouchEnable(false);
+                console.log('True or false');
+                console.log(canvasTouchEnable);
+                setCurrentLabelOption(undefined);
+                setCurrentLabelMode(undefined);
+                //canvas.deletePath(path.path.id);
+                currentLabelMode != 'brush'
+                  ? canvas.deletePath(path.path.id)
+                  : undefined;
+              } catch (error) {
+                console.log(error);
+              }
             }}
           />
         ) : undefined}

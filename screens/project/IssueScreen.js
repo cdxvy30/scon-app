@@ -65,7 +65,7 @@ const IssueScreen = ({navigation, route}) => {
   const {userInfo} = useContext(AuthContext);
   const [action, setAction] = useState(route.params.action);
 
-  const [issueId, setIssueId] = useState(item.issue_id);
+  const [issueId, setIssueId] = useState(item.id);
 
   const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);
   const [violationType, setViolationType] = useState(
