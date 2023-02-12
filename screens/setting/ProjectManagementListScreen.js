@@ -74,9 +74,26 @@ const ProjectManagementListScreen = ({navigation}) => {
   const Item = ({item, onPress, backgroundColor, textColor}) => {
     return (
       <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-        <Text style={[styles.title, textColor]}>
-          {item.project_name} | {item.project_manager ? item.project_manager : '未分配專案管理員'}
-        </Text>
+        <View style={{width:'77%'}}>
+          <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
+            {item.project_name}
+          </Text>
+          <Separator />
+          <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
+            {item.project_manager ? item.project_manager : '未分配專案管理員'}
+          </Text>
+        </View>
+        {item.project_manager ?
+          <Image
+            style={styles.icon}
+            source={require('../../configs/check_mark.png')}
+          />
+          :
+          <Image
+            style={styles.icon}
+            source={require('../../configs/question_mark.png')}
+          />
+        }
       </TouchableOpacity>
     );
   };
@@ -94,7 +111,6 @@ const ProjectManagementListScreen = ({navigation}) => {
           backgroundColor={{ backgroundColor }}
           textColor={{ color }}
         />
-        <Separator key={`seperator_${item.id}`} />
       </View>
     );
   };
@@ -102,7 +118,7 @@ const ProjectManagementListScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        ListHeaderComponent={<Separator />}
+        style={styles.flatList}
         data={projectList}
         renderItem={renderItem}
         keyExtractor={(item) => item.project_id}
@@ -118,13 +134,23 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   flatList: {
-    height: 'auto',
+    padding:10
+  },
+  icon: {
+    width: 70,
+    height: 70,
+    borderRadius: 70 / 2,
+    borderColor: 'black',
+    borderWidth: 2,
   },
   item: {
-    padding: 20,
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    marginVertical:5,
+    padding:10,
+    borderRadius:20,
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center'
   },
   thumbnail: {
     width: 90,
@@ -132,13 +158,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   title: {
+    marginVertical:2,
     marginLeft: 8,
-    fontSize: 20,
-    width: 250,
-    alignSelf: 'center',
-  },
-  status: {
-    marginTop: 26,
+    fontSize: 22,
+    textAlign:'left'
   },
 });
 

@@ -49,7 +49,7 @@ const DataManageScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={corporationClickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>
-                  <Ionicons style={styles.titleIcon} name={'ios-pricetags'} />{' '}
+                  <Ionicons style={styles.titleIcon} name={'ios-build-outline'} />{' '}
                   廠商
                 </Text>
                 <View style={{flexDirection: 'row'}}>
@@ -73,7 +73,7 @@ const DataManageScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={corporationClickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>
-                  <Ionicons style={styles.titleIcon} name={'ios-pricetags'} />{' '}
+                  <Ionicons style={styles.titleIcon} name={'ios-location-outline'} />{' '}
                   地點
                 </Text>
                 <View style={{flexDirection: 'row'}}>

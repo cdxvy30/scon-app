@@ -23,12 +23,12 @@ const SettingNavigation = ({}) => {
           options={{title: '設定'}}
         />
         <Stack.Screen
-          name="DataManageList"
+          name="DataManagementList"
           component={DataManagementScreenList}
           options={{title: '資料管理'}}
         />
         <Stack.Screen
-          name="DataManage"
+          name="DataManagement"
           component={DataManagementScreen}
           options={{title: '專案'}}
         />

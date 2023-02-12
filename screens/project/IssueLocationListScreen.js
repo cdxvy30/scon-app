@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -174,7 +175,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
         .then(async (res) => {
           let data = await res.data;
           setIssueLocationList(data);
-          console.log(data)
+          console.log('data',data)
         })
         .catch((e) => {
           console.log(`list locations error: ${e}`);
@@ -267,7 +268,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginTop: StatusBar.currentHeight || 0,
+    marginTop: StatusBar.currentHeight || 0,
     padding:20,
   },
   flatList: {

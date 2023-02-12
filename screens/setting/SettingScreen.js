@@ -14,7 +14,7 @@ const SettingScreen = ({navigation}) => {
   };
 
   const dataManagementHandler = async () => {
-    navigation.navigate('DataManageList');
+    navigation.navigate('DataManagementList');
   };
 
   const ProjectManagementHandler = async () => {

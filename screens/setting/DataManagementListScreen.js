@@ -66,7 +66,10 @@ const DataManageListScreen = ({navigation}) => {
         if (buttonIndex == options.length - 1) {
           return;
         } else {
-          await navigation.navigate('DataManage', { name: projectList[buttonIndex].project_name, project: projectList[buttonIndex] });
+          await navigation.navigate('DataManagement', {
+            name: projectList[buttonIndex].project_name, 
+            project: projectList[buttonIndex] 
+          });
         }
       },
     );
@@ -80,7 +83,7 @@ const DataManageListScreen = ({navigation}) => {
             <TouchableOpacity onPress={projectListClickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>
-                  <Ionicons style={styles.titleIcon} name={'ios-pricetags'} />{' '}
+                  <Ionicons style={styles.titleIcon} name={'ios-server-outline'} />{' '}
                   專案
                 </Text>
                 <View style={{flexDirection: 'row'}}>
@@ -90,21 +93,23 @@ const DataManageListScreen = ({navigation}) => {
                   </Text>
                 </View>
               </View>
-            {projectList.length > 0 ? (
-              <React.Fragment>
+            {projectList.length > 0 ? 
+              <View>
                 <Separator />
                 <Text style={[styles.description, {marginVertical: 12}]} ellipsizeMode={'tail'} numberOfLines={1}>
                   {projectList.map(o => `${o.project_name}  `)}
                 </Text>
-              </React.Fragment>
-            ) : undefined}
+              </View>
+              : 
+              undefined
+            }
             </TouchableOpacity>
           </View>
           <View style={styles.group}>
             <TouchableOpacity onPress={() => {}}>
               <View style={styles.item}>
                 <Text style={styles.title}>
-                  <Ionicons style={styles.titleIcon} name={'ios-pricetags'} />{' '}
+                  <Ionicons style={styles.titleIcon} name={'ios-pricetags-outline'} />{' '}
                   標籤
                 </Text>
                 <View style={{flexDirection: 'row'}}>
@@ -114,14 +119,16 @@ const DataManageListScreen = ({navigation}) => {
                   </Text>
                 </View>
               </View>
-            {OBJECT_TYPE.length > 0 ? (
-              <React.Fragment>
+            {OBJECT_TYPE.length > 0 ? 
+              <View>
                 <Separator />
                 <Text style={[styles.description, {marginVertical: 12}]}>
                   {OBJECT_TYPE.map(o => `${o.name} `)}
                 </Text>
-              </React.Fragment>
-            ) : undefined}
+              </View>
+              : 
+              undefined
+            }
             </TouchableOpacity>
           </View>
         </ScrollView>

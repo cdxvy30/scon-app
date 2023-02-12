@@ -57,12 +57,20 @@ const ProjectManagementScreen = ({ navigation, route }) => {
 
   const Item = ({item, onPress, backgroundColor, textColor}) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-      <Text style={[styles.title, textColor]}>
-        {item.user_name} | {item.user_corporation} | {item.user_permission} |{' '}
-        {item.user_job}
-      </Text>
-      {/* <Text style={[styles.title, textColor]}>{item.user_corporation}</Text>
-      <Text style={[styles.title, textColor]}>{item.user_job}</Text> */}
+      <Image
+        style={styles.icon}
+        source={require('../../configs/icon.png')}
+      />
+      <View style={{width:'85%'}}>
+        <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
+          {item.user_name} | {item.user_corporation} 
+        </Text>
+        <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
+          {item.user_permission} | {item.user_job}
+        </Text>
+        {/* <Text style={[styles.title, textColor]}>{item.user_corporation}</Text>
+        <Text style={[styles.title, textColor]}>{item.user_job}</Text> */}
+      </View>
     </TouchableOpacity>
   );
 
@@ -118,6 +126,7 @@ const ProjectManagementScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
+        style={styles.flatList}
         data={userList}
         renderItem={renderItem}
         keyExtractor={(item) => item.user_id}
@@ -133,13 +142,23 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   flatList: {
-    height: "auto",
+    padding:10,
   },
   item: {
-    padding: 20,
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    marginVertical:5,
+    padding:20,
+    borderRadius:20,
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'flex-start',
+    alignItems:'center'
+  },
+  icon: {
+    width: 70,
+    height: 70,
+    borderRadius: 70 / 2,
+    borderColor: 'black',
+    borderWidth: 2,
   },
   thumbnail: {
     width: 90,
@@ -147,13 +166,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   title: {
+    marginVertical:1,
     marginLeft: 8,
     fontSize: 20,
-    width: 250,
-    alignSelf: "center",
-  },
-  status: {
-    marginTop: 26,
   },
 });
 
