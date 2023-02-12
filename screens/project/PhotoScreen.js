@@ -31,13 +31,12 @@ import { SketchCanvas } from '@terrylinla/react-native-sketch-canvas';
 import { BlurView } from 'react-native-blur';
 import { OBJECT_TYPE } from '../../configs/objectTypeConfig';
 import SqliteManager from '../../services/SqliteManager';
+import axios from 'axios';
 
 const STROKE_WIDTH = 20;
 const DETECTION_THRESHOLD = 0.7;
 
 const PhotoScreen = ({ navigation, route }) => {
-  const axios = require('axios');
-
   const issueId = route.params.issueId;
   const setIssueLabels = route.params.setIssueLabels;
 
@@ -53,7 +52,7 @@ const PhotoScreen = ({ navigation, route }) => {
   labelOptions.push('取消');
 
   React.useLayoutEffect(() => {
-    navigation.setOptions({
+    navigation.setOptions({ // 按辨識
       headerRight: () => (
         <React.Fragment>
           <Button title="辨識" disabled={isImageDetect} onPress={imageDetect} />
@@ -388,7 +387,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     marginLeft: 10,
-    marginRight: 10
+    marginRight: 10,
   },
 });
 

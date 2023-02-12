@@ -33,6 +33,7 @@ import {BlurView} from 'react-native-blur';
 import {LABEL_OPTIONS} from '../../configs/labelConfig';
 import Orientation from 'react-native-orientation';
 import {SketchCanvas} from '@terrylinla/react-native-sketch-canvas';
+import { BASE_URL } from '../configs/authConfig';
 
 // const BOX_OBJS = [
 //   {
@@ -112,10 +113,16 @@ import {SketchCanvas} from '@terrylinla/react-native-sketch-canvas';
 //   },
 // ];
 
-const PhotoLabelViewer = ({image, labels}) => {
+const PhotoLabelViewer = ({image, labels, item}) => {
+  console.log('/// *** PhotoLabel Component *** ///');
+  console.log(image);
+  console.log(labels);
+  console.log(item);
+  const issueId = item.issue_id;
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
   const [canvas, setCanvas] = useState(undefined);
 
+  // 
   useEffect(() => {
     Orientation.lockToPortrait();
     const windowSize = Dimensions.get('window');
@@ -159,6 +166,7 @@ const PhotoLabelViewer = ({image, labels}) => {
             ref={ref => setCanvas(ref)}
             localSourceImage={{
               filename: image.uri.replace('file://', ''),
+              // filename: `${BASE_URL}/issues/get/thumbnail/${issueId}`,
               directory: null,
               mode: 'AspectFit',
             }}

@@ -117,6 +117,7 @@ const ProjectListScreen = ({ navigation }) => {
     });
   };
 
+  // 導向IssueList, 並帶入project資訊, 以projectId作為請求issueList的參數
   const projectSelectHandler = async (item) => {
     // setSelectedProjectId(item.project_id);
     console.log(item);
@@ -126,6 +127,7 @@ const ProjectListScreen = ({ navigation }) => {
     });
   };
 
+  // 處理SwipeButton編輯或刪除動作
   const swipeBtns = [
     {
       text: <Ionicons name={"create-outline"} size={24} color={"white"} />,

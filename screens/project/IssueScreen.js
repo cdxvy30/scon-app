@@ -52,21 +52,22 @@ import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 
 const IssueScreen = ({navigation, route}) => {
+  console.log('*** --- IssueScreen Params --- ***');
   console.log(route.params);
-  let project = route.params.project;
-  console.log(project.project_id);
-  const item = route.params.item;
-  console.log(item);
+  const project = route.params.project;
+  const item = route.params.item;   // item == issue
+
   // ID作為issue的FK, 同時綁專案名稱、公司
   const projectId = project.project_id;
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
 
   const {userInfo} = useContext(AuthContext);
-  const isFocused = useIsFocused();
   const [action, setAction] = useState(route.params.action);
-  const [issueId, setIssueId] = useState(item.id);
-  const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);   //
+
+  const [issueId, setIssueId] = useState(item.issue_id);
+
+  const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);
   const [violationType, setViolationType] = useState(
     route.params.violation_type
       ? route.params.violation_type
@@ -92,11 +93,13 @@ const IssueScreen = ({navigation, route}) => {
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const keyboardDidShowListener = useRef();
   const keyboardDidHideListener = useRef();
+  const isFocused = useIsFocused();
 
   // 功用未知
   const onKeyboardShow = event =>
     setKeyboardOffset(event.endCoordinates.height);
   const onKeyboardHide = () => setKeyboardOffset(0);
+
   // 更改issue追蹤狀態(Boolean)
   const issueTrackToggleHandler = () => {
     setIssueTrack(previousState => !previousState);
@@ -112,7 +115,7 @@ const IssueScreen = ({navigation, route}) => {
 
   //   })};
 
-  // 不確定意義是什麼
+  // 新增缺失改善照片
   const attachmentAddHandler = async image => {
     const imageUri = image.uri;
     const transformedImageUri = imageUri.replace('file://', '');
@@ -124,7 +127,8 @@ const IssueScreen = ({navigation, route}) => {
     };
 
     await SqliteManager.createIssueAttachment(newAttachment);
-
+    
+    // 可能會有多張缺失改善照片?
     const allAttachments = await SqliteManager.getIssueAttachmentsByIssueId(
       issueId,
     );
@@ -137,6 +141,7 @@ const IssueScreen = ({navigation, route}) => {
     setIssueAttachments(newIssueAttachments);
   };
 
+  // 刪除缺失改善照片
   const attachmentDeleteHandler = index => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -147,9 +152,9 @@ const IssueScreen = ({navigation, route}) => {
       },
       async buttonIndex => {
         switch (buttonIndex) {
-          case 0: // cancel action
+          case 0: // 取消
             break;
-          case 1:
+          case 1: // 刪除
             const targetAttachment = issueAttachments.find(
               (_, attIndex) => attIndex === index,
             );
@@ -164,6 +169,7 @@ const IssueScreen = ({navigation, route}) => {
     );
   };
 
+  // 缺失改善備註
   const remarkChangeHandler = async (index, remark) => {
     const newIssueAttachments = issueAttachments;
     newIssueAttachments[index].remark = remark;
@@ -176,7 +182,9 @@ const IssueScreen = ({navigation, route}) => {
     setIssueAttachments(newIssueAttachments);
   };
 
+  // 新增缺失改善照片
   const imageSelectHandler = () => {
+    // 底部彈出式選單: 取消, 拍照, 從相簿選取照片
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['取消', '拍照', '從相簿選取照片'],
@@ -186,9 +194,9 @@ const IssueScreen = ({navigation, route}) => {
       },
       buttonIndex => {
         switch (buttonIndex) {
-          case 0: // cancel action
+          case 0: // 取消
             break;
-          case 1:
+          case 1: // 拍照
             launchCamera({mediaType: 'photo', saveToPhotos: true}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.errorMessage}`);
@@ -200,7 +208,7 @@ const IssueScreen = ({navigation, route}) => {
               }
             });
             break;
-          case 2:
+          case 2: // 從相簿選取照片
             launchImageLibrary({mediaType: 'photo'}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.errorMessage}`);
@@ -216,6 +224,7 @@ const IssueScreen = ({navigation, route}) => {
     );
   };
 
+  // 右上角"匯出"按鈕
   const imageExportHandler = React.useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -243,6 +252,7 @@ const IssueScreen = ({navigation, route}) => {
     );
   }, [item.image.uri]);
 
+  // 缺失狀態選單
   const issueStatusClickHandler = () => {
     // Geolocation.getCurrentPosition(  //gps測試用
     //   success= (
@@ -280,7 +290,10 @@ const IssueScreen = ({navigation, route}) => {
     );
   };
 
+  // 點選缺失影像
   const issueImageClickHandler = () => {
+    console.log('///issue label///');
+    console.log(issueLabels);
     navigation.navigate('Photo', {
       issueId: issueId,
       image: item.image,
@@ -291,6 +304,7 @@ const IssueScreen = ({navigation, route}) => {
     });
   };
 
+  // 
   function decideIssueTypes(violationType) {
     for (let i = 0; i < ISSUE_TYPE[0].titles.length; i++) {
       if (violationType != ISSUE_TYPE[0].titles[i]) {
@@ -301,7 +315,8 @@ const IssueScreen = ({navigation, route}) => {
       }
     }
   }
-
+  
+  // 選取缺失類別(其他)
   const newIssueTypeClickHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -322,6 +337,7 @@ const IssueScreen = ({navigation, route}) => {
     );
   };
 
+  // 選取缺失類別(其他之外)
   const violationTypeClickHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -353,12 +369,16 @@ const IssueScreen = ({navigation, route}) => {
     );
   };
 
+  // 選取責任廠商
   const responsibleCorporationclickHandler = async () => {
-    // fetch協力廠商
+    // Next line is Old version
     // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    
+    // Fetch協力廠商 !!@ 尚未建立好corporations的路由 @!!
+    // *********** //
     var options = [];
     axios
-      .get(`${BASE_URL}/corporation/${projectId}`)
+      .get(`${BASE_URL}/corporations/${projectId}`)
       .then(async (res) => {
         options = res.data;
         console.log(options);    
@@ -366,6 +386,7 @@ const IssueScreen = ({navigation, route}) => {
       .catch(e => {
         console.log(`Fetch corporation error: ${e}`);
       });
+    // ********** //
 
     options.push({company: '取消'});
     options.length == 1
@@ -412,6 +433,7 @@ const IssueScreen = ({navigation, route}) => {
         );
   };
 
+  // 選取工項
   const workItemClickHandler = async () => {
     var options = await SqliteManager.getWorkItemsByProjectId(projectId);
     options.push({company: '', name: '取消'});
@@ -455,6 +477,7 @@ const IssueScreen = ({navigation, route}) => {
         );
   };
 
+  // 導向IssueLocationListScreen, 選擇缺失地點
   const IssueLocationListHandler = async () => {
     navigation.navigate('IssueLocationList', {
       project: route.params.project,
@@ -463,6 +486,8 @@ const IssueScreen = ({navigation, route}) => {
     });
   };
 
+  // 重要!!!(處理labels)
+  // 處理新增缺失的action
   const issueCreateHandler = React.useCallback(async () => {
     const transformedIssue = {
       image_uri: item.image.uri.replace('file://', ''),
@@ -510,6 +535,8 @@ const IssueScreen = ({navigation, route}) => {
     route.params.violation_type,
   ]);
 
+  // 重要!!!(處理labels)
+  // 處理更新缺失動作
   const issueUpdateHandler = React.useCallback(async () => {
     const transformedIssue = {
       image_uri: item.image.uri.replace('file://', ''),
@@ -546,6 +573,7 @@ const IssueScreen = ({navigation, route}) => {
     projectId,
   ]);
 
+  // 量化project之風險高低指標
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', async () => {
       const issues = await SqliteManager.getIssuesByProjectId(projectId);
@@ -556,6 +584,7 @@ const IssueScreen = ({navigation, route}) => {
     return unsubscribe;
   }, [navigation, projectId]);
 
+  // 計算project之風險高低指標的function
   const CalculateProjectStatus = issues => {
     let sum = 0;
     issues.map(
@@ -571,6 +600,8 @@ const IssueScreen = ({navigation, route}) => {
     else return PROJECT_STATUS.lowRisk.id;
   };
 
+  // 重要!!!(處理labels)
+  // 看IssueListScreen傳來的action是什麼, 決定create或update
   useEffect(() => {
     action === 'create new issue' && issueCreateHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -596,6 +627,7 @@ const IssueScreen = ({navigation, route}) => {
     issueUpdateHandler,
   ]);
 
+  // 功能未知: 應不影響其他功能
   useEffect(() => {
     keyboardDidShowListener.current = Keyboard.addListener(
       'keyboardWillShow',
@@ -626,19 +658,23 @@ const IssueScreen = ({navigation, route}) => {
             if (!violationType) {
               Alert.alert('請點選缺失類別');
               return;
-            } /*else if (!issueType && !issueTypeRemark) {
+            } /*
+            else if (!issueType && !issueTypeRemark) {
               Alert.alert('請點選缺失項目');
               return;
-            } else if (!issueLocationText) {
+            } 
+            else if (!issueLocationText) {
               Alert.alert('請點選缺失地點');
               return;
-            } else if (!responsibleCorporation) {
+            }
+            else if (!responsibleCorporation) {
               Alert.alert('請點選責任廠商');
               return;
-            } */ else if (!issueSafetyManagerText) {
-              Alert.alert('請填寫記錄人員');
-              return;
-            } else {
+            }
+            */
+            else {
+            // 將紀錄完成之缺失資料送至後端
+            // ******************** //
               const data = {
                 violationType: violationType,
                 issueType: issueType,
@@ -646,7 +682,8 @@ const IssueScreen = ({navigation, route}) => {
                 issueLocationText: issueLocationText,
                 responsibleCorporation: responsibleCorporation,
                 issueTaskText: issueTaskText,
-                issueAssigneeText: issueSafetyManagerText,    // 變數名稱: issueSafetyManeger or issueAssigneeText
+                // 紀錄人員變數名稱: issueSafetyManeger or issueAssigneeText
+                issueAssigneeText: issueSafetyManagerText,  // 預設app使用者
                 issueStatus: issueStatus,
                 projectId: projectId,
                 projectName: projectName,
@@ -659,7 +696,7 @@ const IssueScreen = ({navigation, route}) => {
                 uri: item.image.uri,
                 name: item.image.fileName,
               });
-
+              
               axios({
                 method: 'post',
                 url: `${BASE_URL}/issues/add`,
@@ -678,6 +715,7 @@ const IssueScreen = ({navigation, route}) => {
                   console.log(`Add new issue error: ${e}`);
                 });
             }
+            // ******************** //
             navigation.goBack();
           }}
         />
@@ -685,12 +723,14 @@ const IssueScreen = ({navigation, route}) => {
     });
   }, [isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, issueTypeRemark, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token]);
 
+  // 畫面欄位
   return (
     <React.Fragment>
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <View>
-            <PhotoLabelViewer image={item.image} labels={issueLabels} />
+            {/* 可顯示label的bounding box */}
+            <PhotoLabelViewer image={item.image} labels={issueLabels} item={item}/>
             <TouchableOpacity
               style={[
                 styles.image,
@@ -807,7 +847,7 @@ const IssueScreen = ({navigation, route}) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            <View style={styles.item}>
+            {/* <View style={styles.item}>
               <Text style={styles.title}>記錄人員</Text>
               <View style={{flexDirection: 'row'}}>
                 <TextInput
@@ -817,7 +857,7 @@ const IssueScreen = ({navigation, route}) => {
                 />
               </View>
             </View>
-            <Separator />
+            <Separator /> */}
             <View style={styles.item}>
               <Text style={styles.title}>狀態</Text>
               <TouchableOpacity onPress={() => issueStatusClickHandler()}>
