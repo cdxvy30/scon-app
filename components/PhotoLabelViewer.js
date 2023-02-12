@@ -122,7 +122,7 @@ const PhotoLabelViewer = ({image, labels, item}) => {
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
   const [canvas, setCanvas] = useState(undefined);
 
-  // 
+  //
   useEffect(() => {
     Orientation.lockToPortrait();
     const windowSize = Dimensions.get('window');

@@ -52,7 +52,7 @@ import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 
 const IssueScreen = ({navigation, route}) => {
-  console.log('*** --- IssueScreen Params --- ***');
+  console.log('/// --- IssueScreen Params --- ///');
   console.log(route.params);
   const project = route.params.project;
   const item = route.params.item;   // item == issue

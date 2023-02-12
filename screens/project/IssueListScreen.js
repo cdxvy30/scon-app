@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, {useEffect, useState, useContext} from 'react';
 import {AuthContext} from '../../context/AuthContext';
 import {
@@ -81,7 +82,7 @@ const IssueListScreen = ({navigation, route}) => {
     return a;
   }
 
-  // 處理刪除缺失動作
+  // @處理刪除缺失動作
   const issueDeleteHandler = async () => {
     Alert.alert('刪除議題', '真的要刪除議題嗎？', [
       {
@@ -106,7 +107,7 @@ const IssueListScreen = ({navigation, route}) => {
     ]);
   };
 
-  // 處理更新缺失動作, 導入IssueScreen
+  // @處理更新缺失動作, 導入IssueScreen
   // action為"update existing issue"
   const issueSelectHandler = item => {
     let issueId = item.issue_id;
@@ -115,13 +116,13 @@ const IssueListScreen = ({navigation, route}) => {
     navigation.navigate('Issue', {
       project: project,
       projectId: projectId,
-      issueId: issueId,
+      issueId: issueId,                                 // 更新issue時要知道issueId
       action: 'update existing issue',
       item,
     });
   };
 
-  // @!處理將照片送出並辨識動作, 並觸發CreateItemByImage, 導入IssueScreen
+  // @處理將照片送出並辨識動作, 並觸發CreateItemByImage, 導入IssueScreen
   // action為"create new issue"
   const detectViolationTypeThenSwitchToIssueScreen = async imagee => {
     console.log('Send image detect request');
@@ -146,7 +147,7 @@ const IssueListScreen = ({navigation, route}) => {
         //console.log(response.data);
         setIsDedecting(false);
         navigation.navigate('Issue', {
-          projectId: projectId,
+          projectId: projectId,                         // 建立issue時要知道projectId
           project: project,
           action: 'create new issue',
           violation_type: response.data.violation_type,
