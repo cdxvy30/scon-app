@@ -250,13 +250,13 @@ const IssueLocationListScreen = ({navigation, route}) => {
           </ScrollView> */}
           <ScrollView>
             <Accordion
-              activeSections = {activeSections}
-              sections = {CONTENT}
-              touchableComponent = {TouchableOpacity}
-              renderHeader = {renderHeader}
-              renderContent = {renderContent}
-              duration = {400}
-              onChange = {setActiveSections}
+              activeSections={activeSections}
+              sections={CONTENT}
+              touchableComponent={TouchableOpacity}
+              renderHeader={renderHeader}
+              renderContent={renderContent}
+              duration={400}
+              onChange={setActiveSections}
             />
           </ScrollView>
         </View>
