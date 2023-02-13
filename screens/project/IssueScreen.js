@@ -42,11 +42,15 @@ import {ButtonGroup} from 'react-native-elements';
 import {BASE_URL} from '../../configs/authConfig';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
+import RemoteImageWithSketch from './RemoteImageWithSketch';
 
 const IssueScreen = ({navigation, route}) => {
+  console.log('/// Pass to IssueScreen ///');
+  // console.log(route.params.image.uri);
   const project = route.params.project;
-  const item = route.params.item;   // item == issue
-
+  const item = route.params.item;
+  console.log(item);
+  
   const projectId = project.project_id;                                         // ID作為issue的FK, 同時綁專案名稱、公司
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
@@ -286,13 +290,13 @@ const IssueScreen = ({navigation, route}) => {
 
   // 點選缺失影像
   const issueImageClickHandler = () => {
-    console.log('///issue label///');
+    console.log('--- Params in issueImageClickHandler ---');
     console.log(issueLabels);
     navigation.navigate('Photo', {
       issueId: issueId,
       image: item.image,
-      issueLabels: issueLabels,   // 傳參
-      setIssueLabels: labels => {
+      issueLabels: issueLabels,       // 傳issueLabels
+      setIssueLabels: labels => {     // 傳setIssueLabels()
         setIssueLabels(labels);
       },
     });
@@ -800,6 +804,7 @@ const IssueScreen = ({navigation, route}) => {
           <View>
             {/* 可顯示label的bounding box */}
             <PhotoLabelViewer image={item.image} labels={issueLabels} item={item}/>
+            {/* <RemoteImageWithSketch image={item.image} labels={issueLabels} item={item}/> */}
             <TouchableOpacity
               style={[
                 styles.image,

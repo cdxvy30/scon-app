@@ -110,6 +110,8 @@ const IssueListScreen = ({navigation, route}) => {
   // @處理更新缺失動作, 導入IssueScreen
   // action為"update existing issue"
   const issueSelectHandler = item => {
+    console.log('/// item in issueSeleceHandler ///');
+    console.log(item);
     let issueId = item.issue_id;
     setSelectedIssueId(item.issue_id);
 
@@ -118,8 +120,29 @@ const IssueListScreen = ({navigation, route}) => {
       projectId: projectId,
       issueId: issueId,                                 // 更新issue時要知道issueId
       action: 'update existing issue',
-      item,
+      item: CreateItemByExistingIssue(item),
     });
+  };
+
+  const CreateItemByExistingIssue = (item) => {
+    return {
+      id: item.issue_id,
+      title: item.issue_title,
+      type: item.issue_type,
+      violation_type: item.issue_title,
+      image: `${BASE_URL}/get/thumbnail/${item.issue_id}`,
+      status: item.issue_status,
+      tracking: item.tracking_or_not,
+      location: item.issue_location,
+      activity: item.issue_task,
+      assignee: item.issue_recorder,
+      assignee_phone_number: '',
+      responsible_corporation: '',
+      safetyManager: item.issue_recorder,
+      attachments: [],
+      labels: [],
+      timestamp: new Date().toLocaleString(),
+    };
   };
 
   // @處理將照片送出並辨識動作, 並觸發CreateItemByImage, 導入IssueScreen

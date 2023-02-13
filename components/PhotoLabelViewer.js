@@ -113,8 +113,12 @@ import { BASE_URL } from '../configs/authConfig';
 //   },
 // ];
 
-const PhotoLabelViewer = ({image, labels, item}) => {
-  const issueId = item.issue_id;
+const PhotoLabelViewer = ({ image, labels, item }) => {
+  console.log('/// Params in PhotoLabelViewer ///');
+  console.log(item);
+  console.log(image);
+  console.log(labels);
+  const issueId = item.id;
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
   const [canvas, setCanvas] = useState(undefined);
 
@@ -147,7 +151,7 @@ const PhotoLabelViewer = ({image, labels, item}) => {
           zIndex: 9999,
           backgroundColor: '#FFFFFF40',
         }}
-        >
+      >
         <Text> {name} </Text>
       </TouchableOpacity>
     );

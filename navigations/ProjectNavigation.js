@@ -13,6 +13,8 @@ import IssueLocationListScreen from '../screens/project/IssueLocationListScreen'
 import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen'
 import CorporationAddScreen from '../screens/setting/CorporationAddScreen'
 
+import RemoteImageWithSketch from '../screens/project/RemoteImageWithSketch';
+
 const Stack = createNativeStackNavigator();
 
 const ProjectNavigation = ({navigation}) => {
@@ -45,6 +47,11 @@ const ProjectNavigation = ({navigation}) => {
           name="Photo"
           component={PhotoScreen}
           options={{title: '照片標註'}}
+        />
+        <Stack.Screen
+          name="Label"
+          component={RemoteImageWithSketch}
+          options={{title: '物件標註'}}
         />
         <Stack.Screen
           name="ObjectTypeSelector"

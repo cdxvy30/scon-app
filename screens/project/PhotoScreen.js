@@ -32,11 +32,14 @@ import { BlurView } from 'react-native-blur';
 import { OBJECT_TYPE } from '../../configs/objectTypeConfig';
 import SqliteManager from '../../services/SqliteManager';
 import axios from 'axios';
+import { BASE_URL } from '../../configs/authConfig';
 
 const STROKE_WIDTH = 20;
 const DETECTION_THRESHOLD = 0.7;
 
 const PhotoScreen = ({ navigation, route }) => {
+  console.log('/// Pass to PhotoScreen ///');
+  console.log(route.params);
   const issueId = route.params.issueId;
   const setIssueLabels = route.params.setIssueLabels;
 
@@ -220,7 +223,21 @@ const PhotoScreen = ({ navigation, route }) => {
       mode: mode,
       path: path,
     };
+    console.log('new label');
     console.log(newLabel);
+
+    // 存入資料庫
+    axios
+      .post(`${BASE_URL}/labels/add/${issueId}`, {
+        newLabel,
+      })
+      .then(async (res) => {
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log(`label add error: ${e}`);
+      });
+
     await SqliteManager.createIssueLabel(newLabel);
 
     const allLabels = await SqliteManager.getIssueLabelsByIssueId(issueId);
@@ -325,8 +342,6 @@ const PhotoScreen = ({ navigation, route }) => {
                 setBoxObjects(boxObjects.concat([newBoxObj]));
                 setIssueLabels(boxObjects.concat([newBoxObj]));
                 setCanvasTouchEnable(false);
-                console.log('True or false');
-                console.log(canvasTouchEnable);
                 setCurrentLabelOption(undefined);
                 setCurrentLabelMode(undefined);
                 //canvas.deletePath(path.path.id);
