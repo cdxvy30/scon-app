@@ -30,14 +30,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-// import {
-//   Colors,
-//   DebugInstructions,
-//   Header,
-//   LearnMoreLinks,
-//   ReloadInstructions,
-// } from 'react-native/Libraries/NewAppScreen';
-// import RNFetchBlob from 'rn-fetch-blob';
 import SqliteManager from '../../services/SqliteManager';
 import {transformLabels} from '../../util/sqliteHelper';
 import {useIsFocused} from '@react-navigation/native';
@@ -52,13 +44,10 @@ import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 
 const IssueScreen = ({navigation, route}) => {
-  console.log('/// --- IssueScreen Params --- ///');
-  console.log(route.params);
   const project = route.params.project;
   const item = route.params.item;   // item == issue
 
-  // ID作為issue的FK, 同時綁專案名稱、公司
-  const projectId = project.project_id;
+  const projectId = project.project_id;                                         // ID作為issue的FK, 同時綁專案名稱、公司
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
 
@@ -68,31 +57,36 @@ const IssueScreen = ({navigation, route}) => {
   const [issueId, setIssueId] = useState(item.id);
 
   const [selectedIssueLocationId, setSelectedIssueLocationId] = useState(null);
-  const [violationType, setViolationType] = useState(
+
+  const [violationType, setViolationType] = useState(                           // 缺失類別
     route.params.violation_type
       ? route.params.violation_type
       : item.violation_type,
   );
-  const [issueType, setIssueType] = useState(item.type);
-  const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);
-  const [issueTrack, setIssueTrack] = useState(item.tracking);
-  const [issueLocationText, setIssueLocationText] = useState(item.location);
-  const [issueTaskText, setIssueTaskText] = useState(item.activity);
-  const [responsibleCorporation, setResponsibleCorporation] = useState(
+  const [issueType, setIssueType] = useState(item.type);                        // 缺失項目
+  const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);     // if 類別=='其他' 這裡要填項目說明
+  const [issueTrack, setIssueTrack] = useState(item.tracking);                  // 追蹤與否
+  const [issueLocationText, setIssueLocationText] = useState(item.location);    // 缺失地點
+  const [responsibleCorporation, setResponsibleCorporation] = useState(         // 責任廠商
     item.responsible_corporation,
-  );
-  const [issueAssigneeText, setIssueAssigneeText] = useState(item.assignee);
-  const [issueAssigneePhoneNumberText, setIssueAssigneePhoneNumberText] =
+  );                                                                            
+  const [issueTaskText, setIssueTaskText] = useState(item.activity);            // 缺失工項
+
+  // v 用不到
+  const [issueAssigneeText, setIssueAssigneeText] = useState(item.assignee);    // 紀錄人員(不需紀錄, 因為必定為App使用者)
+  const [issueAssigneePhoneNumberText, setIssueAssigneePhoneNumberText] =       // 紀錄人員聯絡方式(不需紀錄, 從資料庫即可查到)
     useState(item.assignee_phone_number);
-  const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(
+  const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(         // 也是紀錄人員?
     userInfo.user.name,
   );
-  const [issueAttachments, setIssueAttachments] = useState(item.attachments);
-  const [issueLabels, setIssueLabels] = useState(transformLabels(item.labels));
-  const [issueStatus, setIssueStatus] = useState(item.status);
-  const [keyboardOffset, setKeyboardOffset] = useState(0);
-  const keyboardDidShowListener = useRef();
-  const keyboardDidHideListener = useRef();
+  //
+
+  const [issueAttachments, setIssueAttachments] = useState(item.attachments);   // 缺失改善照片
+  const [issueLabels, setIssueLabels] = useState(transformLabels(item.labels)); // 缺失影像中的標註
+  const [issueStatus, setIssueStatus] = useState(item.status);                  // 缺失風險高低
+  const [keyboardOffset, setKeyboardOffset] = useState(0);                      // not sure what's this
+  const keyboardDidShowListener = useRef();                                     // not sure what's this
+  const keyboardDidHideListener = useRef();                                     // not sure what's this
   const isFocused = useIsFocused();
 
   // 功用未知
@@ -375,7 +369,7 @@ const IssueScreen = ({navigation, route}) => {
     // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
     
     // Fetch協力廠商 !!@ 尚未建立好corporations的路由 @!!
-    // *********** //
+    // ************************************************************** //
     var options = [];
     axios
       .get(`${BASE_URL}/corporations/${projectId}`)
@@ -386,7 +380,7 @@ const IssueScreen = ({navigation, route}) => {
       .catch(e => {
         console.log(`Fetch corporation error: ${e}`);
       });
-    // ********** //
+    // ************************************************************* //
 
     options.push({company: '取消'});
     options.length == 1
@@ -486,26 +480,71 @@ const IssueScreen = ({navigation, route}) => {
     });
   };
 
-  // 重要!!!(處理labels)
-  // 處理新增缺失的action
+  // !! 處理新增缺失的action
   const issueCreateHandler = React.useCallback(async () => {
+    console.log('/// create ///');
     const transformedIssue = {
-      image_uri: item.image.uri.replace('file://', ''),
-      image_width: item.image.width,
-      image_height: item.image.height,
-      tracking: item.tracking,
-      location: item.location,
-      responsible_corporation: item.responsible_corporation,
-      activity: item.activity,
-      assignee: item.assignee,
-      assignee_phone_number: item.assignee_phone_number,
-      safety_manager: item.safetyManager,
-      violation_type: route.params.violation_type,
-      type: item.type,
-      status: item.status,
-      type_remark: item.typeRemark,
+      image_uri: item.image.uri.replace('file://', ''),     // 缺失影像
+      image_width: item.image.width,                        // 缺失影像寬
+      image_height: item.image.height,                      // 缺失影像高
+      violation_type: route.params.violation_type,          // 缺失類別
+      type: item.type,                                      // 缺失項目
+      type_remark: item.typeRemark,                         // if 類別=='其他', 這裡要填項目說明
+      tracking: item.tracking,                              // 追蹤與否
+      location: item.location,                              // 缺失地點
+      responsible_corporation: item.responsible_corporation,// 責任廠商
+      activity: item.activity,                              // 工項
+      assignee: item.assignee,                              // will not be stored in new version
+      assignee_phone_number: item.assignee_phone_number,    // will not be stored in new version
+      safety_manager: item.safetyManager,                   // 紀錄人員
+      status: item.status,                                  // 缺失風險高低
       project_id: projectId,
     };
+
+    // ************************************************************ //
+    const data = {
+      issue_image_width: item.image.width,
+      issue_image_height: item.image.height,
+      violationType: violationType,
+      issueType: issueType,
+      issueTrack: issueTrack,
+      issueLocationText: issueLocationText,
+      responsibleCorporation: responsibleCorporation,
+      issueTaskText: issueTaskText,
+      issueRecorder: issueSafetyManagerText,                // 紀錄員在原變數中是SafetyManager
+      issueStatus: issueStatus,
+      projectId: projectId,
+      projectName: projectName,
+      projectCorporation: projectCorporation,
+    };
+    const metadata = JSON.stringify(data);
+    var bodyFormData = new FormData();
+    bodyFormData.append('metadata', metadata);
+    bodyFormData.append('issue', {
+      uri: item.image.uri,
+      name: item.image.fileName,
+    });
+    
+    axios({
+      method: 'post',
+      url: `${BASE_URL}/issues/add`,
+      data: bodyFormData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ` + `${userInfo.token}`,
+      },
+    })
+      .then(async res => {
+        console.log(res);
+        let issue_data = res.data;
+        console.log('/// new issue ///');
+        console.log(issue_data);
+        setIssueId(issue_data.issue_id);
+      })
+      .catch(e => {
+        console.log(`Add new issue error: ${e}`);
+      });
+    // ************************************************************ //  
 
     await SqliteManager.createIssue(transformedIssue);
 
@@ -535,9 +574,9 @@ const IssueScreen = ({navigation, route}) => {
     route.params.violation_type,
   ]);
 
-  // 重要!!!(處理labels)
-  // 處理更新缺失動作
+  // !! 處理更新缺失動作
   const issueUpdateHandler = React.useCallback(async () => {
+    console.log('/// update ///');
     const transformedIssue = {
       image_uri: item.image.uri.replace('file://', ''),
       image_width: item.image.width,
@@ -555,6 +594,43 @@ const IssueScreen = ({navigation, route}) => {
       project_id: projectId,
       status: issueStatus,
     };
+    
+    // ************************************************************ //
+    const data = {
+      issue_image_width: item.image.width,
+      issue_image_height: item.image.height,
+      violationType: violationType,
+      issueType: issueType,
+      issueTrack: issueTrack,
+      issueLocationText: issueLocationText,
+      responsibleCorporation: responsibleCorporation,
+      issueTaskText: issueTaskText,
+      issueRecorder: issueSafetyManagerText,                // 紀錄員在原變數中是SafetyManager
+      issueStatus: issueStatus,
+      projectId: projectId,
+      projectName: projectName,
+      projectCorporation: projectCorporation,
+    };
+
+    axios({
+      method: 'patch',
+      url: `${BASE_URL}/issues/update/${issueId}`,
+      data: data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ` + `${userInfo.token}`,
+      },
+    })
+      .then(async res => {
+        console.log(res);
+        let issue_data = res.data;
+        console.log(issue_data);
+      })
+      .catch(e => {
+        console.log(`Update issue error: ${e}`);
+      });
+    // ************************************************************ //
+
     await SqliteManager.updateIssue(issueId, transformedIssue);
   }, [
     issueAssigneeText,
@@ -603,12 +679,13 @@ const IssueScreen = ({navigation, route}) => {
   // 重要!!!(處理labels)
   // 看IssueListScreen傳來的action是什麼, 決定create或update
   useEffect(() => {
+    // action = 'create new issue' 就執行 issueCreateHandler()
     action === 'create new issue' && issueCreateHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issueCreateHandler]);
 
   useEffect(() => {
-    console.log(action);
+    // action = 'update existing issue' 且 有issueId存在 就執行 issueUpdateHandler()
     action === 'update existing issue' && issueId && issueUpdateHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -658,7 +735,7 @@ const IssueScreen = ({navigation, route}) => {
             if (!violationType) {
               Alert.alert('請點選缺失類別');
               return;
-            } /*
+            } 
             else if (!issueType && !issueTypeRemark) {
               Alert.alert('請點選缺失項目');
               return;
@@ -666,62 +743,54 @@ const IssueScreen = ({navigation, route}) => {
             else if (!issueLocationText) {
               Alert.alert('請點選缺失地點');
               return;
-            }
+            }/*
             else if (!responsibleCorporation) {
               Alert.alert('請點選責任廠商');
               return;
-            }
-            */
+            }*/
             else {
-            // 將紀錄完成之缺失資料送至後端
-            // ******************** //
-              const data = {
-                violationType: violationType,
-                issueType: issueType,
-                issueTrack: issueTrack,
-                issueLocationText: issueLocationText,
-                responsibleCorporation: responsibleCorporation,
-                issueTaskText: issueTaskText,
-                // 紀錄人員變數名稱: issueSafetyManeger or issueAssigneeText
-                issueAssigneeText: issueSafetyManagerText,  // 預設app使用者
-                issueStatus: issueStatus,
-                projectId: projectId,
-                projectName: projectName,
-                projectCorporation: projectCorporation,
-              };
-              const metadata = JSON.stringify(data);
-              var bodyFormData = new FormData();
-              bodyFormData.append('metadata', metadata);
-              bodyFormData.append('issue', {
-                uri: item.image.uri,
-                name: item.image.fileName,
-              });
-              
-              axios({
-                method: 'post',
-                url: `${BASE_URL}/issues/add`,
-                data: bodyFormData,
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                  Authorization: `Bearer ` + `${userInfo.token}`,
-                },
+            // 將紀錄完成之缺失資料更新至後端
+            // ************************************************************ //
+            const data = {
+              violationType: violationType,                         // 缺失類別
+              issueType: issueType,                                 // 缺失項目
+              issueTypeRemark: issueTypeRemark,
+              issueTrack: issueTrack,                               // 追蹤與否
+              issueLocationText: issueLocationText,                 // 缺失地點
+              responsibleCorporation: responsibleCorporation,       // 責任廠商
+              issueTaskText: issueTaskText,                         // 工項
+              issueRecorder: issueSafetyManagerText,                // 紀錄員在原變數中是SafetyManager
+              issueStatus: issueStatus,                             // 風險高低
+              projectId: projectId,
+              projectName: projectName,
+              projectCorporation: projectCorporation,
+            };
+
+            // 按下"完成"Button會更新缺失資料到後端
+            axios({
+              method: 'patch',
+              url: `${BASE_URL}/issues/update/${issueId}`,
+              data: data,
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ` + `${userInfo.token}`,
+              },
+            })
+              .then(async res => {
+                console.log(res);
+                let issue_data = res.data;
+                console.log(issue_data);
               })
-                .then(async res => {
-                  console.log(res);
-                  let issue_data = res.data;
-                  console.log(issue_data);
-                })
-                .catch(e => {
-                  console.log(`Add new issue error: ${e}`);
-                });
-            }
-            // ******************** //
+              .catch(e => {
+                console.log(`Update issue error: ${e}`);
+              });
+            // ************************************************************ //
             navigation.goBack();
-          }}
+          }}}
         />
       ),
     });
-  }, [isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, issueTypeRemark, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token]);
+  }, [issueId, isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, issueTypeRemark, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token]);
 
   // 畫面欄位
   return (

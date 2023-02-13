@@ -24,8 +24,8 @@ export default class Issue extends BaseModel {
       tracking: {type: types.BOOLEAN, not_null: true},
       location: {type: types.TEXT, not_null: true},
       responsible_corporation: {type: types.TEXT, not_null: true},
-      activity: {type: types.TEXT, not_null: true},   // What's this?
-      assignee: {type: types.TEXT, not_null: true},
+      activity: {type: types.TEXT, not_null: true},                 // What's this? -> 工項
+      assignee: {type: types.TEXT, not_null: true},                 // 負責人
       assignee_phone_number: {type: types.TEXT, not_null: true},
       safety_manager: {type: types.TEXT, not_null: true},
       violation_type: {type: types.TEXT, not_null: true},

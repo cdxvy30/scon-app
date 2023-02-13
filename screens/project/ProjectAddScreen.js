@@ -20,13 +20,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {PROJECT_STATUS} from './ProjectEnum';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
-import {Dropdown} from 'react-native-element-dropdown';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const ProjectAddScreen = ({navigation, route}) => {
   const { userInfo } = useContext(AuthContext);
   let project = route.params.project;
-  console.log(userInfo);
+  // console.log(userInfo);
   const [thumbnail, setThumbnail] = useState(project ? project.image : '');
   const [name, setName] = useState(project ? project.name : '');
   const [address, setAddress] = useState(project ? project.address : '');
@@ -62,8 +60,6 @@ const ProjectAddScreen = ({navigation, route}) => {
     };
 
     const projectAddToPGSQL = () => {
-      console.log(name);
-      console.log('try to store in PGSQL.');
       setIsLoading(true);
 
       const data = {

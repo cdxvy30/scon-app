@@ -170,7 +170,7 @@ const IssueListScreen = ({navigation, route}) => {
       });
   };
 
-  // 處理缺失輸出動作
+  // @處理缺失輸出動作
   const outputReportHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -367,7 +367,7 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
-  // 處理時間排序動作
+  // @處理時間排序動作
   const issueSortHandler = () => {
     console.log(isExporting)
     ActionSheetIOS.showActionSheetWithOptions(
@@ -423,7 +423,7 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
-  // 處理日期篩選與還原動作
+  // @處理日期篩選與還原動作
   const issueOptionHandler = React.useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -525,7 +525,7 @@ const IssueListScreen = ({navigation, route}) => {
   */
 
   // 向後端請求此project的issues list
-  // ******************** //
+  // **************************************** //
   useEffect(() => {
     const fetchIssues = async () => {
       await axios
@@ -545,7 +545,7 @@ const IssueListScreen = ({navigation, route}) => {
       fetchIssues();
     }
   }, [isFocused, project.project_id]);
-  // ******************** //
+  // **************************************** //
 
   // 頂端列按鈕行為: 時間排序/依日期篩選/匯出缺失記錄表
   React.useLayoutEffect(() => {
@@ -645,7 +645,7 @@ const IssueListScreen = ({navigation, route}) => {
             color={determineStatusColor(item)}
           />
           <Text style={[styles.timestampText, textColor]}>
-            {item.createat}
+            {item.create_at}
           </Text>
         </View>
         <Text style={[styles.descriptionText, textColor]}>
@@ -674,8 +674,6 @@ const IssueListScreen = ({navigation, route}) => {
   );
 
   const renderItem = ({item}) => {
-    console.log('---render issues---');
-    console.log(item);
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
 

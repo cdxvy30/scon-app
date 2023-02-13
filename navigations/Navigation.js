@@ -11,34 +11,35 @@ import {AuthContext} from '../context/AuthContext';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
-  const {userInfo, splashLoading} = useContext(AuthContext);
+  const { userInfo, splashLoading } = useContext(AuthContext);
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {splashLoading ? (
+        {/* {splashLoading ? (
           <Stack.Screen
             name="Splash Screen"
             component={SplashScreen}
             options={{headerShown: false}}
           />
-        ) : userInfo.token ? (
+        ) : */}
+        {userInfo.token ? (
           <Stack.Screen
             name="Tab"
             component={TabNavigation}
-            options={{headerShown: false}}
+            options={{ headerShown: false }}
           />
         ) : (
           <>
             <Stack.Screen
               name="Login"
               component={LoginScreen}
-              options={{headerShown: false}}
+              options={{ headerShown: false }}
             />
             <Stack.Screen
               name="Register"
               component={RegisterScreen}
-              options={{headerShown: false}}
+              options={{ headerShown: false }}
             />
           </>
         )}

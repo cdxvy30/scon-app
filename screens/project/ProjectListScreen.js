@@ -72,7 +72,7 @@ const ProjectListScreen = ({ navigation }) => {
         })
         .then(async (res) => {
           let projects = await res.data;
-          console.log(projects);
+          // console.log(projects);
           setProjectList(projects);
         })
         .catch((e) => {

@@ -251,6 +251,7 @@ const PhotoScreen = ({ navigation, route }) => {
           // cancel action
         } else if (buttonIndex === 1) {
           canvas.clear();
+          // 刪除選取的box
           const newBoxObjs = boxObjects.filter(b => b.key !== labelId);
           await SqliteManager.deleteIssueLabel(labelId);
           setBoxObjects(newBoxObjs);

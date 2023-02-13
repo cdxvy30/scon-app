@@ -114,15 +114,10 @@ import { BASE_URL } from '../configs/authConfig';
 // ];
 
 const PhotoLabelViewer = ({image, labels, item}) => {
-  console.log('/// *** PhotoLabel Component *** ///');
-  console.log(image);
-  console.log(labels);
-  console.log(item);
   const issueId = item.issue_id;
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
   const [canvas, setCanvas] = useState(undefined);
 
-  //
   useEffect(() => {
     Orientation.lockToPortrait();
     const windowSize = Dimensions.get('window');
