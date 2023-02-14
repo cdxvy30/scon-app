@@ -49,7 +49,6 @@ const IssueScreen = ({navigation, route}) => {
   console.log('hihihihi',route.params.item);
   const project = route.params.project;
   const item = route.params.item;
-  
   const projectId = project.project_id;                                         // ID作為issue的FK, 同時綁專案名稱、公司
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
@@ -477,8 +476,7 @@ const IssueScreen = ({navigation, route}) => {
   // 導向IssueLocationListScreen, 選擇缺失地點
   const IssueLocationListHandler = async () => {
     navigation.navigate('IssueLocationList', {
-      project: route.params.project,
-      projectId: route.params.projectId,
+      projectId: projectId,
       setIssueLocationText,
     });
   };

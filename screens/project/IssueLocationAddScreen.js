@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {
   Alert,
@@ -14,10 +14,8 @@ import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
 
 const IssueLocationAddScreen = ({navigation, route}) => {
-  const isFocused = useIsFocused();
   const [floor, setFloor] = useState('');
   const [position, setPosition] = useState('');
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,17 +51,27 @@ const IssueLocationAddScreen = ({navigation, route}) => {
               Alert.alert('請填寫確切位置');
               return;
             } else {
-                  // axios
-                  //   .post(`${BASE_URL}/locations/add`, { 
-                  //     location,    !!!!!(這邊改成存floor和position)!!!!!
-                  //     projectId,
-                  //   })
-                  //   .then(async (res) => {
-                  //     console.log(res.data);
-                  //   })
-                  //   .catch((e) => {
-                  //     console.log(e);
-                  //   });
+                  const data = {
+                    locationName: `${floor}${position}`,
+                    floor: floor,
+                    position: position,
+                    projectId: route.params.projectId
+                  };
+                  const metadata = JSON.stringify(data);
+                  var bodyFormData = new FormData();
+                  bodyFormData.append('metadata', metadata);
+                  axios({
+                    method: 'post',
+                    url: `${BASE_URL}/locations/add`,
+                    data: bodyFormData,
+                  })
+                    .then(async (res) => {
+                      console.log('新增成功')
+                      console.log(res.data);
+                    })
+                    .catch((e) => {
+                      console.log(e);
+                    });
                   navigation.goBack();
             }
           }}

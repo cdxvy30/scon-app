@@ -19,13 +19,13 @@ import Accordion from 'react-native-collapsible/Accordion'
 
 const IssueLocationListScreen = ({navigation, route}) => {
   // console.log(route.params);
-  const sourceProject = route.params.project;
+  // const sourceProject = route.params.project;
   // console.log('Source Project');
   // console.log(sourceProject);
-  const projectId = sourceProject.project_id;
+  const projectId = route.params.projectId;
   const [issueLocationList, setIssueLocationList] = useState(null);
   // const [projectId, setProjectId] = useState(route.params.projectId);
-  const [project, setProject] = useState(route.params.project); // 用不到
+  // const [project, setProject] = useState(route.params.project); // 用不到
   // const [projectId, setProjectId] = useState(sourceProject.project_id);
   const isFocused = useIsFocused();
 
@@ -169,13 +169,15 @@ const IssueLocationListScreen = ({navigation, route}) => {
   }, [navigation, projectId, route.params]);
 
   useEffect(() => {
+    console.log('/// fetching location data ///')
+    console.log('ppID',projectId)
     const fetchIssueLocations = async () => {
       await axios
         .get(`${BASE_URL}/locations/list/${projectId}`)
         .then(async (res) => {
           let data = await res.data;
           setIssueLocationList(data);
-          console.log('data',data)
+          console.log('location_data',data)
         })
         .catch((e) => {
           console.log(`list locations error: ${e}`);
@@ -185,7 +187,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
     if (isFocused) {
       fetchIssueLocations();
     }
-  }, [isFocused, project, projectId]);
+  }, [isFocused, projectId]);
 
   const issueLocationSelectHandler = (floor, position) => {
     route.params.setIssueLocationText(`${floor.title}${position}`);

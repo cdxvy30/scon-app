@@ -56,7 +56,6 @@ const IssueListScreen = ({navigation, route}) => {
   // const project = route.params;
   const { userInfo } = useContext(AuthContext);
 
-  const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
   const [selectedIssueList, setSelectedIssueList] = useState(issueList);
@@ -122,7 +121,6 @@ const IssueListScreen = ({navigation, route}) => {
         console.log('imagepath',res.data)
         navigation.navigate('Issue', {
           project: project,
-          projectId: projectId,
           issueId: issueId,                                 // 更新issue時要知道issueId
           action: 'update existing issue',
           item: CreateItemByExistingIssue(item, res),
@@ -183,7 +181,6 @@ const IssueListScreen = ({navigation, route}) => {
         //console.log(response.data);
         setIsDedecting(false);
         navigation.navigate('Issue', {
-          projectId: projectId,                         // 建立issue時要知道projectId
           project: project,
           action: 'create new issue',
           violation_type: response.data.violation_type,
@@ -196,7 +193,6 @@ const IssueListScreen = ({navigation, route}) => {
         Alert.alert('辨識失敗');
         console.log(response);
         navigation.navigate('Issue', {
-          projectId: projectId,
           project: project,
           action: 'create new issue',
           violation_type: '',
