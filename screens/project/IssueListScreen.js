@@ -109,28 +109,41 @@ const IssueListScreen = ({navigation, route}) => {
 
   // @處理更新缺失動作, 導入IssueScreen
   // action為"update existing issue"
-  const issueSelectHandler = item => {
+  const issueSelectHandler = async item => {
     console.log('/// item in issueSeleceHandler ///');
-    console.log(item);
     let issueId = item.issue_id;
     setSelectedIssueId(item.issue_id);
 
-    navigation.navigate('Issue', {
-      project: project,
-      projectId: projectId,
-      issueId: issueId,                                 // 更新issue時要知道issueId
-      action: 'update existing issue',
-      item: CreateItemByExistingIssue(item),
-    });
+    await RNFetchBlob.config({
+      fileCache: true,
+    })
+      .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`)
+      .then((res) => {
+        console.log('imagepath',res.data)
+        navigation.navigate('Issue', {
+          project: project,
+          projectId: projectId,
+          issueId: issueId,                                 // 更新issue時要知道issueId
+          action: 'update existing issue',
+          item: CreateItemByExistingIssue(item, res),
+        });
+      })
+      .catch(err => {
+        console.log(err)
+      });
   };
 
-  const CreateItemByExistingIssue = (item) => {
+  const CreateItemByExistingIssue = (item, res) => {
     return {
       id: item.issue_id,
       title: item.issue_title,
       type: item.issue_type,
       violation_type: item.issue_title,
-      image: `${BASE_URL}/get/thumbnail/${item.issue_id}`,
+      image: {
+        uri: res.data,
+        height: parseInt(item.issue_image_height, 10),
+        width: parseInt(item.issue_image_width, 10)
+      },
       status: item.issue_status,
       tracking: item.tracking_or_not,
       location: item.issue_location,
@@ -163,7 +176,7 @@ const IssueListScreen = ({navigation, route}) => {
       url: 'http://34.80.209.101:8000/predict',
       data: bodyFormData,
       headers: {'Content-Type': 'multipart/form-data'},
-      timeout: 3000,
+      timeout: 5000,
     })
       .then(async function (response) {
         //handle success
@@ -555,7 +568,6 @@ const IssueListScreen = ({navigation, route}) => {
         .get(`${BASE_URL}/issues/list/${project.project_id}`)
         .then(async (res) => {
           let issues = await res.data;
-          console.log(issues);
           setIssueList(issues);
           setSelectedIssueList(issuesFilter(issues));
         })
@@ -563,9 +575,18 @@ const IssueListScreen = ({navigation, route}) => {
           console.log(`List issues error: ${e}`);
         });
     };
+    const deleteTmpFiles = () => {
+      try{
+        RNFetchBlob.fs.unlink(RNFetchBlob.fs.dirs.DocumentDir + "/RNFetchBlob_tmp/")
+      }
+      catch(e){
+        console.log(e)
+      }
+    }
 
     if (isFocused) {
       fetchIssues();
+      deleteTmpFiles();
     }
   }, [isFocused, project.project_id]);
   // **************************************** //

@@ -46,10 +46,9 @@ import RemoteImageWithSketch from './RemoteImageWithSketch';
 
 const IssueScreen = ({navigation, route}) => {
   console.log('/// Pass to IssueScreen ///');
-  // console.log(route.params.image.uri);
+  console.log('hihihihi',route.params.item);
   const project = route.params.project;
   const item = route.params.item;
-  console.log(item);
   
   const projectId = project.project_id;                                         // ID作為issue的FK, 同時綁專案名稱、公司
   const projectName = project.project_name;
@@ -488,7 +487,7 @@ const IssueScreen = ({navigation, route}) => {
   const issueCreateHandler = React.useCallback(async () => {
     console.log('/// create ///');
     const transformedIssue = {
-      image_uri: item.image.uri.replace('file://', ''),     // 缺失影像
+      image_uri: item.image.uri,     // 缺失影像
       image_width: item.image.width,                        // 缺失影像寬
       image_height: item.image.height,                      // 缺失影像高
       violation_type: route.params.violation_type,          // 缺失類別
@@ -550,15 +549,15 @@ const IssueScreen = ({navigation, route}) => {
       });
     // ************************************************************ //  
 
-    await SqliteManager.createIssue(transformedIssue);
+    // await SqliteManager.createIssue(transformedIssue);
 
-    const allIssues = await SqliteManager.getAllIssues();
-    const sortedIssues = allIssues.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at),
-    );
-    const latestIssue = sortedIssues[0];
+    // const allIssues = await SqliteManager.getAllIssues();
+    // const sortedIssues = allIssues.sort(
+    //   (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    // );
+    // const latestIssue = sortedIssues[0];
 
-    setIssueId(latestIssue.id);
+    // setIssueId(latestIssue.id);
     setAction('update existing issue');
   }, [
     item.activity,
@@ -582,7 +581,7 @@ const IssueScreen = ({navigation, route}) => {
   const issueUpdateHandler = React.useCallback(async () => {
     console.log('/// update ///');
     const transformedIssue = {
-      image_uri: item.image.uri.replace('file://', ''),
+      image_uri: item.image.uri,
       image_width: item.image.width,
       image_height: item.image.height,
       tracking: issueTrack,
@@ -626,6 +625,7 @@ const IssueScreen = ({navigation, route}) => {
       },
     })
       .then(async res => {
+        console.log('on99data:',data)
         console.log(res);
         let issue_data = res.data;
         console.log(issue_data);
@@ -635,7 +635,7 @@ const IssueScreen = ({navigation, route}) => {
       });
     // ************************************************************ //
 
-    await SqliteManager.updateIssue(issueId, transformedIssue);
+    // await SqliteManager.updateIssue(issueId, transformedIssue);
   }, [
     issueAssigneeText,
     issueAssigneePhoneNumberText,
