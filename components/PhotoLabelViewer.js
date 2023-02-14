@@ -16,6 +16,7 @@ import {
   Dimensions,
   View,
 } from 'react-native';
+import RNFetchBlob from 'rn-fetch-blob';
 import {
   Colors,
   DebugInstructions,
@@ -164,7 +165,7 @@ const PhotoLabelViewer = ({ image, labels, item }) => {
           <SketchCanvas
             ref={ref => setCanvas(ref)}
             localSourceImage={{
-              filename: image.uri.replace('file://', ''),
+              filename: image.uri,
               // filename: `${BASE_URL}/issues/get/thumbnail/${issueId}`,
               directory: null,
               mode: 'AspectFit',
