@@ -117,13 +117,18 @@ const IssueLocationListScreen = ({navigation, route}) => {
         .get(`${BASE_URL}/locations/list/${projectId}`)
         .then(async (res) => {
           let locations = await res.data;
-          let sortedLocations = locations.sort(function(x, y){    //排序資料
-            let a = x.floor.toLowerCase();
-            let b = y.floor.toLowerCase();
-            if(a > b) return 1;
-            if(a < b) return -1;
-            else return 0;
+
+          let alpha = [], num = []; //缺失地點排序
+          const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
+          locations.map( (location) => {
+            if( parseInt(location.floor[0]) == location.floor[0]) {
+              num.push(location);
+            }            
+            else {
+              alpha.push(location);
+            }
           });
+          let sortedLocations = [...alpha.sort((a, b) => collator.compare(b.floor, a.floor)), ...num.sort((a, b) => collator.compare(a.floor, b.floor))];
           setIssueLocationList(sortedLocations);
 
           const tmp_content = sortedLocations.map((location)=>location.floor)
