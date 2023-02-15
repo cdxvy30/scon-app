@@ -32,7 +32,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
   const issueLocationAddHandler = async () => {
     navigation.navigate('IssueLocationAdd', { 
       name: 'Create new issue location' ,
-      projectId: projectId
+      projectId: projectId,
     })};
 
   //以下實驗用
@@ -113,7 +113,6 @@ const IssueLocationListScreen = ({navigation, route}) => {
           }
         </Animatable.View>
       </View>
-      
     )
   }
 
@@ -137,7 +136,6 @@ const IssueLocationListScreen = ({navigation, route}) => {
               </Animatable.Text>
             </Animatable.View>
           </TouchableOpacity>
-          
         ))}
       </View>
     )

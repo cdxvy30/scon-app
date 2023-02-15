@@ -52,18 +52,15 @@ const IssueLocationAddScreen = ({navigation, route}) => {
               return;
             } else {
                   const data = {
-                    locationName: `${floor}${position}`,
+                    locationName: `${floor}_${position}`,
                     floor: floor,
                     position: position,
                     projectId: route.params.projectId
                   };
-                  const metadata = JSON.stringify(data);
-                  var bodyFormData = new FormData();
-                  bodyFormData.append('metadata', metadata);
                   axios({
                     method: 'post',
                     url: `${BASE_URL}/locations/add`,
-                    data: bodyFormData,
+                    data: data,
                   })
                     .then(async (res) => {
                       console.log('新增成功')
