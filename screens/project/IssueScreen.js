@@ -653,14 +653,53 @@ const IssueScreen = ({navigation, route}) => {
 
   // 量化project之風險高低指標
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', async () => {
+    // beforeRemove 用來防止   
+    const unsubscribe = navigation.addListener('beforeRemove', async (e) => {
+
+    // ************************************************************ //
+    const data = {
+      violationType: violationType,                         // 缺失類別
+      issueType: issueType,                                 // 缺失項目
+      issueTypeRemark: issueTypeRemark,
+      issueTrack: issueTrack,                               // 追蹤與否
+      issueLocationText: issueLocationText,                 // 缺失地點
+      responsibleCorporation: responsibleCorporation,       // 責任廠商
+      issueTaskText: issueTaskText,                         // 工項
+      issueRecorder: issueSafetyManagerText,                // 紀錄員在原變數中是SafetyManager
+      issueStatus: issueStatus,                             // 風險高低
+      projectId: projectId,
+      projectName: projectName,
+      projectCorporation: projectCorporation,
+    };
+
+    // 按下"完成"Button會更新缺失資料到後端
+    axios({
+      method: 'patch',
+      url: `${BASE_URL}/issues/update/${issueId}`,
+      data: data,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ` + `${userInfo.token}`,
+      },
+    })
+      .then(async res => {
+        console.log(res);
+        let issue_data = res.data;
+        console.log(issue_data);
+      })
+      .catch(e => {
+        console.log(`Update issue error: ${e}`);
+      });
+    // ************************************************************ // 
+
+      // e.preventDefault();
       const issues = await SqliteManager.getIssuesByProjectId(projectId);
       let projectStatus = CalculateProjectStatus(issues);
       await SqliteManager.updateProject(projectId, {status: projectStatus});
     });
 
     return unsubscribe;
-  }, [navigation, projectId]);
+  }, [issueId, issueLocationText, issueSafetyManagerText, issueStatus, issueTaskText, issueTrack, issueType, issueTypeRemark, navigation, projectCorporation, projectId, projectName, responsibleCorporation, userInfo.token, violationType]);
 
   // 計算project之風險高低指標的function
   const CalculateProjectStatus = issues => {
