@@ -18,74 +18,66 @@ import Collapsible from 'react-native-collapsible';
 import Accordion from 'react-native-collapsible/Accordion'
 
 const IssueLocationListScreen = ({navigation, route}) => {
-  // console.log(route.params);
-  // const sourceProject = route.params.project;
-  // console.log('Source Project');
-  // console.log(sourceProject);
   const projectId = route.params.projectId;
   const [issueLocationList, setIssueLocationList] = useState(null);
-  // const [projectId, setProjectId] = useState(route.params.projectId);
-  // const [project, setProject] = useState(route.params.project); // 用不到
-  // const [projectId, setProjectId] = useState(sourceProject.project_id);
   const isFocused = useIsFocused();
+  const [activeSections, setActiveSections] = useState([]);
+  const [CONTENT, setCONTENT] = useState([])
 
   const issueLocationAddHandler = async () => {
     navigation.navigate('IssueLocationAdd', { 
       name: 'Create new issue location' ,
       projectId: projectId,
     })};
-
-  //以下實驗用
-  const [activeSections, setActiveSections] = useState([]);
-  //預想是fetch出floor和position
-  const CONTENT = [
-    {
-      title: '1F',
-      content: ['1F_position','1F_position_2']
-    },
-    {
-      title: '2F',
-      content: ['2F_position']
-    },
-    {
-      title: '3F',
-      content: ['3F_position']
-    },
-    {
-      title: '4F',
-      content: ['4F_position']
-    },{
-      title: '5F',
-      content: ['5F_position']
-    },
-    {
-      title: '6F',
-      content: ['6F_position']
-    },
-    {
-      title: '7F',
-      content: ['7F_position']
-    },
-    {
-      title: '8F',
-      content: ['8F_position']
-    },{
-      title: '9F',
-      content: ['9F_position']
-    },
-    {
-      title: '10F',
-      content: ['10F_position']
-    },
-    {
-      title: '11F',
-      content: ['11F_position']
-    },
-    {
-      title: '12F',
-      content: ['12F_position']
-    }
-  ]
+  
+  // const CONTENT = [
+  //   {
+  //     title: '1F',
+  //     content: ['1F_position','1F_position_2']
+  //   },
+  //   {
+  //     title: '2F',
+  //     content: ['2F_position']
+  //   },
+  //   {
+  //     title: '3F',
+  //     content: ['3F_position']
+  //   },
+  //   {
+  //     title: '4F',
+  //     content: ['4F_position']
+  //   },{
+  //     title: '5F',
+  //     content: ['5F_position']
+  //   },
+  //   {
+  //     title: '6F',
+  //     content: ['6F_position']
+  //   },
+  //   {
+  //     title: '7F',
+  //     content: ['7F_position']
+  //   },
+  //   {
+  //     title: '8F',
+  //     content: ['8F_position']
+  //   },{
+  //     title: '9F',
+  //     content: ['9F_position']
+  //   },
+  //   {
+  //     title: '10F',
+  //     content: ['10F_position']
+  //   },
+  //   {
+  //     title: '11F',
+  //     content: ['11F_position']
+  //   },
+  //   {
+  //     title: '12F',
+  //     content: ['12F_position']
+  //   }
+  // ]
 
   const renderHeader = (section, _, isActive) => {
     return(
@@ -168,14 +160,33 @@ const IssueLocationListScreen = ({navigation, route}) => {
 
   useEffect(() => {
     console.log('/// fetching location data ///')
-    console.log('ppID',projectId)
     const fetchIssueLocations = async () => {
       await axios
         .get(`${BASE_URL}/locations/list/${projectId}`)
         .then(async (res) => {
-          let data = await res.data;
-          setIssueLocationList(data);
-          console.log('location_data',data)
+          let locations = await res.data;
+          let sortedLocations = locations.sort(function(x, y){    //排序資料
+            let a = x.floor.toLowerCase();
+            let b = y.floor.toLowerCase();
+            if(a > b) return 1;
+            if(a < b) return -1;
+            else return 0;
+          });
+          setIssueLocationList(sortedLocations);
+
+          const tmp_content = sortedLocations.map((location)=>location.floor)
+          .map((floor, index) => ({
+              title: floor, 
+              content: [sortedLocations.map((location)=>location.position)[index]]
+          }));
+          tmp_content.forEach((item) => {
+            if (CONTENT.map(option => option.title).includes(item.title)){
+              setCONTENT(CONTENT[CONTENT.map(option => option.title).indexOf(item.title)].content.push(item.title))
+            } else {
+              CONTENT.push(item)
+            }
+          })
+          console.log('///CONTENT///',CONTENT)  //[{"content": ["南側"], "title": "1F"}, {"content": ["北側", "4F"], "title": "4F"}, {"content": ["中庭"], "title": "B1"}]
         })
         .catch((e) => {
           console.log(`list locations error: ${e}`);

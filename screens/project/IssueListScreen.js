@@ -113,7 +113,7 @@ const IssueListScreen = ({navigation, route}) => {
     let issueId = item.issue_id;
     setSelectedIssueId(item.issue_id);
 
-    await RNFetchBlob.config({
+    await RNFetchBlob.config({             //先暫時載到本地端
       fileCache: true,
     })
       .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`)
@@ -401,7 +401,6 @@ const IssueListScreen = ({navigation, route}) => {
 
   // @處理時間排序動作
   const issueSortHandler = () => {
-    console.log(isExporting)
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['取消', '依時間排序(由新到舊)', '依時間排序(由舊到新)'],
@@ -564,8 +563,11 @@ const IssueListScreen = ({navigation, route}) => {
         .get(`${BASE_URL}/issues/list/${project.project_id}`)
         .then(async (res) => {
           let issues = await res.data;
-          setIssueList(issues);
-          setSelectedIssueList(issuesFilter(issues));
+          sortIssues = issues.sort(               //按照時間將issues排序
+            (a, b) => new Date(b.create_at) - new Date(a.create_at)
+          )
+          setIssueList(sortIssues);
+          setSelectedIssueList(issuesFilter(sortIssues));
         })
         .catch((e) => {
           console.log(`List issues error: ${e}`);
@@ -716,7 +718,7 @@ const IssueListScreen = ({navigation, route}) => {
   const renderItem = ({item}) => {
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
-
+    
     return (
       <React.Fragment>
         <Swipeout

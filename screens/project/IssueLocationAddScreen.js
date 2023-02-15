@@ -63,7 +63,7 @@ const IssueLocationAddScreen = ({navigation, route}) => {
                     data: data,
                   })
                     .then(async (res) => {
-                      console.log('新增成功')
+                      console.log('新增地點成功');
                       console.log(res.data);
                     })
                     .catch((e) => {
