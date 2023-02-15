@@ -22,7 +22,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
   const [issueLocationList, setIssueLocationList] = useState(null);
   const isFocused = useIsFocused();
   const [activeSections, setActiveSections] = useState([]);
-  const [CONTENT, setCONTENT] = useState([])
+  const [CONTENT, setCONTENT] = useState([]);
 
   const issueLocationAddHandler = async () => {
     navigation.navigate('IssueLocationAdd', { 
@@ -30,54 +30,6 @@ const IssueLocationListScreen = ({navigation, route}) => {
       projectId: projectId,
     })};
   
-  // const CONTENT = [
-  //   {
-  //     title: '1F',
-  //     content: ['1F_position','1F_position_2']
-  //   },
-  //   {
-  //     title: '2F',
-  //     content: ['2F_position']
-  //   },
-  //   {
-  //     title: '3F',
-  //     content: ['3F_position']
-  //   },
-  //   {
-  //     title: '4F',
-  //     content: ['4F_position']
-  //   },{
-  //     title: '5F',
-  //     content: ['5F_position']
-  //   },
-  //   {
-  //     title: '6F',
-  //     content: ['6F_position']
-  //   },
-  //   {
-  //     title: '7F',
-  //     content: ['7F_position']
-  //   },
-  //   {
-  //     title: '8F',
-  //     content: ['8F_position']
-  //   },{
-  //     title: '9F',
-  //     content: ['9F_position']
-  //   },
-  //   {
-  //     title: '10F',
-  //     content: ['10F_position']
-  //   },
-  //   {
-  //     title: '11F',
-  //     content: ['11F_position']
-  //   },
-  //   {
-  //     title: '12F',
-  //     content: ['12F_position']
-  //   }
-  // ]
 
   const renderHeader = (section, _, isActive) => {
     return(
@@ -179,14 +131,19 @@ const IssueLocationListScreen = ({navigation, route}) => {
               title: floor, 
               content: [sortedLocations.map((location)=>location.position)[index]]
           }));
-          tmp_content.forEach((item) => {
-            if (CONTENT.map(option => option.title).includes(item.title)){
-              setCONTENT(CONTENT[CONTENT.map(option => option.title).indexOf(item.title)].content.push(item.title))
-            } else {
-              CONTENT.push(item)
-            }
-          })
-          console.log('///CONTENT///',CONTENT)  //[{"content": ["南側"], "title": "1F"}, {"content": ["北側", "4F"], "title": "4F"}, {"content": ["中庭"], "title": "B1"}]
+
+          const final_content = [];
+          tranformContent = () => {
+            tmp_content.forEach((item) => {
+              if (final_content.map(option => option.title).includes(item.title)){
+                final_content[final_content.map(option => option.title).indexOf(item.title)].content.push(item.content)
+              } else {
+                final_content.push(item)
+              }
+            })
+            return(final_content)
+          }
+          setCONTENT(await tranformContent())  
         })
         .catch((e) => {
           console.log(`list locations error: ${e}`);
@@ -199,7 +156,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
   }, [isFocused, projectId]);
 
   const issueLocationSelectHandler = (floor, position) => {
-    route.params.setIssueLocationText(`${floor.title}${position}`);
+    route.params.setIssueLocationText(`${floor.title}_${position}`);
     navigation.goBack();
   };
 
