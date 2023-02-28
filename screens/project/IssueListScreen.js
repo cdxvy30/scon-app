@@ -112,6 +112,7 @@ const IssueListScreen = ({navigation, route}) => {
     console.log('/// item in issueSeleceHandler ///');
     let issueId = item.issue_id;
     setSelectedIssueId(item.issue_id);
+    console.log('item',item)
 
     await RNFetchBlob.config({             //先暫時載到本地端
       fileCache: true,
@@ -738,25 +739,14 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
-  // 缺失表單生成中, 顯示loading畫面
-  if (isExporting === true) {
+  // 缺失表單生成中 或 缺失類別辨識中, 顯示loading畫面
+  if (isExporting === true || isDedecting === true) {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
           <View style={styles.loading_container}>
             <ActivityIndicator size="large" color="#000000" />
             <Text style={[styles.loading_text]}>缺失表單生成中...</Text>
-          </View>
-        </SafeAreaView>
-      </React.Fragment>
-    );
-  } else if (isDedecting === true) {  // 缺失類別辨識中, 顯示loading畫面
-    return (
-      <React.Fragment>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.loading_container}>
-            <ActivityIndicator size="large" color="#000000" />
-            <Text style={[styles.loading_text]}>缺失類別辨識中...</Text>
           </View>
         </SafeAreaView>
       </React.Fragment>

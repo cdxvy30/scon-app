@@ -46,7 +46,6 @@ import RemoteImageWithSketch from './RemoteImageWithSketch';
 
 const IssueScreen = ({navigation, route}) => {
   console.log('/// Pass to IssueScreen ///');
-  console.log('hihihihi',route.params.item);
   const project = route.params.project;
   const item = route.params.item;
   const projectId = project.project_id;                                         // ID作為issue的FK, 同時綁專案名稱、公司
@@ -165,6 +164,34 @@ const IssueScreen = ({navigation, route}) => {
     );
   };
 
+  // 取得照片標註
+  const fetchLabels = async () => {
+    await axios
+      .get(`${BASE_URL}/labels/list/${issueId}`)
+      .then(async (res) => {
+        setIssueLabels(
+          res.data.map(label => (
+              {
+                box:{
+                  maxX: `${label.max_x}`,
+                  maxY: `${label.max_y}`,
+                  minX: `${label.min_x}`,
+                  minY: `${label.min_y}`
+                },
+                key: `${label.label_id}`,
+                mode: `${label.label_mode}`,
+                name: `${label.label_name}`,
+                path:JSON.parse(label.label_path)
+              }
+            )
+          )
+        )
+      })
+      .catch((e) => {
+        console.log(`list labels error: ${e}`);
+      });
+  };
+
   // 缺失改善備註
   const remarkChangeHandler = async (index, remark) => {
     const newIssueAttachments = issueAttachments;
@@ -250,17 +277,6 @@ const IssueScreen = ({navigation, route}) => {
 
   // 缺失狀態選單
   const issueStatusClickHandler = () => {
-    // Geolocation.getCurrentPosition(  //gps測試用
-    //   success= (
-    //     info => console.log(info)),
-    //   error= (
-    //     error => error.message=="User denied access to location services."?Alert.alert('未允許使用位置'):console.log(error)),
-    //   options= {
-    //       timeout: 0,
-    //       maximumAge: 0,
-    //       enableHighAccuracy: true
-    //   }
-    // ),
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['取消', '無風險', '有風險，須改善', '有風險，須立即改善'],
@@ -623,7 +639,6 @@ const IssueScreen = ({navigation, route}) => {
       },
     })
       .then(async res => {
-        console.log('on99data:',data)
         console.log(res);
         let issue_data = res.data;
         console.log(issue_data);
@@ -693,9 +708,9 @@ const IssueScreen = ({navigation, route}) => {
     // ************************************************************ // 
 
       // e.preventDefault();
-      const issues = await SqliteManager.getIssuesByProjectId(projectId);
+      // const issues = await SqliteManager.getIssuesByProjectId(projectId);
       let projectStatus = CalculateProjectStatus(issues);
-      await SqliteManager.updateProject(projectId, {status: projectStatus});
+      // await SqliteManager.updateProject(projectId, {status: projectStatus});
     });
 
     return unsubscribe;
@@ -725,7 +740,8 @@ const IssueScreen = ({navigation, route}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issueCreateHandler]);
 
-  useEffect(() => {
+  useEffect(async () => {
+    fetchLabels()
     // action = 'update existing issue' 且 有issueId存在 就執行 issueUpdateHandler()
     action === 'update existing issue' && issueId && issueUpdateHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps

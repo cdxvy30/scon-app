@@ -255,7 +255,7 @@ const PhotoScreen = ({ navigation, route }) => {
     };
   };
 
-  const labelDeleteHandler = async labelId => {
+  const labelDeleteHandler = async labelId => {       //後端還沒好
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['取消', '刪除'],
