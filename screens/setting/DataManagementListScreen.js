@@ -39,9 +39,7 @@ const DataManageListScreen = ({navigation}) => {
           },
         })
         .then(async (res) => {
-          let projects = await res.data;
-          console.log(projects);
-          setProjectList(projects);
+          setProjectList(await res.data);
         })
         .catch((e) => {
           console.error(`List Projects Error: ${e}`);
@@ -97,7 +95,7 @@ const DataManageListScreen = ({navigation}) => {
               <View>
                 <Separator />
                 <Text style={[styles.description, {marginVertical: 12}]} ellipsizeMode={'tail'} numberOfLines={1}>
-                  {projectList.map(o => `${o.project_name}  `)}
+                  {projectList.map(project => `${project.project_name}  `)}
                 </Text>
               </View>
               : 

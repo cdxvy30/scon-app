@@ -164,33 +164,6 @@ const IssueScreen = ({navigation, route}) => {
     );
   };
 
-  // 取得照片標註
-  const fetchLabels = async () => {
-    await axios
-      .get(`${BASE_URL}/labels/list/${issueId}`)
-      .then(async (res) => {
-        setIssueLabels(
-          res.data.map(label => (
-              {
-                box:{
-                  maxX: `${label.max_x}`,
-                  maxY: `${label.max_y}`,
-                  minX: `${label.min_x}`,
-                  minY: `${label.min_y}`
-                },
-                key: `${label.label_id}`,
-                mode: `${label.label_mode}`,
-                name: `${label.label_name}`,
-                path:JSON.parse(label.label_path)
-              }
-            )
-          )
-        )
-      })
-      .catch((e) => {
-        console.log(`list labels error: ${e}`);
-      });
-  };
 
   // 缺失改善備註
   const remarkChangeHandler = async (index, remark) => {
@@ -733,6 +706,40 @@ const IssueScreen = ({navigation, route}) => {
   };
 
   // 重要!!!(處理labels)
+  useEffect(() => {
+    // 取得照片標註
+    const fetchLabels = async () => {
+      await axios
+        .get(`${BASE_URL}/labels/list/${issueId}`)
+        .then((res) => {
+          setIssueLabels(
+            res.data.map(label => (
+                {
+                  box:{
+                    maxX: label.max_x,
+                    maxY: label.max_y,
+                    minX: label.min_x,
+                    minY: label.min_y
+                  },
+                  key: `${label.label_id}`,
+                  mode: `${label.label_mode}`,
+                  name: `${label.label_name}`,
+                  path:JSON.parse(label.label_path)
+                }
+              )
+            )
+          )
+        })
+        .catch((e) => {
+          console.log(`list labels error: ${e}`);
+        });
+    };  
+
+    if (isFocused) {
+      fetchLabels();
+    }
+  }, [isFocused]);
+
   // 看IssueListScreen傳來的action是什麼, 決定create或update
   useEffect(() => {
     // action = 'create new issue' 就執行 issueCreateHandler()
@@ -740,8 +747,7 @@ const IssueScreen = ({navigation, route}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issueCreateHandler]);
 
-  useEffect(async () => {
-    fetchLabels()
+  useEffect(() => {
     // action = 'update existing issue' 且 有issueId存在 就執行 issueUpdateHandler()
     action === 'update existing issue' && issueId && issueUpdateHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
