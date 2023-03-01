@@ -39,7 +39,8 @@ const DataManageListScreen = ({navigation}) => {
           },
         })
         .then(async (res) => {
-          setProjectList(await res.data);
+          let projects = await res.data;
+          setProjectList(projects);
         })
         .catch((e) => {
           console.error(`List Projects Error: ${e}`);

@@ -5,6 +5,8 @@ import DataManagementScreenList from '../screens/setting/DataManagementListScree
 import DataManagementScreen from '../screens/setting/DataManagementScreen';
 import CorporationListScreen from '../screens/setting/CorporationListScreen';
 import CorporationAddScreen from '../screens/setting/CorporationAddScreen';
+import LocationManagementScreen from '../screens/setting/LocationManagementScreen';
+import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen'
 import CorpListScreen from '../screens/setting/CorpListScreen';
 import UserListScreen from '../screens/user/UserListScreen';
 import UserManagementScreen from '../screens/user/UserManagementScreen';
@@ -30,7 +32,7 @@ const SettingNavigation = ({}) => {
         <Stack.Screen
           name="DataManagement"
           component={DataManagementScreen}
-          options={{title: '專案'}}
+          options={{title: '專案管理'}}
         />
         <Stack.Screen
           name="CorporationList"
@@ -43,6 +45,16 @@ const SettingNavigation = ({}) => {
           // component={CorporationAddScreen}
           component={CorpListScreen}
           options={{title: '廠商資訊'}}
+        />
+        <Stack.Screen
+          name="LocationManagement"
+          component={LocationManagementScreen}
+          options={{title: '地點管理'}}
+        />
+        <Stack.Screen
+          name="IssueLocationAdd"
+          component={IssueLocationAddScreen}
+          options={{title: '新增缺失地點'}}
         />
         <Stack.Screen
           name="UserListScreen"

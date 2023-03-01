@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIsFocused} from '@react-navigation/native';
-import {Icon} from 'react-native-elements';
+import {Button, Icon} from 'react-native-elements';
 import {
   SafeAreaView,
   ScrollView,
@@ -17,12 +17,13 @@ import * as Animatable from 'react-native-animatable'
 import Collapsible from 'react-native-collapsible';
 import Accordion from 'react-native-collapsible/Accordion'
 
-const IssueLocationListScreen = ({navigation, route}) => {
-  const projectId = route.params.projectId;
+const LocationManagementScreen = ({navigation, route}) => {
+  const project = route.params.project;
   const [issueLocationList, setIssueLocationList] = useState(null);
   const isFocused = useIsFocused();
   const [activeSections, setActiveSections] = useState([]);
   const [CONTENT, setCONTENT] = useState([]);
+  let projectId = project.project_id
 
   const issueLocationAddHandler = async () => {
     navigation.navigate('IssueLocationAdd', { 
@@ -31,7 +32,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
     })};
   
 
-  const renderHeader = (section, _, isActive) => {
+  const renderHeader = (section, _,) => {
     return(
       <View>
         <Animatable.View
@@ -42,19 +43,13 @@ const IssueLocationListScreen = ({navigation, route}) => {
             style={{color: 'dodgerblue', fontSize: 40}}
             name={'pin-outline'}
             />
-            <Text style = {[styles.headerText, isActive ? styles.headerText_active : styles.headerText]}> {section.title}</Text>
-          </View>
-          {isActive?
-            <Ionicons
-            style={{color: 'dodgerblue', fontSize: 30}}
-            name={'chevron-down-outline'}
-            />
-            :
-            <Ionicons
-            style={{color: 'dodgerblue', fontSize: 30}}
-            name={'ios-chevron-forward'}
-            />
-          }
+            <Text style = {styles.headerText}> {section.title}</Text>
+          </View> 
+          <Ionicons
+            style={{color: 'red', fontSize: 40}}
+            name={'ios-remove-circle'}
+            onPress={()=>{}} //Alert然後從database delete （樓層下所有位置都delete）
+          />
         </Animatable.View>
       </View>
     )
@@ -64,40 +59,43 @@ const IssueLocationListScreen = ({navigation, route}) => {
     return(
       <View>
         {section.content.map((item)=> (
-          <TouchableOpacity onPress={() => {issueLocationSelectHandler(section,item)}}>
             <Animatable.View
             duration = {400}
-            style = {[styles.content, isActive ? styles.content_active : styles.content]}
+            style = {styles.content}
             >
+              <View style = {styles.contentItem}>
+                <Ionicons
+                  style={{color: 'dodgerblue', fontSize: 40}}
+                  name={'location-outline'}
+                />
+                <Animatable.Text
+                animation = {isActive ? 'bounceIn' : undefined}
+                style = {styles.contentText}>
+                  {item}
+                </Animatable.Text>
+              </View>
               <Ionicons
-                style={{color: 'dodgerblue', fontSize: 40}}
-                name={'location-outline'}
+                style={{color: 'red', fontSize: 40}}
+                name={'ios-remove-circle-outline'}
+                onPress={()=>{}}    //Alert然後從database delete
               />
-              <Animatable.Text
-              animation = {isActive ? 'bounceIn' : undefined}
-              style = {styles.contentText}>
-                {item}
-              </Animatable.Text>
             </Animatable.View>
-          </TouchableOpacity>
         ))}
       </View>
     )
   }
-  //以上實驗用
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <React.Fragment>
           <Icon
-            style={{marginRight: 10}}
             name="ios-add"
             type="ionicon"
             color="dodgerblue"
             size={30}
             onPress={() => {issueLocationAddHandler()}}
-          />
+          />      
         </React.Fragment>
       ),
     });
@@ -153,11 +151,6 @@ const IssueLocationListScreen = ({navigation, route}) => {
     }
   }, [isFocused, projectId]);
 
-  const issueLocationSelectHandler = (floor, position) => {
-    route.params.setIssueLocationText(`${floor.title}_${position}`);
-    navigation.goBack();
-  };
-
   return (
     <React.Fragment>
       <SafeAreaView style={{flex:1}}>
@@ -169,8 +162,8 @@ const IssueLocationListScreen = ({navigation, route}) => {
               touchableComponent={TouchableOpacity}
               renderHeader={renderHeader}
               renderContent={renderContent}
-              duration={400}
               onChange={setActiveSections}
+              duration={400}
             />
           </ScrollView>
         </View>
@@ -223,17 +216,27 @@ const styles = StyleSheet.create({
   headerText_active:{
     fontSize: 26,
     fontWeight: '400',
+    color:'#FFFFFF'
   },
   content:{
     flex:0,
     flexDirection:'row',
+    justifyContent:'space-between',
     alignItems:'center',
     paddingVertical:5,
-    marginHorizontal:30,
+    marginHorizontal:30
+  },
+  contentItem:{
+    flex:0,
+    flexDirection:'row',
+    alignItems:'center',
   },
   contentText:{
     color:'#727272',
     fontSize:20,
+  },
+  header_active:{
+    backgroundColor:'#A9A9A9',
   },
   content_active:{
 
@@ -256,4 +259,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IssueLocationListScreen;
+export default LocationManagementScreen;

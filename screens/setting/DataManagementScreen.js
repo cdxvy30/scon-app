@@ -13,22 +13,37 @@ import { useIsFocused } from '@react-navigation/native';
 import Separator from '../../components/Separator';
 import SqliteManager from '../../services/SqliteManager';
 import {OBJECT_TYPE} from '../../configs/objectTypeConfig';
+import axios from 'axios';
+import {BASE_URL} from '../../configs/authConfig';
 
 const DataManageScreen = ({navigation, route}) => {
-  const [projectId, setProjectId] = useState(null);
   const [project, setProject] = useState(route.params.project);
   const [corporationList, setCorporationList] = useState([]);
+  const [locationList, setLocationList] = useState([]);
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    console.log(project)
-    const fetchData = async () => {
+    const fetchCorporations = async () => {
       // 等資料庫建責任廠商的table
       // const corporations = await SqliteManager.getWorkItemsByProjectId(project.id);
       // setCorporationList(corporations);
     };
+
+    const fetchLocations = async () => {
+      await axios
+        .get(`${BASE_URL}/locations/list/${project.project_id}`)
+        .then(async (res) => {
+          let locations = await res.data;
+          setLocationList(locations);
+        })
+        .catch((e) => {
+          console.log(`list locations error: ${e}`);
+        });
+    };
+
     if (isFocused) {
-      fetchData();
+      fetchCorporations();
+      fetchLocations();
     }
   }, [route.params.name, isFocused]);
 
@@ -36,7 +51,14 @@ const DataManageScreen = ({navigation, route}) => {
     navigation.navigate(
       'CorporationList', {
         project: project,
-        projectId: projectId
+      }
+    )
+  }
+
+  locationClickHandler = () => {
+    navigation.navigate(
+      'LocationManagement', {
+        project: project,
       }
     )
   }
@@ -70,7 +92,7 @@ const DataManageScreen = ({navigation, route}) => {
             </TouchableOpacity>
           </View>
           <View style={styles.group}>
-            <TouchableOpacity onPress={corporationClickHandler}>
+            <TouchableOpacity onPress={locationClickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>
                   <Ionicons style={styles.titleIcon} name={'ios-location-outline'} />{' '}
@@ -79,15 +101,15 @@ const DataManageScreen = ({navigation, route}) => {
                 <View style={{flexDirection: 'row'}}>
                   <Text style={styles.description}>
                     {' '}
-                    {corporationList.length}個{' '} 
+                    {locationList.length}個{' '} 
                   </Text>
                 </View>
               </View>
-            {corporationList.length > 0 ? (
+            {locationList.length > 0 ? (
               <React.Fragment>
                 <Separator />
                 <Text style={[styles.description, {marginVertical: 12}]} ellipsizeMode={'tail'} numberOfLines={1}>
-                  {corporationList.map(o => `${o.company}  `)}
+                  {locationList.map(o => `${o.floor}${o.position}   `)}
                 </Text>
               </React.Fragment>
             ) : undefined}
