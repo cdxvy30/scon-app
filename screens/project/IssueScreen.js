@@ -117,7 +117,7 @@ const IssueScreen = ({navigation, route}) => {
   //   })};
 
   // 新增缺失改善照片
-  const attachmentAddHandler = async image => {
+  const attachmentAddHandler = React.useCallback(async image => {
     const imageUri = image.uri;
     const imageName = image.fileName;
     const transformedImageUri = imageUri.replace('file://', '');
@@ -148,14 +148,13 @@ const IssueScreen = ({navigation, route}) => {
       data: bodyFormData,
       headers: {
         'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ` + `${userInfo.token}`,
+        Authorization: 'Bearer ' + `${userInfo.token}`,
       },
     })
       .then(async res => {
         let attachment_data = res.data;
         console.log('Add an attachment: ', attachment_data);
-        const tmp = issueAttachments.push(attachment_data);
-        setIssueAttachments(tmp);
+        setIssueAttachments([attachment_data]);
       })
       .catch(e => {
         console.log(`Add an attachment error: ${e}`);
@@ -178,7 +177,8 @@ const IssueScreen = ({navigation, route}) => {
     // const newIssueAttachments = issueAttachments.concat(latestAttachments);
     // console.log('IssueAttachments: ', newIssueAttachments);
     // setIssueAttachments(newIssueAttachments);
-  };
+  
+  }, [issueAttachments, issueId, projectCorporation, projectId, projectName, userInfo.token]);
 
   // 刪除缺失改善照片
   const attachmentDeleteHandler = index => {
@@ -609,7 +609,6 @@ const IssueScreen = ({navigation, route}) => {
 
   // !! 處理更新缺失動作
   const issueUpdateHandler = React.useCallback(async () => {
-    console.log('/// update ///');
     // const transformedIssue = {
     //   image_uri: item.image.uri,
     //   image_width: item.image.width,
@@ -764,7 +763,7 @@ const IssueScreen = ({navigation, route}) => {
                   key: `${label.label_id}`,
                   mode: `${label.label_mode}`,
                   name: `${label.label_name}`,
-                  path:JSON.parse(label.label_path)
+                  path: JSON.parse(label.label_path),
                 }
               )
             )
@@ -804,6 +803,14 @@ const IssueScreen = ({navigation, route}) => {
     issueTrack,
     issueStatus,
     issueUpdateHandler,
+  ]);
+
+  useEffect(() => {
+    issueId && issueAttachments && attachmentAddHandler();
+  }, [
+    issueId,
+    issueAttachments,
+    attachmentAddHandler,
   ]);
 
   // 功能未知: 應不影響其他功能
