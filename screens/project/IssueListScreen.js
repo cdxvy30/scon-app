@@ -270,6 +270,7 @@ const IssueListScreen = ({navigation, route}) => {
             break;
 
           case 3:
+            console.log('Exporting all issue document')
             try{
                 setIsExporting(true);
 
@@ -277,16 +278,31 @@ const IssueListScreen = ({navigation, route}) => {
                   session : 'output_image',
                   fileCache: true,
                 }
-                for (let i = issueList.length - 1; i >= 0; i--){
-                  await RNFetchBlob.config(options)
-                    .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedEndDate ? selectedIssueList[i].issue_id : issueList[i].issue_id}`)
-                    .then(() => {
-                      console.log(RNFetchBlob.session('output_image').list().length)
-                    })
-                    .catch(err => {
-                      console.log(err)
-                    });
+                
+                if (selectedEndDate) {
+                  for (let i = selectedIssueList.length - 1; i >= 0; i--){
+                    await RNFetchBlob.config(options)
+                      .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedIssueList[i].issue_id}`)
+                      .then(() => {
+                        console.log(RNFetchBlob.session('output_image').list().length)
+                      })
+                      .catch(err => {
+                        console.log('failed to fetch export image',err)
+                      });
+                  }
+                }else{
+                  for (let i = issueList.length - 1; i >= 0; i--){
+                    await RNFetchBlob.config(options)
+                      .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}`)
+                      .then(() => {
+                        console.log(RNFetchBlob.session('output_image').list().length)
+                      })
+                      .catch(err => {
+                        console.log('failed to fetch export image',err)
+                      });
+                  }
                 }
+                
                 const doc = new Document({
                   sections: issueReportGenerator(
                     userInfo,
@@ -335,31 +351,49 @@ const IssueListScreen = ({navigation, route}) => {
             }
             finally{
               RNFetchBlob.session('output_image').dispose();
+              console.log('output image deleted')
             }
+            break;
               
           case 4:
-            // try{
+            try{
               setIsExporting(true);
-
+              console.log('Exporting issue improvement document')
               let options = {
                 session : 'output_image',
                 fileCache: true,
               }
-              for (let i = issueList.length - 1; i >= 0; i--){
-                await RNFetchBlob.config(options)
-                  .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedEndDate ? selectedIssueList[i].issue_id : issueList[i].issue_id}`)
-                  .then(() => {
-                    console.log(RNFetchBlob.session('output_image').list().length)
-                  })
-                  .catch(err => {
-                    console.log(err)
-                  });
+
+              if (selectedEndDate) {
+                for (let i = selectedIssueList.length - 1; i >= 0; i--){
+                  await RNFetchBlob.config(options)
+                    .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedIssueList[i].issue_id}`)
+                    .then(() => {
+                      console.log(RNFetchBlob.session('output_image').list().length)
+                    })
+                    .catch(err => {
+                      console.log('failed to fetch export image',err)
+                    });
+                }
+              }else{
+                for (let i = issueList.length - 1; i >= 0; i--){
+                  await RNFetchBlob.config(options)
+                    .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}`)
+                    .then(() => {
+                      console.log(RNFetchBlob.session('output_image').list().length)
+                    })
+                    .catch(err => {
+                      console.log('failed to fetch export image',err)
+                    });
+                }
               }
+
               const doc_2 = new Document({
                 sections: [
                   {
                     properties: {},
                     children: improveReportGenerator(
+                      userInfo,
                       selectedEndDate ? selectedIssueList : issueList,
                       fs,
                       config,
@@ -394,16 +428,21 @@ const IssueListScreen = ({navigation, route}) => {
                   style: 'cancel',
                 },
               ]);
-            // }
-            // catch(error){
-            //   Alert.alert('匯出取消或失敗', '', [
-            //     {
-            //       text: '返回',
-            //       onPress: () => setIsExporting(false),
-            //       style: 'cancel',
-            //     },
-            //   ]);
-            // }
+            }
+            catch(error){
+              Alert.alert('匯出取消或失敗', '', [
+                {
+                  text: '返回',
+                  onPress: () => setIsExporting(false),
+                  style: 'cancel',
+                },
+              ]);
+            }
+            finally{
+              RNFetchBlob.session('output_image').dispose();
+              console.log('output image deleted')
+            }
+            break;
 
           // case 5:
           //   const issue_web = issueHtmlGenerator(
@@ -612,7 +651,7 @@ const IssueListScreen = ({navigation, route}) => {
         RNFetchBlob.fs.unlink(RNFetchBlob.fs.dirs.DocumentDir + "/RNFetchBlob_tmp/")
       }
       catch(e){
-        console.log(e)
+        console.log('failed to delete tmp files',e)
       }
     }
 
