@@ -682,7 +682,7 @@ const IssueScreen = ({navigation, route}) => {
 
       // e.preventDefault();
       // const issues = await SqliteManager.getIssuesByProjectId(projectId);
-      let projectStatus = CalculateProjectStatus(issues);
+      // let projectStatus = CalculateProjectStatus(issues);
       // await SqliteManager.updateProject(projectId, {status: projectStatus});
     });
 
@@ -690,20 +690,20 @@ const IssueScreen = ({navigation, route}) => {
   }, [issueId, issueLocationText, issueSafetyManagerText, issueStatus, issueTaskText, issueTrack, issueType, issueTypeRemark, navigation, projectCorporation, projectId, projectName, responsibleCorporation, userInfo.token, violationType]);
 
   // 計算project之風險高低指標的function
-  const CalculateProjectStatus = issues => {
-    let sum = 0;
-    issues.map(
-      i =>
-        (sum += getIssueStatusById(i.status)
-          ? getIssueStatusById(i.status).value
-          : 0),
-    );
-    let risk = Math.ceil(sum / issues.length);
-    if (risk === 1) return PROJECT_STATUS.lowRisk.id;
-    else if (risk === 2) return PROJECT_STATUS.mediumRisk.id;
-    else if (risk === 3) return PROJECT_STATUS.highRisk.id;
-    else return PROJECT_STATUS.lowRisk.id;
-  };
+  // const CalculateProjectStatus = issues => {
+  //   let sum = 0;
+  //   issues.map(
+  //     i =>
+  //       (sum += getIssueStatusById(i.status)
+  //         ? getIssueStatusById(i.status).value
+  //         : 0),
+  //   );
+  //   let risk = Math.ceil(sum / issues.length);
+  //   if (risk === 1) return PROJECT_STATUS.lowRisk.id;
+  //   else if (risk === 2) return PROJECT_STATUS.mediumRisk.id;
+  //   else if (risk === 3) return PROJECT_STATUS.highRisk.id;
+  //   else return PROJECT_STATUS.lowRisk.id;
+  // };
 
   // 重要!!!(處理labels)
   useEffect(() => {

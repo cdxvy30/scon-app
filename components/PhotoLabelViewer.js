@@ -142,10 +142,12 @@ const PhotoLabelViewer = ({ image, labels, item }) => {
         key={key}
         style={{
           position: 'absolute',
-          left: box.minX * windowSize.scale ,
-          top: box.minY * windowSize.scale ,
-          width: (box.maxX - box.minX) * windowSize.scale,
-          height: (box.maxY - box.minY) * windowSize.scale,
+          //應要把原本畫label的設備的window size存在後端
+          left: box.minX,
+          top: box.minY,
+          width: box.maxX - box.minX,
+          height: box.maxY - box.minY,
+
           borderWidth: 2,
           borderColor: 'green',
           zIndex: 9999,
