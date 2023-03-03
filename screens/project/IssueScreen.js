@@ -69,7 +69,7 @@ const IssueScreen = ({navigation, route}) => {
       : item.violation_type,
   );
   const [issueType, setIssueType] = useState(item.type);                        // 缺失項目
-  const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);     // if 類別=='其他' 這裡要填項目說明
+  // const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);     // if 類別=='其他' 這裡要填項目說明
   const [issueTrack, setIssueTrack] = useState(item.tracking);                  // 追蹤與否
   const [issueLocationText, setIssueLocationText] = useState(item.location);    // 缺失地點
   const [responsibleCorporation, setResponsibleCorporation] = useState(         // 責任廠商
@@ -610,23 +610,23 @@ const IssueScreen = ({navigation, route}) => {
   // !! 處理更新缺失動作
   const issueUpdateHandler = React.useCallback(async () => {
     console.log('/// update ///');
-    const transformedIssue = {
-      image_uri: item.image.uri,
-      image_width: item.image.width,
-      image_height: item.image.height,
-      tracking: issueTrack,
-      location: issueLocationText,
-      activity: issueTaskText,
-      responsible_corporation: responsibleCorporation,
-      assignee: issueAssigneeText,
-      assignee_phone_number: issueAssigneePhoneNumberText,
-      safety_manager: issueSafetyManagerText,
-      violation_type: violationType,
-      type: issueType,
-      type_remark: issueTypeRemark,
-      project_id: projectId,
-      status: issueStatus,
-    };
+    // const transformedIssue = {
+    //   image_uri: item.image.uri,
+    //   image_width: item.image.width,
+    //   image_height: item.image.height,
+    //   tracking: issueTrack,
+    //   location: issueLocationText,
+    //   activity: issueTaskText,
+    //   responsible_corporation: responsibleCorporation,
+    //   assignee: issueAssigneeText,
+    //   assignee_phone_number: issueAssigneePhoneNumberText,
+    //   safety_manager: issueSafetyManagerText,
+    //   violation_type: violationType,
+    //   type: issueType,
+    //   type_remark: issueTypeRemark,
+    //   project_id: projectId,
+    //   status: issueStatus,
+    // };
     
     // ************************************************************ //
     const data = {
@@ -674,7 +674,6 @@ const IssueScreen = ({navigation, route}) => {
     issueTaskText,
     violationType,
     issueType,
-    issueTypeRemark,
     issueTrack,
     issueStatus,
     item,
@@ -690,7 +689,7 @@ const IssueScreen = ({navigation, route}) => {
     const data = {
       violationType: violationType,                         // 缺失類別
       issueType: issueType,                                 // 缺失項目
-      issueTypeRemark: issueTypeRemark,
+      // issueTypeRemark: issueTypeRemark,
       issueTrack: issueTrack,                               // 追蹤與否
       issueLocationText: issueLocationText,                 // 缺失地點
       responsibleCorporation: responsibleCorporation,       // 責任廠商
@@ -728,7 +727,7 @@ const IssueScreen = ({navigation, route}) => {
     });
 
     return unsubscribe;
-  }, [issueId, issueLocationText, issueSafetyManagerText, issueStatus, issueTaskText, issueTrack, issueType, issueTypeRemark, navigation, projectCorporation, projectId, projectName, responsibleCorporation, userInfo.token, violationType]);
+  }, [issueId, issueLocationText, issueSafetyManagerText, issueStatus, issueTaskText, issueTrack, issueType, navigation, projectCorporation, projectId, projectName, responsibleCorporation, userInfo.token, violationType]);
 
   // 計算project之風險高低指標的function
   // const CalculateProjectStatus = issues => {
@@ -802,7 +801,6 @@ const IssueScreen = ({navigation, route}) => {
     issueSafetyManagerText,
     issueType,
     violationType,
-    issueTypeRemark,
     issueTrack,
     issueStatus,
     issueUpdateHandler,
@@ -840,7 +838,7 @@ const IssueScreen = ({navigation, route}) => {
               Alert.alert('請點選缺失類別');
               return;
             } 
-            else if (!issueType && !issueTypeRemark) {
+            else if (!issueType) {
               Alert.alert('請點選缺失項目');
               return;
             } 
@@ -858,7 +856,7 @@ const IssueScreen = ({navigation, route}) => {
             const data = {
               violationType: violationType,                         // 缺失類別
               issueType: issueType,                                 // 缺失項目
-              issueTypeRemark: issueTypeRemark,
+              // issueTypeRemark: issueTypeRemark,
               issueTrack: issueTrack,                               // 追蹤與否
               issueLocationText: issueLocationText,                 // 缺失地點
               responsibleCorporation: responsibleCorporation,       // 責任廠商
@@ -893,7 +891,7 @@ const IssueScreen = ({navigation, route}) => {
         />
       ),
     });
-  }, [issueId, isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, issueTypeRemark, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token]);
+  }, [issueId, isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token]);
 
   // 畫面欄位
   return (
@@ -950,12 +948,12 @@ const IssueScreen = ({navigation, route}) => {
             {violationType == '其他' ? (
               <React.Fragment>
                 <View style={styles.item}>
-                  <Text style={styles.title}></Text>
+                  <Text style={styles.title}>缺失項目</Text>
                   <View style={{flexDirection: 'row'}}>
                     <TextInput
                       style={styles.textInput}
-                      onChangeText={setIssueTypeRemark}
-                      defaultValue={issueTypeRemark}
+                      onChangeText={setIssueType}
+                      defaultValue={issueType}
                     />
                   </View>
                 </View>
