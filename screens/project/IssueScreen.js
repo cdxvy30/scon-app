@@ -44,15 +44,17 @@ import {BASE_URL} from '../../configs/authConfig';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
 import RemoteImageWithSketch from './RemoteImageWithSketch';
+import FastImage from 'react-native-fast-image';
 
 const IssueScreen = ({navigation, route}) => {
-  console.log('/// Pass to IssueScreen ///');
+  console.log('--- Pass to IssueScreen ---');
   const project = route.params.project;
   const item = route.params.item;
+  console.log('item: ', item);
   const projectId = project.project_id;                                         // ID作為issue的FK, 同時綁專案名稱、公司
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
-  const windowSize = Dimensions.get('window')
+  const windowSize = Dimensions.get('window');
 
   const {userInfo} = useContext(AuthContext);
   const [action, setAction] = useState(route.params.action);
@@ -82,8 +84,8 @@ const IssueScreen = ({navigation, route}) => {
   const [issueSafetyManagerText, setIssueSafetyManagerText] = useState(         // 也是紀錄人員?
     userInfo.user.name,
   );
-  //
 
+  // 原本的方法可能有問題, 因為在IssueListScreen navigate過來的function內, attachments必為空陣列
   const [issueAttachments, setIssueAttachments] = useState(item.attachments);   // 缺失改善照片
   const [issueLabels, setIssueLabels] = useState(transformLabels(item.labels)); // 缺失影像中的標註
   const [issueStatus, setIssueStatus] = useState(item.status);                  // 缺失風險高低
@@ -91,6 +93,8 @@ const IssueScreen = ({navigation, route}) => {
   const keyboardDidShowListener = useRef();                                     // not sure what's this
   const keyboardDidHideListener = useRef();                                     // not sure what's this
   const isFocused = useIsFocused();
+
+  console.log('In begin: \n', issueAttachments);
 
   // 功用未知
   const onKeyboardShow = event =>
@@ -115,6 +119,7 @@ const IssueScreen = ({navigation, route}) => {
   // 新增缺失改善照片
   const attachmentAddHandler = async image => {
     const imageUri = image.uri;
+    const imageName = image.fileName;
     const transformedImageUri = imageUri.replace('file://', '');
 
     const newAttachment = {
@@ -123,19 +128,56 @@ const IssueScreen = ({navigation, route}) => {
       issue_id: issueId,
     };
 
-    await SqliteManager.createIssueAttachment(newAttachment);
-    
-    // 可能會有多張缺失改善照片?
-    const allAttachments = await SqliteManager.getIssueAttachmentsByIssueId(
-      issueId,
-    );
-    const sortedAttachments = allAttachments.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at),
-    );
-    const latestAttachments = sortedAttachments[0];
+    // ************************************************************ //
+    const data = {
+      projectId: projectId,
+      projectName: projectName,
+      projectCorporation: projectCorporation,
+    };  // 用於存檔
+    const metadata = JSON.stringify(data);
+    var bodyFormData = new FormData();
+    bodyFormData.append('metadata', metadata);
+    bodyFormData.append('attachment', {
+      uri: imageUri,
+      name: imageName,
+    });
 
-    const newIssueAttachments = issueAttachments.concat(latestAttachments);
-    setIssueAttachments(newIssueAttachments);
+    axios({
+      method: 'post',
+      url: `${BASE_URL}/attachments/add/${issueId}`,
+      data: bodyFormData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ` + `${userInfo.token}`,
+      },
+    })
+      .then(async res => {
+        let attachment_data = res.data;
+        console.log('Add an attachment: ', attachment_data);
+        const tmp = issueAttachments.push(attachment_data);
+        setIssueAttachments(tmp);
+      })
+      .catch(e => {
+        console.log(`Add an attachment error: ${e}`);
+      });
+
+    console.log('In AddHandler: \n', issueAttachments);
+    // ************************************************************ //
+
+    // await SqliteManager.createIssueAttachment(newAttachment);
+    
+    // // 可能會有多張缺失改善照片
+    // const allAttachments = await SqliteManager.getIssueAttachmentsByIssueId(
+    //   issueId,
+    // );
+    // const sortedAttachments = allAttachments.sort(
+    //   (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    // );
+    // const latestAttachments = sortedAttachments[0];
+
+    // const newIssueAttachments = issueAttachments.concat(latestAttachments);
+    // console.log('IssueAttachments: ', newIssueAttachments);
+    // setIssueAttachments(newIssueAttachments);
   };
 
   // 刪除缺失改善照片
@@ -527,7 +569,6 @@ const IssueScreen = ({navigation, route}) => {
       },
     })
       .then(async res => {
-        console.log(res);
         let issue_data = res.data;
         console.log('/// new issue ///');
         console.log(issue_data);
@@ -614,7 +655,6 @@ const IssueScreen = ({navigation, route}) => {
       },
     })
       .then(async res => {
-        console.log(res);
         let issue_data = res.data;
         console.log(issue_data);
       })
@@ -673,7 +713,6 @@ const IssueScreen = ({navigation, route}) => {
       },
     })
       .then(async res => {
-        console.log(res);
         let issue_data = res.data;
         console.log(issue_data);
       })
@@ -842,7 +881,6 @@ const IssueScreen = ({navigation, route}) => {
               },
             })
               .then(async res => {
-                console.log(res);
                 let issue_data = res.data;
                 console.log(issue_data);
               })
@@ -1008,23 +1046,7 @@ const IssueScreen = ({navigation, route}) => {
           </View>
 
           <View style={styles.group}>
-            {issueAttachments[0] ? undefined : (
-              <View style={styles.item}>
-                <Text style={styles.title}>缺失改善</Text>
-                <TouchableOpacity onPress={() => imageSelectHandler()}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: 'goldenrod', fontSize: 18}}>
-                      新增已改善照片
-                    </Text>
-                    <Ionicons
-                      style={{color: 'goldenrod', fontSize: 22}}
-                      name={'ios-add-circle-outline'}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            )}
-            {issueAttachments ? (
+            {issueAttachments[0] ? (
               issueAttachments.map((a, i) => {
                 return (
                   <View key={`issue_attachment_${i}`}>
@@ -1033,7 +1055,13 @@ const IssueScreen = ({navigation, route}) => {
                     </View>
                     <TouchableOpacity
                       onPress={() => attachmentDeleteHandler(i)}>
-                      <Image style={styles.itemImage} source={{uri: a.image}} />
+                      {/* <Image style={styles.itemImage} source={{uri: a.image}} /> */}
+                      <FastImage 
+                        style={styles.itemImage} 
+                        source={{
+                          uri: `${BASE_URL}/attachments/get/thumbnail/${issueAttachments[0].attachment_id}`,
+                        }}
+                      />
                     </TouchableOpacity>
                     <View style={{marginBottom: 15, ...styles.item}}>
                       <Text style={styles.title}>備註：</Text>
@@ -1050,8 +1078,56 @@ const IssueScreen = ({navigation, route}) => {
                 );
               })
             ) : (
-              <></>
+              <View style={styles.item}>
+                <Text style={styles.title}>缺失改善</Text>
+                <TouchableOpacity onPress={() => imageSelectHandler()}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={{color: 'goldenrod', fontSize: 18}}>
+                      新增已改善照片
+                    </Text>
+                    <Ionicons
+                      style={{color: 'goldenrod', fontSize: 22}}
+                      name={'ios-add-circle-outline'}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
             )}
+            {/*
+              {issueAttachments ? (
+                issueAttachments.map((a, i) => {
+                  return (
+                    <View key={`issue_attachment_${i}`}>
+                      <View style={{marginBottom: 15, ...styles.item}}>
+                        <Text style={styles.title}>已改善照片</Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => attachmentDeleteHandler(i)}>
+                        <FastImage 
+                          style={styles.itemImage} 
+                          source={{
+                            uri: `${BASE_URL}/attachments/get/thumbnail/1ac31ef2-7972-48a2-9ba0-cc2d184b1868`
+                          }} 
+                        />
+                      </TouchableOpacity>
+                      <View style={{marginBottom: 15, ...styles.item}}>
+                        <Text style={styles.title}>備註：</Text>
+                        <TextInput
+                          id={a.id}
+                          key={a.id}
+                          style={styles.textInput}
+                          onChangeText={text => remarkChangeHandler(i, text)}
+                          defaultValue={a.remark}
+                          onSubmitEditing={Keyboard.dismiss}
+                        />
+                      </View>
+                    </View>
+                  );
+                })
+              ) : (
+                <></>
+              )}
+            */}
           </View>
           <View style={{marginBottom: keyboardOffset}} />
         </ScrollView>

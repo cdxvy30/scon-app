@@ -115,9 +115,9 @@ import { BASE_URL } from '../configs/authConfig';
 // ];
 
 const PhotoLabelViewer = ({ image, labels, item }) => {
-  console.log('/// Params in PhotoLabelViewer ///');
-  console.log(item);
-  console.log(image);
+  // console.log('/// Params in PhotoLabelViewer ///');
+  // console.log(item);
+  // console.log(image);
   const issueId = item.id;
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
   const [canvas, setCanvas] = useState(undefined);

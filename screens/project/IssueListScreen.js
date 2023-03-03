@@ -112,27 +112,40 @@ const IssueListScreen = ({navigation, route}) => {
     console.log('/// item in issueSeleceHandler ///');
     let issueId = item.issue_id;
     setSelectedIssueId(item.issue_id);
-    console.log('item',item)
+    console.log('item',item);
+
+    var attach;
+    await axios({
+      methods: 'get',
+      url: `${BASE_URL}/attachments/list/${issueId}`,
+    })
+      .then(async res => {
+        attach = await res.data;
+        console.log(`In issueSelectHandler: \n`, attach);
+      })
+      .catch(e => {
+        console.log(`${e}`);
+      });
 
     await RNFetchBlob.config({             //先將圖片暫時載到本地端
       fileCache: true,
     })
       .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`)
       .then((res) => {
-        console.log('imagepath',res.data)
+        console.log('imagepath',res.data);
         navigation.navigate('Issue', {
           project: project,
           issueId: issueId,                                 // 更新issue時要知道issueId
           action: 'update existing issue',
-          item: CreateItemByExistingIssue(item, res),
+          item: CreateItemByExistingIssue(item, res, attach),
         });
       })
       .catch(err => {
-        console.log(err)
+        console.log(err);
       });
   };
 
-  const CreateItemByExistingIssue = (item, res) => {
+  const CreateItemByExistingIssue = (item, res, attach) => {
     return {
       id: item.issue_id,
       title: item.issue_title,
@@ -141,7 +154,7 @@ const IssueListScreen = ({navigation, route}) => {
       image: {
         uri: res.data,
         height: parseInt(item.issue_image_height, 10),
-        width: parseInt(item.issue_image_width, 10)
+        width: parseInt(item.issue_image_width, 10),
       },
       status: item.issue_status,
       tracking: item.tracking_or_not,
@@ -151,7 +164,7 @@ const IssueListScreen = ({navigation, route}) => {
       assignee_phone_number: '',
       responsible_corporation: '',
       safetyManager: item.issue_recorder,
-      attachments: [],
+      attachments: [attach],
       labels: [],
       timestamp: new Date().toLocaleString(),
     };

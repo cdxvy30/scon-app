@@ -39,8 +39,6 @@ const DETECTION_THRESHOLD = 0.7;
 
 
 const PhotoScreen = ({ navigation, route }) => {
-  console.log('/// Pass to PhotoScreen ///');
-  console.log(route.params);
   const issueId = route.params.issueId;
   const setIssueLabels = route.params.setIssueLabels;
   const windowSize = Dimensions.get('window')
