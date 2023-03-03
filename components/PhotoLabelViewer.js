@@ -122,10 +122,10 @@ const PhotoLabelViewer = ({ image, labels, item }) => {
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
   const [canvas, setCanvas] = useState(undefined);
   const windowSize = Dimensions.get('window')
+  const canvasHeight = (image.height * windowSize.width) / image.width;
 
   useEffect(async () => {
     Orientation.lockToPortrait();
-    const canvasHeight = (image.height * windowSize.width) / image.width;
     if (canvasHeight) {
       const style = {height: canvasHeight, width: windowSize.width};
       setCanvasContainerStyle(style);
@@ -142,11 +142,11 @@ const PhotoLabelViewer = ({ image, labels, item }) => {
         key={key}
         style={{
           position: 'absolute',
-          //應要把原本畫label的設備的window size存在後端
-          left: box.minX,
-          top: box.minY,
-          width: box.maxX - box.minX,
-          height: box.maxY - box.minY,
+          //將數值存在後端的相對scale放大
+          left: box.minX * windowSize.width, 
+          top: box.minY * canvasHeight,
+          width: (box.maxX - box.minX) * windowSize.width,
+          height: (box.maxY - box.minY) * canvasHeight,
 
           borderWidth: 2,
           borderColor: 'green',

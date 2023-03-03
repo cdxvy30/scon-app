@@ -17,6 +17,7 @@ import {
   Alert,
   ActionSheetIOS,
   Button,
+  Dimensions,
   Image,
   Icon,
   Keyboard,
@@ -51,6 +52,7 @@ const IssueScreen = ({navigation, route}) => {
   const projectId = project.project_id;                                         // ID作為issue的FK, 同時綁專案名稱、公司
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
+  const windowSize = Dimensions.get('window')
 
   const {userInfo} = useContext(AuthContext);
   const [action, setAction] = useState(route.params.action);
@@ -867,7 +869,7 @@ const IssueScreen = ({navigation, route}) => {
             <TouchableOpacity
               style={[
                 styles.image,
-                {width: item.image.width, height: item.image.height},
+                {width: windowSize.width, height: (item.image.height * windowSize.width) / item.image.width},
               ]}
               onPress={() => issueImageClickHandler()}
             />

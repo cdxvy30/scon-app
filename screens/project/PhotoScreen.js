@@ -37,11 +37,14 @@ import { BASE_URL } from '../../configs/authConfig';
 const STROKE_WIDTH = 20;
 const DETECTION_THRESHOLD = 0.7;
 
+
 const PhotoScreen = ({ navigation, route }) => {
   console.log('/// Pass to PhotoScreen ///');
   console.log(route.params);
   const issueId = route.params.issueId;
   const setIssueLabels = route.params.setIssueLabels;
+  const windowSize = Dimensions.get('window')
+  const canvasHeight = (route.params.image.height * windowSize.width) / route.params.image.width;
 
   const [canvas, setCanvas] = useState(undefined);
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
@@ -99,8 +102,7 @@ const PhotoScreen = ({ navigation, route }) => {
     //{"boxes": [[1760, 0, 4032, 3024]], "labels": ["excavator"]}
     var bodyFormData = new FormData();
     let image = route.params.image;
-    const windowWidth = Dimensions.get('window').width;
-    const imageScaleRatio = windowWidth / image.width;
+    const imageScaleRatio = windowSize.width / image.width;
     image.uri = 'file://' + image.uri.replace('file://', '');
     bodyFormData.append('file', {
       uri: image.uri,
@@ -164,8 +166,6 @@ const PhotoScreen = ({ navigation, route }) => {
   useEffect(() => {
     Orientation.lockToPortrait();
     const image = route.params.image;
-    const windowSize = Dimensions.get('window');
-    const canvasHeight = (image.height * windowSize.width) / image.width;
     if (canvasHeight) {
       const style = {height: canvasHeight, width: windowSize.width};
       setCanvasContainerStyle(style);
@@ -214,10 +214,11 @@ const PhotoScreen = ({ navigation, route }) => {
 
   const labelAddHandler = async (box, name, mode, path) => {
     const newLabel = {
-      max_x: box.maxX,
-      max_y: box.maxY,
-      min_x: box.minX,
-      min_y: box.minY,
+      //將相對scale儲存在後端
+      max_x: box.maxX / windowSize.width,
+      max_y: box.maxY / canvasHeight,
+      min_x: box.minX / windowSize.width,
+      min_y: box.minY / canvasHeight,
       issue_id: issueId,
       name: name,
       mode: mode,
@@ -303,9 +304,37 @@ const PhotoScreen = ({ navigation, route }) => {
     );
   };
 
+  const CreateBoxWithScale = boxObject => {
+    const { key, name, box, path, mode } = boxObject;
+    if (canvas && mode === 'brush') {
+      canvas.addPath(path);
+    }
+    return (
+      <TouchableOpacity
+        key={key}
+        style={{
+          position: 'absolute',
+          left: box.minX * windowSize.width,
+          top: box.minY * canvasHeight,
+          width: (box.maxX - box.minX) * windowSize.width,
+          height: (box.maxY - box.minY) * canvasHeight,
+          borderWidth: 2,
+          borderColor: 'green',
+          zIndex: 9999,
+          backgroundColor: '#FFFFFF40',
+        }}
+        onPress={() => labelDeleteHandler(key)}>
+        <Text> {name} </Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <React.Fragment>
-      {boxObjects.map(boxObject => CreateBox(boxObject))}
+      {boxObjects.map((boxObject, index)=> 
+        (index + 1) > route.params.issueLabels.length ?
+        CreateBox(boxObject) : CreateBoxWithScale(boxObject) //判定是否新新增的，如是則不放大顯示，如否則放大顯示
+      )}
       <View style={{ flex: 1, flexDirection: 'row' }}>
         {canvasContainerStyle ? (
           <SketchCanvas
