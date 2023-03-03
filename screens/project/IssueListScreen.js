@@ -66,9 +66,6 @@ const IssueListScreen = ({navigation, route}) => {
   const [isExporting, setIsExporting] = useState(false);
   const isFocused = useIsFocused();
 
-  console.log('really',selectedStartDate)
-  console.log('really2',selectedEndDate)
-
   function issuesFilter(Issues) {
     var a = [];
     for (let i = 0; i < Issues.length; i++) {
@@ -117,7 +114,7 @@ const IssueListScreen = ({navigation, route}) => {
     setSelectedIssueId(item.issue_id);
     console.log('item',item)
 
-    await RNFetchBlob.config({             //先暫時載到本地端
+    await RNFetchBlob.config({             //先將圖片暫時載到本地端
       fileCache: true,
     })
       .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`)

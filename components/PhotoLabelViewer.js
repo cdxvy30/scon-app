@@ -121,10 +121,10 @@ const PhotoLabelViewer = ({ image, labels, item }) => {
   const issueId = item.id;
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
   const [canvas, setCanvas] = useState(undefined);
+  const windowSize = Dimensions.get('window')
 
   useEffect(async () => {
     Orientation.lockToPortrait();
-    const windowSize = Dimensions.get('window');
     const canvasHeight = (image.height * windowSize.width) / image.width;
     if (canvasHeight) {
       const style = {height: canvasHeight, width: windowSize.width};
@@ -142,10 +142,10 @@ const PhotoLabelViewer = ({ image, labels, item }) => {
         key={key}
         style={{
           position: 'absolute',
-          left: box.minX,
-          top: box.minY,
-          width: box.maxX - box.minX,
-          height: box.maxY - box.minY,
+          left: box.minX * windowSize.scale ,
+          top: box.minY * windowSize.scale ,
+          width: (box.maxX - box.minX) * windowSize.scale,
+          height: (box.maxY - box.minY) * windowSize.scale,
           borderWidth: 2,
           borderColor: 'green',
           zIndex: 9999,
