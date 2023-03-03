@@ -66,14 +66,17 @@ const IssueListScreen = ({navigation, route}) => {
   const [isExporting, setIsExporting] = useState(false);
   const isFocused = useIsFocused();
 
+  console.log('really',selectedStartDate)
+  console.log('really2',selectedEndDate)
+
   function issuesFilter(Issues) {
     var a = [];
     for (let i = 0; i < Issues.length; i++) {
       if (
-        new Date(selectedEndDate).getTime() + 43200000 >=
-          new Date(Issues[i].createat).getTime() &&
-        new Date(selectedStartDate).getTime() - 43200000 <=
-          new Date(Issues[i].createat).getTime()
+        new Date(selectedEndDate).getTime() + 43200000 >= //選的時間都是中午12點，所以往「後」12小時變成00：00
+          new Date(Issues[i].create_at).getTime() &&
+        new Date(selectedStartDate).getTime() - 43200000 <= //選的時間都是中午12點，所以往「前」12小時變成00：00
+          new Date(Issues[i].create_at).getTime()
       ) {
         a.push(Issues[i]);
       }
@@ -211,7 +214,7 @@ const IssueListScreen = ({navigation, route}) => {
           '取消',
           '匯出專案資訊',
           '匯出專案圖片',
-          '匯出缺失記錄表',
+          '匯出缺失記錄表(WORD)',
           '匯出缺失改善前後記錄表(WORD)',
           '匯出缺失改善前後記錄表(HTML)',
         ],
@@ -338,7 +341,23 @@ const IssueListScreen = ({navigation, route}) => {
             }
               
           case 4:
+            // try{
               setIsExporting(true);
+
+              let options = {
+                session : 'output_image',
+                fileCache: true,
+              }
+              for (let i = issueList.length - 1; i >= 0; i--){
+                await RNFetchBlob.config(options)
+                  .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedEndDate ? selectedIssueList[i].issue_id : issueList[i].issue_id}`)
+                  .then(() => {
+                    console.log(RNFetchBlob.session('output_image').list().length)
+                  })
+                  .catch(err => {
+                    console.log(err)
+                  });
+              }
               const doc_2 = new Document({
                 sections: [
                   {
@@ -371,7 +390,23 @@ const IssueListScreen = ({navigation, route}) => {
               };
   
               await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
-              break;
+              Alert.alert('匯出成功！', '', [
+                {
+                  text: '返回',
+                  onPress: () => setIsExporting(false),
+                  style: 'cancel',
+                },
+              ]);
+            // }
+            // catch(error){
+            //   Alert.alert('匯出取消或失敗', '', [
+            //     {
+            //       text: '返回',
+            //       onPress: () => setIsExporting(false),
+            //       style: 'cancel',
+            //     },
+            //   ]);
+            // }
 
           // case 5:
           //   const issue_web = issueHtmlGenerator(
@@ -417,22 +452,23 @@ const IssueListScreen = ({navigation, route}) => {
           case 1:
             selectedEndDate
               ? selectedIssueList.sort(
-                  (a, b) => new Date(b.createat) - new Date(a.createat),
+                  (a, b) => new Date(b.create_at) - new Date(a.create_at),
                 )
               : issueList.sort(
-                  (a, b) => new Date(b.createat) - new Date(a.createat),
+                  (a, b) => new Date(b.create_at) - new Date(a.create_at),
                 );
             selectedEndDate
               ? setSelectedIssueList([...selectedIssueList])
               : setIssueList([...issueList]);
             break;
           case 2:
+            console.log('haha',issueList)
             selectedEndDate
               ? selectedIssueList.sort(
-                  (a, b) => new Date(a.createat) - new Date(b.createat),
+                  (a, b) => new Date(a.create_at) - new Date(b.create_at),
                 )
               : issueList.sort(
-                  (a, b) => new Date(a.createat) - new Date(b.createat),
+                  (a, b) => new Date(a.create_at) - new Date(b.create_at),
                 );
             selectedEndDate
               ? setSelectedIssueList([...selectedIssueList])

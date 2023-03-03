@@ -68,13 +68,11 @@ const ProjectNavigation = ({navigation}) => {
           component={CorporationAddScreen}
           options={{title: '廠商資訊'}}
         />
-        <Stack.Group screenOptions={{presentation: 'formSheet'}}>
         <Stack.Screen
           name="DateSelector"
           component={DateSelectorScreen}
           options={{title: '選取日期範圍'}}
         />
-        </Stack.Group>
         <Stack.Screen
           name="IssueLocationList"
           component={IssueLocationListScreen}

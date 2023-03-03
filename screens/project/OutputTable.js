@@ -334,6 +334,7 @@ function issueRowsGenerator (issueList,fs, config) {
 }
 
 export function improveReportGenerator (issueList, fs, config, project) {
+    console.log('ayeyo',issueList)
     let pages = [];
     for (let i = issueList.length - 1; i >= 0; i--){
 
