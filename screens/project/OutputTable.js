@@ -347,6 +347,10 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
     let pages = [];
     let improved_count = 0
     for (let i = issueList.length - 1; i >= 0; i--){
+      //判斷是否追蹤，如否則跳過此缺失
+      if (issueList[i].tracking_or_not === false){  
+        continue
+      }
 
       await RNFetchBlob.config({
         session : 'output_image',
@@ -367,30 +371,28 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
       })
         .then(async res => {
           attach = await res.data;
-          await RNFetchBlob.config({
-            session : 'improved_image',
-            fileCache: true,
-          })
-            .fetch("GET", `${BASE_URL}/attachments/get/thumbnail/${attach.attachment_id}`)
-            .then(() => {
-              // the temp file path
-              console.log(`improved_image: ${RNFetchBlob.session('improved_image').list().length}`)
+          //如果有改善才有圖片
+          attach
+          ?
+            await RNFetchBlob.config({
+              session : 'improved_image',
+              fileCache: true,
             })
-            .catch(err => {
-              console.log('failed to fetch export improved image',err)
-            });
+              .fetch("GET", `${BASE_URL}/attachments/get/thumbnail/${await attach.attachment_id}`)
+              .then(() => {
+                // the temp file path
+                console.log(`improved_image: ${RNFetchBlob.session('improved_image').list().length}`)
+              })
+              .catch(err => {
+                console.log('failed to fetch export improved image',err)
+              })
+          :
+            undefined;
+          
         })
         .catch(e => {
           console.log(`${e}`);
         });
-      
-
-      
-
-      //判斷是否追蹤，如否則跳過此缺失
-      if (issueList[i].tracking_or_not === false){  
-        continue
-      }
 
       //判斷改善資訊是否存在
       // if (issueList[i]['attachments'][0] !== undefined){ 
@@ -398,9 +400,6 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
       //   var improve_remark = issueList[i]['attachments'][0]['remark']
       //   var improve_image = fs.readFile(`.${issueList[i]['attachments'][0]['image']}`, 'ascii')
       //   } else{
-        var improve_time = '未改善'
-        var improve_remark = '未改善'
-        var improve_image = null
       // }
       
       pages.push(
@@ -410,7 +409,7 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
                         new TextRun({text: '工程名稱：', size: 30, bold: true}),
                         new TextRun({text: project.project_name, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
                         new TextRun({text:'\t\t工地負責人：', size: 30, bold: true}),
-                        new TextRun({text: `${project.project_manager}`, size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
+                        new TextRun({text: project.project_manager != null ? project.project_manager : '未設定', size: 30, bold: true,  underline:{type: UnderlineType.SINGLE}}),
                     ], alignment:AlignmentType.CENTER,
                 }),
                 new Paragraph({
@@ -441,7 +440,7 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
                           width:{size:1000, type:WidthType.DXA},
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new TextRun({text: `後端還沒好`, size: 30 })], alignment:AlignmentType.LEFT}) ],
+                          children: [new Paragraph({children:[new TextRun({text: `稍後更新`, size: 30 })], alignment:AlignmentType.LEFT}) ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:1000, type:WidthType.DXA},
                         }),
@@ -513,17 +512,35 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
                           width:{size:1500, type:WidthType.DXA},
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:[new ImageRun({data:fs.readFile(RNFetchBlob.session('improved_image').list()[improved_count], 'ascii') ,transformation:{width:[300],height:[225]}})], alignment:AlignmentType.CENTER}) ],
+                          children: [
+                            new Paragraph({children:[
+                              attach ?
+                              new ImageRun({data:fs.readFile(RNFetchBlob.session('improved_image').list()[improved_count], 'ascii') ,transformation:{width:[300],height:[225]}})
+                              :
+                              new TextRun({text: '未改善', size: 30, bold:true})
+                            ], 
+                            alignment:AlignmentType.CENTER}) 
+                          ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:4700, type:WidthType.DXA},
                           columnSpan: 2,
                         }),
                         new TableCell({
                           children: [new Paragraph({children:[new TextRun({text: '備註: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}), 
-                                     new Paragraph({children:[new TextRun({text: improve_remark, size: 30 })], alignment:AlignmentType.LEFT}), 
+                                     new Paragraph({children:[
+                                      attach ?
+                                      new TextRun({text: attach.attachment_remark == null ? '未改善或未填寫' : attach.attachment_remark, size: 30 })
+                                      :
+                                      new TextRun({text: '未改善', size: 30 })
+                                     ], alignment:AlignmentType.LEFT}), 
                                      new Paragraph({}),
                                      new Paragraph({children:[new TextRun({text: '改善日期: ', size: 30, bold:true})], alignment:AlignmentType.LEFT}), 
-                                     new Paragraph({children:[new TextRun({text: improve_time, size: 30 })], alignment:AlignmentType.LEFT})],
+                                     new Paragraph({children:[
+                                      attach ?
+                                      new TextRun({text: `${new Date(attach.update_at).toLocaleDateString()}`, size: 30 })
+                                      :
+                                      new TextRun({text: '未改善', size: 30 })
+                                     ], alignment:AlignmentType.LEFT})],
                           width:{size:3200, type:WidthType.DXA},               
                         }),
                       ],
@@ -534,7 +551,12 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
                   alignment:AlignmentType.CENTER,
                 }),
       )
-      improved_count = improved_count + 1
+      //判定改善圖片在不在
+      attach?
+        improved_count = improved_count + 1
+        :
+        undefined
+      
     };
     return (pages)
   }

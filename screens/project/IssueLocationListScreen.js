@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
     borderRadius:15,
     borderWidth:1,
+    borderColor:'#BBBBBB',
     padding:10
   },
   headerText:{

@@ -3,11 +3,11 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import SettingScreen from '../screens/setting/SettingScreen';
 import DataManagementScreenList from '../screens/setting/DataManagementListScreen';
 import DataManagementScreen from '../screens/setting/DataManagementScreen';
-import CorporationListScreen from '../screens/setting/CorporationListScreen';
-import CorporationAddScreen from '../screens/setting/CorporationAddScreen';
+// import CorporationListScreen from '../screens/setting/CorporationListScreen';
+// import CorporationAddScreen from '../screens/setting/CorporationAddScreen';
 import LocationManagementScreen from '../screens/setting/LocationManagementScreen';
 import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen'
-import CorpListScreen from '../screens/setting/CorpListScreen';
+// import CorpListScreen from '../screens/setting/CorpListScreen';
 import UserListScreen from '../screens/user/UserListScreen';
 import UserManagementScreen from '../screens/user/UserManagementScreen';
 import ProjectManagementListScreen from '../screens/setting/ProjectManagementListScreen';
@@ -34,18 +34,18 @@ const SettingNavigation = ({}) => {
           component={DataManagementScreen}
           options={{title: '專案管理'}}
         />
-        <Stack.Screen
+        {/* <Stack.Screen   //宏發：我之後再弄一個用來管理的screen，就跟LocationManagementScreen一樣
           name="CorporationList"
           component={CorporationListScreen}
           options={{title: '責任廠商'}}
-        />
-        <Stack.Screen
-          // name="CorporationAdd"
+        /> */}
+        {/* <Stack.Screen
+          name="CorporationAdd"
           name="CorpList"
-          // component={CorporationAddScreen}
+          component={CorporationAddScreen}
           component={CorpListScreen}
           options={{title: '廠商資訊'}}
-        />
+        /> */}
         <Stack.Screen
           name="LocationManagement"
           component={LocationManagementScreen}

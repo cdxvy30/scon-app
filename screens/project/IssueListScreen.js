@@ -162,7 +162,7 @@ const IssueListScreen = ({navigation, route}) => {
       activity: item.issue_task,
       assignee: item.issue_recorder,
       assignee_phone_number: '',
-      responsible_corporation: '',
+      responsible_corporation: item.issue_manufacturer,
       safetyManager: item.issue_recorder,
       attachments: [attach],
       labels: [],

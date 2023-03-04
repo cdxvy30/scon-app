@@ -12,6 +12,7 @@ import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
 import IssueLocationListScreen from '../screens/project/IssueLocationListScreen'
 import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen'
 import CorporationAddScreen from '../screens/setting/CorporationAddScreen'
+import CorporationListScreen from '../screens/project/CorporationListScreen'
 
 import RemoteImageWithSketch from '../screens/project/RemoteImageWithSketch';
 
@@ -64,9 +65,14 @@ const ProjectNavigation = ({navigation}) => {
           options={{title: '缺失項目'}}
         />
         <Stack.Screen
+          name="CorporationList"
+          component={CorporationListScreen}
+          options={{title: '廠商資訊'}}
+        />
+        <Stack.Screen
           name="CorporationAdd"
           component={CorporationAddScreen}
-          options={{title: '廠商資訊'}}
+          options={{title: '新增廠商'}}
         />
         <Stack.Screen
           name="DateSelector"

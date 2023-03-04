@@ -401,69 +401,73 @@ const IssueScreen = ({navigation, route}) => {
 
   // 選取責任廠商
   const responsibleCorporationclickHandler = async () => {
+    // 換回去CorporationListScreen
+    navigation.navigate('CorporationList', {
+      name: 'List all corporation',
+      project_id: projectId,
+      setResponsibleCorporation
+    });
+
     // Next line is Old version
     // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
-    var options = new Array();
+    // var options = new Array();
     
-    // ************************************************************** //
-    const getCorps = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/corporations/list/${projectId}`);
-        const data = await res.data;
-        console.log('In get method: \n', data);
-        options = data;
-        options.push({ corporation_name: '取消' });
-        console.log(options);
-      } catch (e) {
-        console.log(`Fetch corporation error: ${e}`);
-      }
-    };
-    await getCorps();
-    // ************************************************************* //
-
-    // options.push({company: '取消'});
-    options.length === 1
-      ? Alert.alert(
-          '未新增任何協力廠商',
-          '請選擇',
-          [
-            {
-              text: '返回',
-              style: 'cancel',
-              onPress: () => {
-                return;
-              },
-            },
-            {
-              text: '新增',
-              onPress: () => {
-                navigation.navigate('CorporationAdd', {
-                  name: 'Create new corporation',
-                  projectId: projectId,
-                });
-              },
-            },
-          ],
-          'light',
-        )
-      : ActionSheetIOS.showActionSheetWithOptions(
-          {
-            options: options.map(item => item.corporation_name),
-            cancelButtonIndex: options.length - 1,
-            userInterfaceStyle: 'light',
-          },
-          buttonIndex => {
-            if (buttonIndex == options.length - 1) {
-              setResponsibleCorporation(responsibleCorporation);
-            } else {
-              setResponsibleCorporation(options[buttonIndex].corporation_name);
-              // setIssueAssigneeText(options[buttonIndex].corporation_manager);
-              // setIssueAssigneePhoneNumberText(
-              //   options[buttonIndex].corporation_phone,
-              // );
-            }
-          },
-        );
+    // // ************************************************************** //
+    // const getCorps = async () => {
+    //   try {
+    //     const res = await axios.get(`${BASE_URL}/corporations/list/${projectId}`);
+    //     const data = await res.data;
+    //     console.log('In get method corporations: \n', data);
+    //     options = data;
+    //   } catch (e) {
+    //     console.log(`Fetch corporation error: ${e}`);
+    //   }
+    // };
+    // await getCorps();
+    // // ************************************************************* //
+    // options.push({ corporation_name: '取消' });
+    // options.length === 1
+    //   ? Alert.alert(
+    //       '未新增任何協力廠商',
+    //       '請選擇',
+    //       [
+    //         {
+    //           text: '返回',
+    //           style: 'cancel',
+    //           onPress: () => {
+    //             return;
+    //           },
+    //         },
+    //         {
+    //           text: '新增',
+    //           onPress: () => {
+    //             navigation.navigate('CorporationAdd', {
+    //               name: 'Create new corporation',
+    //               projectId: projectId,
+    //             });
+    //           },
+    //         },
+    //       ],
+    //       'light',
+    //     )
+    //   : ActionSheetIOS.showActionSheetWithOptions(
+    //       {
+    //         options: options.map(item => item.corporation_name),
+    //         cancelButtonIndex: options.length - 1,
+    //         userInterfaceStyle: 'light',
+    //       },
+    //       buttonIndex => {
+    //         if (buttonIndex == options.length - 1) {
+    //           setResponsibleCorporation(responsibleCorporation);
+    //         } else {
+    //           setResponsibleCorporation(options[buttonIndex].corporation_name);
+    //           // setIssueAssigneeText(options[buttonIndex].corporation_manager);
+    //           // setIssueAssigneePhoneNumberText(
+    //           //   options[buttonIndex].corporation_phone,
+    //           // );
+    //         }
+    //       },
+    //     );
   };
 
   // 選取工項
@@ -522,7 +526,7 @@ const IssueScreen = ({navigation, route}) => {
   const issueCreateHandler = React.useCallback(async () => {
     console.log('/// create ///');
     const transformedIssue = {
-      image_uri: item.image.uri,     // 缺失影像
+      image_uri: item.image.uri,                            // 缺失影像
       image_width: item.image.width,                        // 缺失影像寬
       image_height: item.image.height,                      // 缺失影像高
       violation_type: route.params.violation_type,          // 缺失類別
