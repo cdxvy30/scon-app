@@ -66,7 +66,6 @@ const WorkItemAddScreen = ({navigation, route}) => {
       company,
       manager,
       phone_number,
-      // name,  // 工項名稱
       projectId,
     };
 
