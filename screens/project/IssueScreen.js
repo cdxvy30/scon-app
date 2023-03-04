@@ -95,7 +95,7 @@ const IssueScreen = ({navigation, route}) => {
   const keyboardDidHideListener = useRef();                                     // not sure what's this
   const isFocused = useIsFocused();
 
-  console.log('In begin: \n', issueAttachments);
+  // console.log('In begin: \n', issueAttachments);
 
   // 功用未知
   const onKeyboardShow = event =>

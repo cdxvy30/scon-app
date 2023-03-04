@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   Button,
   SafeAreaView,
@@ -18,6 +18,9 @@ import {
   // useColorScheme,
 } from 'react-native';
 import SqliteManager from '../../services/SqliteManager';
+import axios from 'axios';
+import { BASE_URL } from '../../configs/authConfig';
+import {AuthContext} from '../../context/AuthContext';
 
 // name: {type: types.TEXT, not_null: true},
 // manager: {type: types.TEXT, not_null: true},
@@ -25,14 +28,17 @@ import SqliteManager from '../../services/SqliteManager';
 // company: {type: types.TEXT, not_null: true},
 
 const WorkItemAddScreen = ({navigation, route}) => {
+  console.log(route.params);
   let workitem = route.params.item;
   const [name, setName] = useState(workitem ? workitem.name : '');
   const [manager, setManager] = useState(workitem ? workitem.manager : '');
   const [phone_number, setPhone_Number] = useState(workitem ? workitem.phone_number : '');
   const [company, setCompany] = useState(workitem ? workitem.company : '');
   const projectId = route.params.projectId;
+  const {userInfo} = useContext(AuthContext);
 
   const workitemAddHandler = React.useCallback(async () => {
+    console.log('add corp');
     if (!company) {
       Alert.alert('請填入廠商名稱');
       return;
@@ -54,6 +60,38 @@ const WorkItemAddScreen = ({navigation, route}) => {
       company,
       project_id: projectId,
     };
+
+    // ************************************************** //
+    const newCorp = {
+      company,
+      manager,
+      phone_number,
+      // name,  // 工項名稱
+      projectId,
+    };
+
+    console.log("New Corp: \n", newCorp);
+    console.log(BASE_URL);
+    axios({
+      method: 'post',
+      url: `${BASE_URL}/corporations/add`,
+      data: newCorp,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ` + `${userInfo.token}`,
+      },
+    })
+      .then(async (res) => {
+        let data = await res.data;
+        console.log(data);
+      })
+      .catch((e) => {
+        console.log(`Add corporation error: ${e}`);
+      });
+    console.log("New Corp: \n", newCorp);
+    console.log(BASE_URL);
+    // ************************************************** //
+
     await SqliteManager.createWorkItem(newWorkItem);
     navigation.goBack();
   }, [
@@ -103,7 +141,8 @@ const WorkItemAddScreen = ({navigation, route}) => {
       headerRight: () => (
         <Button
           title="完成"
-          onPress={workitem ? workitemUpdateHandler : workitemAddHandler}
+          // onPress={workitem ? workitemUpdateHandler : workitemAddHandler}
+          onPress={workitemAddHandler}
         />
       ),
       headerLeft: () => (
