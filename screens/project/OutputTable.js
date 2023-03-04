@@ -1,8 +1,10 @@
 import { AlignmentType, HeightRule, ImageRun, Paragraph, SectionType, Table, TableCell, TableRow, TextRun, UnderlineType, VerticalAlign, WidthType, PageBreak } from 'docx';
 import { getIssueStatusById } from './IssueEnum';
 import RNFetchBlob from 'rn-fetch-blob';
+import axios from 'axios';
+import { BASE_URL } from '../../configs/authConfig';
 
-export function issueReportGenerator(userInfo, project, selectedEndDate, selectedStartDate, issueList, fs){
+export async function issueReportGenerator(userInfo, project, selectedEndDate, selectedStartDate, issueList, fs){
   return [
     {
         children: [
@@ -30,7 +32,7 @@ export function issueReportGenerator(userInfo, project, selectedEndDate, selecte
               ], alignment:AlignmentType.CENTER,
             }),
             new Table({
-              rows: issueRowsGenerator((selectedEndDate ? selectedIssueList : issueList), fs),
+              rows: await issueRowsGenerator((selectedEndDate ? selectedIssueList : issueList), fs),
               alignment:AlignmentType.CENTER,
             }),
         ],
@@ -38,7 +40,7 @@ export function issueReportGenerator(userInfo, project, selectedEndDate, selecte
 ]
 }
 
-function issueRowsGenerator (issueList, fs) {
+async function issueRowsGenerator (issueList, fs) {
   var count = 0
   let rows = [
       new TableRow({
@@ -65,276 +67,325 @@ function issueRowsGenerator (issueList, fs) {
       }),
   ];
   for (let i = issueList.length - 1; i >= 0; i--){
-        // var issue_item = issueList[i].type;
-        // if (issue_item === '其他'){
-        //     issue_item = issueList[i].type_remark
-        // }
-        if (Math.round(count%4)==0 && count!=0){
-            rows.push(
-              new TableRow({
-                children:[
-                  new TableCell({
-                      children: [new Paragraph({children:[new TextRun({text: `${issueList.length - i}`, size: 30 })], pageBreakBefore:true, alignment:AlignmentType.CENTER}) ],
-                      verticalAlign:VerticalAlign.CENTER,
-                      width:{size:500, type:WidthType.DXA},
-                      height:{size:6000, type:WidthType.DXA},
-                      rowSpan: 6,
-                      cantSplit:true,
-                  }),
-                  new TableCell({
-                      children: [new Paragraph({children:[new ImageRun({data:fs.readFile(RNFetchBlob.session('output_image').list()[issueList.length - i - 1], 'ascii') ,transformation:{width:[210],height:[157.5]}})], alignment:AlignmentType.CENTER}) ],
-                      verticalAlign:VerticalAlign.CENTER,
-                      width:{size:3500, type:WidthType.DXA},
-                      height:{size:6000, type:WidthType.DXA},
-                      rowSpan: 6,
-                      cantSplit:true,
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '類別', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_title, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '項目', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_type, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '風險評級', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: `${getIssueStatusById(issueList[i].issue_status).name}`, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '地點', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_location, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '責任廠商', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_manufacturer, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '工項', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_task, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [
-                      new Paragraph({children:[new TextRun({text: '', size: 30})] }),
-                      new Paragraph({children:[new TextRun({text: '', size: 30})] }),
-                    ],
-                    columnSpan:4,
-                    height:{size:500, type:WidthType.EXACT},
-                  }),
+
+    await RNFetchBlob.config({
+      session : 'output_image',
+      fileCache: true,
+    })
+    .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}`)
+    .then(() => {
+      console.log(`original_image: ${RNFetchBlob.session('output_image').list().length}`)
+    })
+    .catch(err => {
+      console.log('failed to fetch export origin image',err)
+    });
+
+    if (Math.round(count%4)==0 && count!=0){
+      rows.push(
+        new TableRow({
+          children:[
+            new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: `${issueList.length - i}`, size: 30 })], pageBreakBefore:true, alignment:AlignmentType.CENTER}) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:500, type:WidthType.DXA},
+                height:{size:6000, type:WidthType.DXA},
+                rowSpan: 6,
+                cantSplit:true,
+            }),
+            new TableCell({
+                children: [new Paragraph({children:[new ImageRun({data:fs.readFile(RNFetchBlob.session('output_image').list()[issueList.length - i - 1], 'ascii') ,transformation:{width:[210],height:[157.5]}})], alignment:AlignmentType.CENTER}) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:3500, type:WidthType.DXA},
+                height:{size:6000, type:WidthType.DXA},
+                rowSpan: 6,
+                cantSplit:true,
+            }),
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: '類別', size: 30, bold: true})] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:1500, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_title, size: 28 })] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:4000, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+          ],
+        }),
+        new TableRow({
+          children:[
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: '項目', size: 30, bold: true})] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:1500, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_type, size: 28 })] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:4000, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+          ],
+        }),
+        new TableRow({
+          children:[
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: '風險評級', size: 30, bold: true})] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:1500, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: `${getIssueStatusById(issueList[i].issue_status).name}`, size: 28 })] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:4000, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+          ],
+        }),
+        new TableRow({
+          children:[
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: '地點', size: 30, bold: true})] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:1500, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_location, size: 28 })] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:4000, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+          ],
+        }),
+        new TableRow({
+          children:[
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: '責任廠商', size: 30, bold: true})] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:1500, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_manufacturer, size: 28 })] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:4000, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+          ],
+        }),
+        new TableRow({
+          children:[
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: '工項', size: 30, bold: true})] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:1500, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+            new TableCell({
+              children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_task, size: 28 })] }) ],
+              verticalAlign:VerticalAlign.CENTER,
+              width:{size:4000, type:WidthType.DXA},
+              height:{size:1000, type:WidthType.DXA},
+            }),
+          ],
+        }),
+        new TableRow({
+          children:[
+            new TableCell({
+              children: [
+                new Paragraph({children:[new TextRun({text: '', size: 30})] }),
+                new Paragraph({children:[new TextRun({text: '', size: 30})] }),
               ],
-              cantSplit:true,
+              columnSpan:4,
+              height:{size:500, type:WidthType.EXACT},
+            }),
+        ],
+        cantSplit:true,
+        }),
+      )
+    }
+    else{
+        rows.push(
+          new TableRow({
+            children:[
+              new TableCell({
+                  children: [new Paragraph({children:[new TextRun({text: `${issueList.length - i}`, size: 30 })], alignment:AlignmentType.CENTER}) ],
+                  verticalAlign:VerticalAlign.CENTER,
+                  width:{size:500, type:WidthType.DXA},
+                  height:{size:6000, type:WidthType.DXA},
+                  rowSpan: 6,
+                  cantSplit:true,
               }),
-            )
-        }
-        else{
-            rows.push(
-              new TableRow({
-                children:[
-                  new TableCell({
-                      children: [new Paragraph({children:[new TextRun({text: `${issueList.length - i}`, size: 30 })], alignment:AlignmentType.CENTER}) ],
-                      verticalAlign:VerticalAlign.CENTER,
-                      width:{size:500, type:WidthType.DXA},
-                      height:{size:6000, type:WidthType.DXA},
-                      rowSpan: 6,
-                      cantSplit:true,
-                  }),
-                  new TableCell({
-                      children: [new Paragraph({children:[new ImageRun({data:fs.readFile(RNFetchBlob.session('output_image').list()[issueList.length - i - 1], 'ascii') ,transformation:{width:[210],height:[157.5]}})], alignment:AlignmentType.CENTER}) ],
-                      verticalAlign:VerticalAlign.CENTER,
-                      width:{size:3500, type:WidthType.DXA},
-                      height:{size:6000, type:WidthType.DXA},
-                      rowSpan: 6,
-                      cantSplit:true,
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '類別', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_title, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
+              new TableCell({
+                  children: [new Paragraph({children:[new ImageRun({data:fs.readFile(RNFetchBlob.session('output_image').list()[issueList.length - i - 1], 'ascii') ,transformation:{width:[210],height:[157.5]}})], alignment:AlignmentType.CENTER}) ],
+                  verticalAlign:VerticalAlign.CENTER,
+                  width:{size:3500, type:WidthType.DXA},
+                  height:{size:6000, type:WidthType.DXA},
+                  rowSpan: 6,
+                  cantSplit:true,
+              }),
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: '類別', size: 30, bold: true})] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:1500, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_title, size: 28 })] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:4000, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+            ],
+          }),
+          new TableRow({
+            children:[
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: '項目', size: 30, bold: true})] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:1500, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_type, size: 28 })] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:4000, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+            ],
+          }),
+          new TableRow({
+            children:[
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: '風險評級', size: 30, bold: true})] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:1500, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: `${getIssueStatusById(issueList[i].issue_status).name}`, size: 28 })] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:4000, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+            ],
+          }),
+          new TableRow({
+            children:[
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: '地點', size: 30, bold: true})] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:1500, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_location, size: 28 })] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:4000, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+            ],
+          }),
+          new TableRow({
+            children:[
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: '責任廠商', size: 30, bold: true})] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:1500, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_manufacturer, size: 28 })] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:4000, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+            ],
+          }),
+          new TableRow({
+            children:[
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: '工項', size: 30, bold: true})] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:1500, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+              new TableCell({
+                children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_task, size: 28 })] }) ],
+                verticalAlign:VerticalAlign.CENTER,
+                width:{size:4000, type:WidthType.DXA},
+                height:{size:1000, type:WidthType.DXA},
+              }),
+            ],
+          }),
+          new TableRow({
+            children:[
+              new TableCell({
+                children: [
+                  new Paragraph({children:[new TextRun({text: '', size: 30})] }),
+                  new Paragraph({children:[new TextRun({text: '', size: 30})] }),
                 ],
+                columnSpan:4,
+                height:{size:500, type:WidthType.EXACT},
               }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '項目', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_type, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '風險評級', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: `${getIssueStatusById(issueList[i].issue_status).name}`, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '地點', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_location, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '責任廠商', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_manufacturer, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: '工項', size: 30, bold: true})] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:1500, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                  new TableCell({
-                    children: [new Paragraph({children:[new TextRun({text: issueList[i].issue_task, size: 28 })] }) ],
-                    verticalAlign:VerticalAlign.CENTER,
-                    width:{size:4000, type:WidthType.DXA},
-                    height:{size:1000, type:WidthType.DXA},
-                  }),
-                ],
-              }),
-              new TableRow({
-                children:[
-                  new TableCell({
-                    children: [
-                      new Paragraph({children:[new TextRun({text: '', size: 30})] }),
-                      new Paragraph({children:[new TextRun({text: '', size: 30})] }),
-                    ],
-                    columnSpan:4,
-                    height:{size:500, type:WidthType.EXACT},
-                  }),
-              ],
-              cantSplit:true,
-              }),
-            )
-        }
+          ],
+          cantSplit:true,
+          }),
+        )
+    }
     count = count + 1
     }
   return (rows);
 }
 
-export function improveReportGenerator (userInfo, issueList, fs, config, project) {
+export async function improveReportGenerator (userInfo, issueList, fs, config, project) {
     let pages = [];
+    let improved_count = 0
     for (let i = issueList.length - 1; i >= 0; i--){
+
+      await RNFetchBlob.config({
+        session : 'output_image',
+        fileCache: true,
+      })
+      .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}`)
+      .then(() => {
+        console.log(`original_image: ${RNFetchBlob.session('output_image').list().length}`)
+      })
+      .catch(err => {
+        console.log('failed to fetch export origin image',err)
+      });
+
+      var attach;
+      await axios({
+        methods: 'get',
+        url: `${BASE_URL}/attachments/list/${issueList[i].issue_id}`,
+      })
+        .then(async res => {
+          attach = await res.data;
+          await RNFetchBlob.config({
+            session : 'improved_image',
+            fileCache: true,
+          })
+            .fetch("GET", `${BASE_URL}/attachments/get/thumbnail/${attach.attachment_id}`)
+            .then(() => {
+              // the temp file path
+              console.log(`improved_image: ${RNFetchBlob.session('improved_image').list().length}`)
+            })
+            .catch(err => {
+              console.log('failed to fetch export improved image',err)
+            });
+        })
+        .catch(e => {
+          console.log(`${e}`);
+        });
+      
+
+      
 
       //判斷是否追蹤，如否則跳過此缺失
       if (issueList[i].tracking_or_not === false){  
@@ -462,7 +513,7 @@ export function improveReportGenerator (userInfo, issueList, fs, config, project
                           width:{size:1500, type:WidthType.DXA},
                         }),
                         new TableCell({
-                          children: [new Paragraph({children:improve_image == null?[]:[new ImageRun({data: improve_image ,transformation:{width:[300],height:[225]}})], alignment:AlignmentType.CENTER}) ],
+                          children: [new Paragraph({children:[new ImageRun({data:fs.readFile(RNFetchBlob.session('improved_image').list()[improved_count], 'ascii') ,transformation:{width:[300],height:[225]}})], alignment:AlignmentType.CENTER}) ],
                           verticalAlign:VerticalAlign.CENTER,
                           width:{size:4700, type:WidthType.DXA},
                           columnSpan: 2,
@@ -483,6 +534,7 @@ export function improveReportGenerator (userInfo, issueList, fs, config, project
                   alignment:AlignmentType.CENTER,
                 }),
       )
+      improved_count = improved_count + 1
     };
     return (pages)
   }

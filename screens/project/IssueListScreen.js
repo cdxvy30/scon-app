@@ -286,44 +286,14 @@ const IssueListScreen = ({navigation, route}) => {
             console.log('Exporting all issue document')
             try{
                 setIsExporting(true);
-
-                let options = {
-                  session : 'output_image',
-                  fileCache: true,
-                }
-                
-                if (selectedEndDate) {
-                  for (let i = selectedIssueList.length - 1; i >= 0; i--){
-                    await RNFetchBlob.config(options)
-                      .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedIssueList[i].issue_id}`)
-                      .then(() => {
-                        console.log(RNFetchBlob.session('output_image').list().length)
-                      })
-                      .catch(err => {
-                        console.log('failed to fetch export image',err)
-                      });
-                  }
-                }else{
-                  for (let i = issueList.length - 1; i >= 0; i--){
-                    await RNFetchBlob.config(options)
-                      .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}`)
-                      .then(() => {
-                        console.log(RNFetchBlob.session('output_image').list().length)
-                      })
-                      .catch(err => {
-                        console.log('failed to fetch export image',err)
-                      });
-                  }
-                }
-                
                 const doc = new Document({
-                  sections: issueReportGenerator(
+                  sections: await issueReportGenerator(
                     userInfo,
                     project,
                     selectedEndDate,
                     selectedStartDate,
                     selectedEndDate ? selectedIssueList : issueList,
-                    fs,
+                    fs
                   ),
                 });
     
@@ -372,40 +342,12 @@ const IssueListScreen = ({navigation, route}) => {
             try{
               setIsExporting(true);
               console.log('Exporting issue improvement document')
-              let options = {
-                session : 'output_image',
-                fileCache: true,
-              }
-
-              if (selectedEndDate) {
-                for (let i = selectedIssueList.length - 1; i >= 0; i--){
-                  await RNFetchBlob.config(options)
-                    .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${selectedIssueList[i].issue_id}`)
-                    .then(() => {
-                      console.log(RNFetchBlob.session('output_image').list().length)
-                    })
-                    .catch(err => {
-                      console.log('failed to fetch export image',err)
-                    });
-                }
-              }else{
-                for (let i = issueList.length - 1; i >= 0; i--){
-                  await RNFetchBlob.config(options)
-                    .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}`)
-                    .then(() => {
-                      console.log(RNFetchBlob.session('output_image').list().length)
-                    })
-                    .catch(err => {
-                      console.log('failed to fetch export image',err)
-                    });
-                }
-              }
 
               const doc_2 = new Document({
                 sections: [
                   {
                     properties: {},
-                    children: improveReportGenerator(
+                    children: await improveReportGenerator(
                       userInfo,
                       selectedEndDate ? selectedIssueList : issueList,
                       fs,
@@ -417,7 +359,6 @@ const IssueListScreen = ({navigation, route}) => {
               });
   
               await Packer.toBase64String(doc_2).then(base64 => {
-                console.log('exporting Roport');
                 fs.writeFile(
                   `${docPath}/${project.project_name}-缺失改善前後記錄表.docx`,
                   base64,
@@ -443,6 +384,7 @@ const IssueListScreen = ({navigation, route}) => {
               ]);
             }
             catch(error){
+              console.log(`Issue improved document error: ${error}`)
               Alert.alert('匯出取消或失敗', '', [
                 {
                   text: '返回',
@@ -454,6 +396,8 @@ const IssueListScreen = ({navigation, route}) => {
             finally{
               RNFetchBlob.session('output_image').dispose();
               console.log('output image deleted')
+              RNFetchBlob.session('improved_image').dispose();
+              console.log('improved image deleted')
             }
             break;
 
