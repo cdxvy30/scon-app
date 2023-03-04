@@ -74,7 +74,8 @@ const IssueScreen = ({navigation, route}) => {
   const [issueLocationText, setIssueLocationText] = useState(item.location);    // 缺失地點
   const [responsibleCorporation, setResponsibleCorporation] = useState(         // 責任廠商
     item.responsible_corporation,
-  );                                                                            
+  );
+  const [responsibleCorpOptions, setResponsibleCorpOptions] = useState([]);
   const [issueTaskText, setIssueTaskText] = useState(item.activity);            // 缺失工項
 
   // v 用不到
@@ -402,23 +403,26 @@ const IssueScreen = ({navigation, route}) => {
   const responsibleCorporationclickHandler = async () => {
     // Next line is Old version
     // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    var options = new Array();
     
-    // Fetch協力廠商 !!@ 尚未建立好corporations的路由 @!!
     // ************************************************************** //
-    var options = [];
-    axios
-      .get(`${BASE_URL}/corporations/${projectId}`)
-      .then(async (res) => {
-        options = res.data;
-        console.log(options);    
-      })
-      .catch(e => {
+    const getCorps = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/corporations/list/${projectId}`);
+        const data = await res.data;
+        console.log('In get method: \n', data);
+        options = data;
+        options.push({ corporation_name: '取消' });
+        console.log(options);
+      } catch (e) {
         console.log(`Fetch corporation error: ${e}`);
-      });
+      }
+    };
+    await getCorps();
     // ************************************************************* //
 
-    options.push({company: '取消'});
-    options.length == 1
+    // options.push({company: '取消'});
+    options.length === 1
       ? Alert.alert(
           '未新增任何協力廠商',
           '請選擇',
@@ -444,7 +448,7 @@ const IssueScreen = ({navigation, route}) => {
         )
       : ActionSheetIOS.showActionSheetWithOptions(
           {
-            options: options.map(item => item.company),
+            options: options.map(item => item.corporation_name),
             cancelButtonIndex: options.length - 1,
             userInterfaceStyle: 'light',
           },
@@ -452,11 +456,11 @@ const IssueScreen = ({navigation, route}) => {
             if (buttonIndex == options.length - 1) {
               setResponsibleCorporation(responsibleCorporation);
             } else {
-              setResponsibleCorporation(options[buttonIndex].company);
-              setIssueAssigneeText(options[buttonIndex].manager);
-              setIssueAssigneePhoneNumberText(
-                options[buttonIndex].phone_number,
-              );
+              setResponsibleCorporation(options[buttonIndex].corporation_name);
+              // setIssueAssigneeText(options[buttonIndex].corporation_manager);
+              // setIssueAssigneePhoneNumberText(
+              //   options[buttonIndex].corporation_phone,
+              // );
             }
           },
         );
