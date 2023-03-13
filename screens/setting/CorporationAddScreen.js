@@ -122,7 +122,7 @@ const WorkItemAddScreen = ({navigation, route}) => {
       phone_number,
       company,
       project_id: projectId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     await SqliteManager.updateWorkItem(workitem.id, newWorkItem);
@@ -165,7 +165,7 @@ const WorkItemAddScreen = ({navigation, route}) => {
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setCompany(text)}
+                onChangeText={(text) => setCompany(text)}
                 defaultValue={company}
                 value={company}
                 style={styles.input}
@@ -176,7 +176,7 @@ const WorkItemAddScreen = ({navigation, route}) => {
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setManager(text)}
+                onChangeText={(text) => setManager(text)}
                 defaultValue={manager}
                 value={manager}
                 style={styles.input}
@@ -187,7 +187,7 @@ const WorkItemAddScreen = ({navigation, route}) => {
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setPhone_Number(text)}
+                onChangeText={(text) => setPhone_Number(text)}
                 defaultValue={phone_number}
                 value={phone_number}
                 style={styles.input}
@@ -198,14 +198,14 @@ const WorkItemAddScreen = ({navigation, route}) => {
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setName(text)}
+                onChangeText={(text) => setName(text)}
                 defaultValue={name}
                 value={name}
                 style={styles.input}
               />
             </View>
           </View>
-          <View style={{height: 300}} />
+          <View style={{ height: 300 }} />
         </ScrollView>
       </SafeAreaView>
     </React.Fragment>

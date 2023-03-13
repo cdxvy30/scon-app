@@ -38,7 +38,6 @@ const CorporationListScreen = ({navigation, route}) => {
             onPress={() => {corporationAddHandler()}}
           />
         </React.Fragment>
-
       ),
     });
   }, [navigation]);
@@ -55,19 +54,6 @@ const CorporationListScreen = ({navigation, route}) => {
     //   setProjectId(project.id);
     //   setProject(project)
     // };
-
-    //參考用
-    // const getCorps = async () => {
-    //   try {
-    //     const res = await axios.get(`${BASE_URL}/corporations/list/${projectId}`);
-    //     const data = await res.data;
-    //     console.log('In get method corporations: \n', data);
-    //     options = data;
-    //   } catch (e) {
-    //     console.log(`Fetch corporation error: ${e}`);
-    //   }
-    // };
-    // await getCorps();
 
     const fetchCorporations = async () => {
       try{
