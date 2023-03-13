@@ -123,12 +123,6 @@ const IssueScreen = ({navigation, route}) => {
     const imageName = image.fileName;
     const transformedImageUri = imageUri.replace('file://', '');
 
-    const newAttachment = {
-      image: transformedImageUri,
-      remark: '',
-      issue_id: issueId,
-    };
-
     // ************************************************************ //
     const data = {
       projectId: projectId,
@@ -752,7 +746,7 @@ const IssueScreen = ({navigation, route}) => {
   //   else return PROJECT_STATUS.lowRisk.id;
   // };
 
-  // 重要!!!(處理labels)
+  // 重要(處理labels)
   useEffect(() => {
     // 取得照片標註
     const fetchLabels = async () => {
@@ -975,17 +969,6 @@ const IssueScreen = ({navigation, route}) => {
                 <Separator />
               </React.Fragment>
             ) : undefined}
-            <View style={styles.item}>
-              <Text style={styles.title}>追蹤缺失</Text>
-              <View style={{flexDirection: 'row'}}>
-                <Switch
-                  onValueChange={() => issueTrackToggleHandler()}
-                  value={issueTrack}
-                />
-              </View>
-            </View>
-          </View>
-          <View style={styles.group}>
             <TouchableOpacity onPress={IssueLocationListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失地點</Text>
@@ -1056,8 +1039,17 @@ const IssueScreen = ({navigation, route}) => {
                 </View>
               </TouchableOpacity>
             </View>
+            <Separator />
+            <View style={styles.item}>
+              <Text style={styles.title}>追蹤缺失</Text>
+              <View style={{flexDirection: 'row'}}>
+                <Switch
+                  onValueChange={() => issueTrackToggleHandler()}
+                  value={issueTrack}
+                />
+              </View>
+            </View>
           </View>
-
           <View style={styles.group}>
             {issueAttachments[0] ? (
               issueAttachments.map((a, i) => {
@@ -1106,7 +1098,7 @@ const IssueScreen = ({navigation, route}) => {
                 </TouchableOpacity>
               </View>
             )}
-            {/*
+            {/* 原寫法
               {issueAttachments ? (
                 issueAttachments.map((a, i) => {
                   return (
