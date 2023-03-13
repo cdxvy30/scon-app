@@ -39,10 +39,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Use camera for capture photos</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Use location to define issue location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Use location to define issue location</string>
-  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-  <string>Use location to define issue location</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Use camera for capture photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
