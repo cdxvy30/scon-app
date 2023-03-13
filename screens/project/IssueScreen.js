@@ -13,6 +13,7 @@ import Separator from '../../components/Separator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PhotoLabelViewer from './../../components/PhotoLabelViewer';
 import Share from 'react-native-share';
+import {Input} from 'react-native-elements';
 import {
   Alert,
   ActionSheetIOS,
@@ -88,6 +89,11 @@ const IssueScreen = ({navigation, route}) => {
 
   // 原本的方法可能有問題, 因為在IssueListScreen navigate過來的function內, attachments必為空陣列
   const [issueAttachments, setIssueAttachments] = useState(item.attachments);   // 缺失改善照片
+  const [issueAttachmentsRemark, setIssueAttachmentsRemark] = useState(
+    item.attachments[0].attachment_remark 
+    ? item.attachments[0].attachment_remark
+    : '' 
+  );
   const [issueLabels, setIssueLabels] = useState(transformLabels(item.labels)); // 缺失影像中的標註
   const [issueStatus, setIssueStatus] = useState(item.status);                  // 缺失風險高低
   const [keyboardOffset, setKeyboardOffset] = useState(0);                      // not sure what's this
@@ -114,15 +120,13 @@ const IssueScreen = ({navigation, route}) => {
   //     setIssueTaskText,
   //     setIssueAssigneeText,
   //     setIssueAssigneePhoneNumberText: assignee_phone_number =>{setIssueAssigneePhoneNumberText(assignee_phone_number)}
-
   //   })};
 
   // 新增缺失改善照片
+  // 作用時間: 有照片append時(不是按下完成時)
   const attachmentAddHandler = React.useCallback(async image => {
     const imageUri = image.uri;
     const imageName = image.fileName;
-    const transformedImageUri = imageUri.replace('file://', '');
-
     // ************************************************************ //
     const data = {
       projectId: projectId,
@@ -157,22 +161,6 @@ const IssueScreen = ({navigation, route}) => {
 
     console.log('In AddHandler: \n', issueAttachments);
     // ************************************************************ //
-
-    // await SqliteManager.createIssueAttachment(newAttachment);
-    
-    // // 可能會有多張缺失改善照片
-    // const allAttachments = await SqliteManager.getIssueAttachmentsByIssueId(
-    //   issueId,
-    // );
-    // const sortedAttachments = allAttachments.sort(
-    //   (a, b) => new Date(b.created_at) - new Date(a.created_at),
-    // );
-    // const latestAttachments = sortedAttachments[0];
-
-    // const newIssueAttachments = issueAttachments.concat(latestAttachments);
-    // console.log('IssueAttachments: ', newIssueAttachments);
-    // setIssueAttachments(newIssueAttachments);
-  
   }, [issueAttachments, issueId, projectCorporation, projectId, projectName, userInfo.token]);
 
   // 刪除缺失改善照片
@@ -205,16 +193,39 @@ const IssueScreen = ({navigation, route}) => {
 
 
   // 缺失改善備註
-  const remarkChangeHandler = async (index, remark) => {
-    const newIssueAttachments = issueAttachments;
-    newIssueAttachments[index].remark = remark;
+  const remarkChangeHandler = async () => {
+    // const remarkChangeHandler = async (index, remark) => {
+    // const newIssueAttachments = issueAttachments;
+    // newIssueAttachments[index].remark = remark;
 
-    const targetIssueAttachment = newIssueAttachments[index];
-    await SqliteManager.updateIssueAttachment(
-      targetIssueAttachment.id,
-      targetIssueAttachment,
-    );
-    setIssueAttachments(newIssueAttachments);
+    // ************************************************** //
+
+    axios({
+      method: 'patch',
+      url: `${BASE_URL}/attachments/remark/${issueId}`,
+      data: issueAttachmentsRemark,
+      headers: {
+        'Content-Type': 'applicationl/json',
+        Authorization: 'Bearer ' + `${userInfo.token}`,
+      },
+    })
+      .then(async (res) => {
+        let data = await res.data;
+        console.log(data);
+        setIssueAttachmentsRemark(data);
+      })
+      .catch((e) => {
+        console.log(`Update a remark error: ${e}`);
+      });
+
+    // ************************************************** //
+
+    // const targetIssueAttachment = newIssueAttachments[index];
+    // await SqliteManager.updateIssueAttachment(
+    //   targetIssueAttachment.id,
+    //   targetIssueAttachment,
+    // );
+    // setIssueAttachments(newIssueAttachments);
   };
 
   // 新增缺失改善照片
@@ -399,74 +410,14 @@ const IssueScreen = ({navigation, route}) => {
     navigation.navigate('CorporationList', {
       name: 'List all corporation',
       project_id: projectId,
-      setResponsibleCorporation
+      setResponsibleCorporation,  // not sure what's this.
     });
-
-    // Next line is Old version
-    // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
-    // var options = new Array();
-    
-    // // ************************************************************** //
-    // const getCorps = async () => {
-    //   try {
-    //     const res = await axios.get(`${BASE_URL}/corporations/list/${projectId}`);
-    //     const data = await res.data;
-    //     console.log('In get method corporations: \n', data);
-    //     options = data;
-    //   } catch (e) {
-    //     console.log(`Fetch corporation error: ${e}`);
-    //   }
-    // };
-    // await getCorps();
-    // // ************************************************************* //
-    // options.push({ corporation_name: '取消' });
-    // options.length === 1
-    //   ? Alert.alert(
-    //       '未新增任何協力廠商',
-    //       '請選擇',
-    //       [
-    //         {
-    //           text: '返回',
-    //           style: 'cancel',
-    //           onPress: () => {
-    //             return;
-    //           },
-    //         },
-    //         {
-    //           text: '新增',
-    //           onPress: () => {
-    //             navigation.navigate('CorporationAdd', {
-    //               name: 'Create new corporation',
-    //               projectId: projectId,
-    //             });
-    //           },
-    //         },
-    //       ],
-    //       'light',
-    //     )
-    //   : ActionSheetIOS.showActionSheetWithOptions(
-    //       {
-    //         options: options.map(item => item.corporation_name),
-    //         cancelButtonIndex: options.length - 1,
-    //         userInterfaceStyle: 'light',
-    //       },
-    //       buttonIndex => {
-    //         if (buttonIndex == options.length - 1) {
-    //           setResponsibleCorporation(responsibleCorporation);
-    //         } else {
-    //           setResponsibleCorporation(options[buttonIndex].corporation_name);
-    //           // setIssueAssigneeText(options[buttonIndex].corporation_manager);
-    //           // setIssueAssigneePhoneNumberText(
-    //           //   options[buttonIndex].corporation_phone,
-    //           // );
-    //         }
-    //       },
-    //     );
   };
 
   // 選取工項
   const workItemClickHandler = async () => {
-    var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
+    var options = new Array();
     options.push({company: '', name: '取消'});
     options.length == 1
       ? Alert.alert(
@@ -609,7 +560,7 @@ const IssueScreen = ({navigation, route}) => {
     route.params.violation_type,
   ]);
 
-  // !! 處理更新缺失動作
+  // 處理更新缺失動作
   const issueUpdateHandler = React.useCallback(async () => {
     // const transformedIssue = {
     //   image_uri: item.image.uri,
@@ -854,11 +805,11 @@ const IssueScreen = ({navigation, route}) => {
             else if (!issueLocationText) {
               Alert.alert('請點選缺失地點');
               return;
-            }/*
+            }
             else if (!responsibleCorporation) {
               Alert.alert('請點選責任廠商');
               return;
-            }*/
+            }
             else {
             // 將紀錄完成之缺失資料更新至後端
             // ************************************************************ //
@@ -877,6 +828,29 @@ const IssueScreen = ({navigation, route}) => {
               projectCorporation: projectCorporation,
             };
 
+            // remarkChangeHandler();
+            console.log(issueAttachmentsRemark);
+            const remark = { issueAttachmentsRemark };
+            console.log('Remark: \n', remark);
+
+            axios({
+              method: 'patch',
+              url: `${BASE_URL}/attachments/remark/${issueId}`,
+              data: remark,
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + `${userInfo.token}`,
+              },
+            })
+              .then(async (res) => {
+                let data = await res.data;
+                console.log(data);
+                setIssueAttachmentsRemark(data);
+              })
+              .catch((e) => {
+                console.log(`Update a remark error: ${e}`);
+              });
+
             // 按下"完成"Button會更新缺失資料到後端
             axios({
               method: 'patch',
@@ -888,7 +862,7 @@ const IssueScreen = ({navigation, route}) => {
               },
             })
               .then(async res => {
-                let issue_data = res.data;
+                let issue_data = await res.data;
                 console.log(issue_data);
               })
               .catch(e => {
@@ -900,7 +874,7 @@ const IssueScreen = ({navigation, route}) => {
         />
       ),
     });
-  }, [issueId, isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token]);
+  }, [issueId, isFocused, imageExportHandler, navigation, issueTrack, violationType, issueType, issueLocationText, issueTaskText, responsibleCorporation, issueAssigneeText, issueAssigneePhoneNumberText, issueSafetyManagerText, issueStatus, item.image.uri, item.image.fileName, projectId, projectName, projectCorporation, userInfo.token, issueAttachmentsRemark]);
 
   // 畫面欄位
   return (
@@ -1052,7 +1026,7 @@ const IssueScreen = ({navigation, route}) => {
           </View>
           <View style={styles.group}>
             {issueAttachments[0] ? (
-              issueAttachments.map((a, i) => {
+              issueAttachments.map((a, i) => {  // what is a?
                 return (
                   <View key={`issue_attachment_${i}`}>
                     <View style={{marginBottom: 15, ...styles.item}}>
@@ -1064,7 +1038,7 @@ const IssueScreen = ({navigation, route}) => {
                       <FastImage 
                         style={styles.itemImage} 
                         source={{
-                          uri: `${BASE_URL}/attachments/get/thumbnail/${issueAttachments[0].attachment_id}`,
+                          uri: `${BASE_URL}/attachments/thumbnail/${issueAttachments[0].attachment_id}`,
                         }}
                       />
                     </TouchableOpacity>
@@ -1074,9 +1048,10 @@ const IssueScreen = ({navigation, route}) => {
                         id={a.id}
                         key={a.id}
                         style={styles.textInput}
-                        onChangeText={text => remarkChangeHandler(i, text)}
-                        defaultValue={a.remark}
-                        onSubmitEditing={Keyboard.dismiss}
+                        onChangeText={(text) => setIssueAttachmentsRemark(text)}
+                        defaultValue={issueAttachmentsRemark}
+                        value={issueAttachmentsRemark}
+                        // onSubmitEditing={Keyboard.dismiss}
                       />
                     </View>
                   </View>
