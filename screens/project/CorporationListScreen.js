@@ -7,18 +7,17 @@ import { useIsFocused } from '@react-navigation/native';
 import { transformWorkItems } from '../../util/sqliteHelper';
 import Swipeout from 'react-native-swipeout';
 import {
-    Alert,
-    FlatList,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-  } from 'react-native';
+  Alert,
+  FlatList,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
-
 
 const CorporationListScreen = ({navigation, route}) => {
   const [corporationList, setCorporationList] = useState([]);

@@ -40,7 +40,7 @@ const RegisterScreen = ({navigation}) => {
           labelField="label"
           valueField="value"
           value={corporation}
-          onChange={item => {
+          onChange={(item) => {
             setCorporation(item.value);
           }}
           renderLeftIcon={() => (
@@ -51,7 +51,7 @@ const RegisterScreen = ({navigation}) => {
           style={styles.input}
           value={name}
           placeholder="輸入您的名字"
-          onChangeText={text => setName(text)}
+          onChangeText={(text) => setName(text)}
           leftIcon={
             <Icon
               name="user"
@@ -64,13 +64,13 @@ const RegisterScreen = ({navigation}) => {
         <Input
           value={email}
           placeholder="輸入信箱"
-          onChangeText={text => setEmail(text)}
+          onChangeText={(text) => setEmail(text)}
           leftIcon={<Icon name="envelope" type="font-awesome" size={20} />}
         />
         <Input
           value={password}
           placeholder="設定密碼"
-          onChangeText={text => setPassword(text)}
+          onChangeText={(text) => setPassword(text)}
           leftIcon={<Icon name="key" type="font-awesome" size={20} />}
           secureTextEntry
         />
