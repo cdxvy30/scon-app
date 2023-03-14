@@ -37,10 +37,6 @@ import {transformLabels} from '../../util/sqliteHelper';
 import {useIsFocused} from '@react-navigation/native';
 import {ISSUE_STATUS, getIssueStatusById} from './IssueEnum';
 import {ISSUE_TYPE} from '../../configs/issueTypeConfig';
-import {PROJECT_STATUS} from './ProjectEnum';
-import {transformIssues} from '../../util/sqliteHelper';
-import {WorkItemList} from './WorkItemListScreen';
-import {ButtonGroup} from 'react-native-elements';
 import {BASE_URL} from '../../configs/authConfig';
 import axios from 'axios';
 import Geolocation from '@react-native-community/geolocation';
@@ -70,6 +66,11 @@ const IssueScreen = ({navigation, route}) => {
       : item.violation_type,
   );
   const [issueType, setIssueType] = useState(item.type);                        // 缺失項目
+  const [issueCaption, setIssueCaption] = useState(
+    route.params.caption
+    ? route.params.caption
+    : item.caption
+  );
   // const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);     // if 類別=='其他' 這裡要填項目說明
   const [issueTrack, setIssueTrack] = useState(item.tracking);                  // 追蹤與否
   const [issueLocationText, setIssueLocationText] = useState(item.location);    // 缺失地點
@@ -410,53 +411,18 @@ const IssueScreen = ({navigation, route}) => {
     navigation.navigate('CorporationList', {
       name: 'List all corporation',
       project_id: projectId,
-      setResponsibleCorporation,  // not sure what's this.
+      setResponsibleCorporation,
     });
   };
 
   // 選取工項
-  const workItemClickHandler = async () => {
+  const taskClickHandler = async () => {
     // var options = await SqliteManager.getWorkItemsByProjectId(projectId);
-    var options = new Array();
-    options.push({company: '', name: '取消'});
-    options.length == 1
-      ? Alert.alert(
-          '未新增任何協力廠商',
-          '請選擇',
-          [
-            {
-              text: '返回',
-              style: 'cancel',
-              onPress: () => {
-                return;
-              },
-            },
-            {
-              text: '新增',
-              onPress: () => {
-                navigation.navigate('CorporationAdd', {
-                  name: 'Create new corporation',
-                  projectId: projectId,
-                });
-              },
-            },
-          ],
-          'light',
-        )
-      : ActionSheetIOS.showActionSheetWithOptions(
-          {
-            options: options.map(item => `${item.company} ${item.name}`),
-            cancelButtonIndex: options.length - 1,
-            userInterfaceStyle: 'light',
-          },
-          buttonIndex => {
-            if (buttonIndex == options.length - 1) {
-              setIssueTaskText(issueTaskText);
-            } else {
-              setIssueTaskText(options[buttonIndex].name);
-            }
-          },
-        );
+    navigation.navigate('TaskList', {
+      name: 'List all tasks',
+      project_id: projectId,
+      setIssueTaskText,
+    });
   };
 
   // 導向IssueLocationListScreen, 選擇缺失地點
@@ -943,6 +909,19 @@ const IssueScreen = ({navigation, route}) => {
                 <Separator />
               </React.Fragment>
             ) : undefined}
+            <React.Fragment>
+                <View style={styles.item}>
+                  <Text style={styles.title}>缺失描述</Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <TextInput
+                      style={styles.textInput}
+                      onChangeText={setIssueCaption}
+                      defaultValue={issueCaption}
+                    />
+                  </View>
+                </View>
+                <Separator />
+              </React.Fragment>
             <TouchableOpacity onPress={IssueLocationListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失地點</Text>
@@ -975,7 +954,7 @@ const IssueScreen = ({navigation, route}) => {
               </View>
             </TouchableOpacity>
             <Separator />
-            <TouchableOpacity onPress={workItemClickHandler}>
+            <TouchableOpacity onPress={taskClickHandler}>
               <View style={styles.item}>
                 <Text style={{fontSize: 18, color: '#8C8C8C'}}>工項(選填)</Text>
                 <View style={{flexDirection: 'row'}}>

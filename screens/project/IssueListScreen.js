@@ -195,10 +195,12 @@ const IssueListScreen = ({navigation, route}) => {
         //handle success
         //console.log(response.data);
         setIsDedecting(false);
+        console.log(response.data);
         navigation.navigate('Issue', {
           project: project,
           action: 'create new issue',
           violation_type: response.data.violation_type,
+          caption: response.data.caption,
           item: CreateItemByImage(image, attach),
         });
       })
@@ -206,11 +208,11 @@ const IssueListScreen = ({navigation, route}) => {
         //handle error
         setIsDedecting(false);
         Alert.alert('辨識失敗');
-        console.log(response);
         navigation.navigate('Issue', {
           project: project,
           action: 'create new issue',
           violation_type: '',
+          caption: '',
           item: CreateItemByImage(image, attach),
         });
         console.log(e);
@@ -672,6 +674,7 @@ const IssueListScreen = ({navigation, route}) => {
       title: '',
       type: '',
       violation_type: '',
+      caption: '',
       image,
       status: ISSUE_STATUS.lowRisk.id,
       tracking: true,

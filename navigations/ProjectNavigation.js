@@ -9,10 +9,12 @@ import PhotoScreen from '../screens/project/PhotoScreen';
 import ObjectTypeSelectorScreen from '../screens/project/selector/ObjectTypeSelectorScreen';
 import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelectorScreen';
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
-import IssueLocationListScreen from '../screens/project/IssueLocationListScreen'
-import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen'
-import CorporationAddScreen from '../screens/setting/CorporationAddScreen'
-import CorporationListScreen from '../screens/project/CorporationListScreen'
+import IssueLocationListScreen from '../screens/project/IssueLocationListScreen';
+import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen';
+import CorporationAddScreen from '../screens/setting/CorporationAddScreen';
+import CorporationListScreen from '../screens/project/CorporationListScreen';
+import TaskAddScreen from '../screens/project/TaskAddScreen';
+import TaskListScreen from '../screens/project/TaskListScreen';
 
 import RemoteImageWithSketch from '../screens/project/RemoteImageWithSketch';
 
@@ -73,6 +75,16 @@ const ProjectNavigation = ({navigation}) => {
           name="CorporationAdd"
           component={CorporationAddScreen}
           options={{title: '新增廠商'}}
+        />
+        <Stack.Screen
+          name="TaskList"
+          component={TaskListScreen}
+          options={{title: '工項列表'}}
+        />
+        <Stack.Screen
+          name="TaskAdd"
+          component={TaskAddScreen}
+          options={{title: '新增工項'}}
         />
         <Stack.Screen
           name="DateSelector"
