@@ -183,6 +183,7 @@ const IssueListScreen = ({navigation, route}) => {
       name: image.fileName,
       type: 'image/jpg',
     });
+    var attach = new Object();
     axios({
       method: 'post',
       url: 'http://34.80.209.101:8000/predict',
@@ -198,7 +199,7 @@ const IssueListScreen = ({navigation, route}) => {
           project: project,
           action: 'create new issue',
           violation_type: response.data.violation_type,
-          item: CreateItemByImage(image),
+          item: CreateItemByImage(image, attach),
         });
       })
       .catch(e => {
@@ -210,7 +211,7 @@ const IssueListScreen = ({navigation, route}) => {
           project: project,
           action: 'create new issue',
           violation_type: '',
-          item: CreateItemByImage(image),
+          item: CreateItemByImage(image, attach),
         });
         console.log(e);
       });
@@ -663,7 +664,7 @@ const IssueListScreen = ({navigation, route}) => {
   ];
 
   // 在detectViolationTypeThenSwitchToIssueScreen中觸發
-  const CreateItemByImage = image => {
+  const CreateItemByImage = (image, attach) => {
     image.uri = image.uri.replace('file://', '');
 
     return {
@@ -680,7 +681,7 @@ const IssueListScreen = ({navigation, route}) => {
       assignee_phone_number: '',
       responsible_corporation: '',
       safetyManager: project.inspector,
-      attachments: [],
+      attachments: [attach],
       labels: [],
       timestamp: new Date().toLocaleString(),
     };
