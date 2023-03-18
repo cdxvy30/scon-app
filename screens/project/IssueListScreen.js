@@ -42,6 +42,7 @@ import {
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
 import { BASE_URL } from '../../configs/authConfig';
+import { MultipleSelectList } from 'react-native-dropdown-select-list'
 // import { MobileModel, Image } from "react-native-pytorch-core";
 
 // 定義缺失風險指標
@@ -67,6 +68,7 @@ const IssueListScreen = ({navigation, route}) => {
   const [isDedecting, setIsDedecting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [popUpMenuVisible, setPopUpMenuVisible] = useState(false)
+  const [selectedSearch, setSelectedSearch] = React.useState("");
   const popUpMenuScale = useRef(new Animated.Value(0)).current
   const isFocused = useIsFocused();
   const { config, fs } = RNFetchBlob;
@@ -121,7 +123,7 @@ const IssueListScreen = ({navigation, route}) => {
     let issueId = item.issue_id;
     setSelectedIssueId(item.issue_id);
     console.log('item',item);
-
+    
     var attach;
     await axios({
       methods: 'get',
@@ -607,7 +609,7 @@ const IssueListScreen = ({navigation, route}) => {
             (a, b) => new Date(b.create_at) - new Date(a.create_at)
           )
           setIssueList(sortIssues);
-          setSelectedIssueList(issuesFilter(sortIssues));
+          selectedEndDate? setSelectedIssueList(issuesFilter(sortIssues)) : setSelectedIssueList('');
         })
         .catch((e) => {
           console.log(`List issues error: ${e}`);
@@ -626,7 +628,7 @@ const IssueListScreen = ({navigation, route}) => {
       fetchIssues();
       deleteTmpFiles();
     }
-  }, [isFocused, project.project_id]);
+  }, [isFocused, project.project_id, selectedSearch]);
   // **************************************** //
 
   // 頂端列按鈕行為: 時間排序/依日期篩選/匯出缺失記錄表
@@ -982,6 +984,27 @@ const IssueListScreen = ({navigation, route}) => {
     }).start(() => to === 0 && setPopUpMenuVisible(false));
   }
 
+  const search_option =[
+    {key:'1', value:'已改善', disabled:true},
+    {key:'2', value:'是'},
+    {key:'3', value:'否'},
+    {key:'4', value:'風險狀態', disabled:true},
+    {key:'5', value:'無風險'},
+    {key:'6', value:'有風險，須改善'},
+    {key:'7', value:'有風險，須立即改善'},
+    {key:'8', value:'缺失類別', disabled:true},
+    {key:'9', value:'墜落'},
+    {key:'10', value:'機械'},
+    {key:'11', value:'物料'},
+    {key:'12', value:'感電'},
+    {key:'13', value:'防護具'},
+    {key:'14', value:'穿刺'},
+    {key:'15', value:'爆炸'},
+    {key:'16', value:'工作場所'},
+    {key:'17', value:'搬運'},
+    {key:'18', value:'其他'},
+  ]
+
   // List中各單獨元件
   const Item = ({item, onPress, backgroundColor, textColor}) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
@@ -1132,6 +1155,49 @@ const IssueListScreen = ({navigation, route}) => {
           </SafeAreaView>
         </Modal>
         <SafeAreaView style={styles.container}>
+          <View style={{paddingHorizontal:5, backgroundColor:'white'}}>
+            <MultipleSelectList 
+            setSelected={async(val) => {
+              setSelectedSearch(val)
+              // await selectedSearch.map((key) =>{
+              //   switch (parseInt(key)) {
+              //     case 2:
+              //       break;
+              //     case 3:
+              //       break;
+              //     case 5:
+              //       break;
+              //     case 6:
+              //       break;
+              //     case 7:
+              //       break;
+              //   }
+              // })
+            }} 
+            data={search_option}
+            save="key"
+            label="已選擇："
+            placeholder='點撃選擇欲顯示缺失之條件'
+            searchPlaceholder='請輸入關鍵字'
+            notFoundText='找不到'
+            arrowicon={<Icon name="chevron-down" type={'font-awesome'} size={12} color={'black'} />} 
+            searchicon={<Icon name="search" type={'font-awesome'} size={12} color={'black'} />}
+            closeicon={<Icon name="check" type={'font-awesome'} size={20} color={'black'} />}
+            boxStyles={{borderColor: '#ccc'}}
+            // search={false}
+            inputStyles={{marginLeft:10, placeholderTextColor:'#aaa', fontSize:16}}
+            dropdownStyles={{marginBottom:10}}
+            dropdownItemStyles={{paddingVertical:15}}
+            dropdownTextStyles={{fontSize:18}}
+            disabledItemStyles={{paddingVertical:15}}
+            disabledTextStyles={{fontSize:18, color:'#999'}}
+            checkBoxStyles={{width:20, height:20}}
+            disabledCheckBoxStyles={{width:0, height:0}}
+            badgeStyles={{backgroundColor:'#fff', borderWidth:1, borderColor:'#ccc'}}
+            badgeTextStyles={{fontSize:14, color:'dodgerblue'}}
+            labelStyles={{fontSize:18, color:'#333'}}
+            />
+          </View>
           <FlatList
             ListHeaderComponent={<Separator />}
             data={selectedEndDate ? selectedIssueList : issueList}
