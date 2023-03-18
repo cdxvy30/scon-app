@@ -912,7 +912,7 @@ const IssueScreen = ({navigation, route}) => {
             <React.Fragment>
                 <View style={styles.item}>
                   <Text style={styles.title}>缺失描述</Text>
-                  <View style={{flexDirection: 'row'}}>
+                  <View>
                     <TextInput
                       style={styles.textInput}
                       onChangeText={setIssueCaption}
@@ -980,18 +980,18 @@ const IssueScreen = ({navigation, route}) => {
               </View>
             </View>
             <Separator /> */}
-            <View style={styles.item}>
-              <Text style={styles.title}>狀態</Text>
-              <TouchableOpacity onPress={() => issueStatusClickHandler()}>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.textInput}>
-                    {!!getIssueStatusById(issueStatus)
-                      ? getIssueStatusById(issueStatus).name
-                      : undefined}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={() => issueStatusClickHandler()}>
+              <View style={styles.item}>
+                <Text style={styles.title}>狀態</Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.textInput}>
+                      {!!getIssueStatusById(issueStatus)
+                        ? getIssueStatusById(issueStatus).name
+                        : undefined}
+                    </Text>
+                  </View>
+              </View>
+            </TouchableOpacity>
             <Separator />
             <View style={styles.item}>
               <Text style={styles.title}>追蹤缺失</Text>
