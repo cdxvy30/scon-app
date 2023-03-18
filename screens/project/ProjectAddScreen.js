@@ -45,6 +45,12 @@ const ProjectAddScreen = ({navigation, route}) => {
     if (!name) {
       Alert.alert('請填入工地名稱');
       return;
+    }else if(!address){
+      Alert.alert('請填入工地地址');
+      return;
+    }else if(!thumbnail){
+      Alert.alert('請選擇專案圖片');
+      return;
     }
 
     const users = await SqliteManager.getAllUsers(); // 改成從伺服器fetch
@@ -109,6 +115,12 @@ const ProjectAddScreen = ({navigation, route}) => {
   const projectUpdateHandler = React.useCallback(async () => {
     if (!name) {
       Alert.alert('請填入工地名稱');
+      return;
+    }else if(!address){
+      Alert.alert('請填入工地地址');
+      return;
+    }else if(!thumbnail){
+      Alert.alert('請選擇專案圖片');
       return;
     }
 
