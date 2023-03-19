@@ -288,7 +288,7 @@ const IssueListScreen = ({navigation, route}) => {
     if (isFocused) {
       deleteTmpFiles();
     }
-  }, [isFocused, project.project_id, selectedSearch]);
+  }, [isFocused, project.project_id, selectedSearch, selectedEndDate]);
   // **************************************** //
 
   // 篩選issues
