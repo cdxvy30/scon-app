@@ -46,10 +46,6 @@ const PopUpMenu = ({
     const projectName = project.project_name;
     const { config, fs } = RNFetchBlob;
     const { userInfo } = useContext(AuthContext);
-    
-    console.log('in pop up menu')
-    console.log('issueList',issueList)
-    console.log('selectissueList', selectedIssueList)
 
     // popUp功能選單的動畫及顯示控制 
     function resizePopUpMenu(to){

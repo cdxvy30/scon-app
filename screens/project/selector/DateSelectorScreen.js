@@ -12,7 +12,7 @@ const DateSelectorScreen = ({navigation, route}) => {
     const [ selectedEndDate_1, setSelectedEndDate_1] = useState(null);
     const startDate  =  selectedStartDate_1 ? new Date(selectedStartDate_1).toLocaleDateString() : '';
     const endDate = selectedEndDate_1 ? new Date(selectedEndDate_1).toLocaleDateString() : '';
-    console.log('好',new Date(selectedStartDate_1).getTime())
+    
     const onDateChange = (date, type) => {
         if (type === 'END_DATE') {
           route.params.setSelectedEndDate(date);

@@ -1,15 +1,10 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useState, useContext, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActionSheetIOS,
   ActivityIndicator,
   Alert,
-  Animated,
-  Easing,
-  Button,
   FlatList,
-  Image,
-  Modal,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -25,13 +20,7 @@ import {Badge, Icon} from 'react-native-elements';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import SqliteManager from '../../services/SqliteManager';
 import RNFetchBlob from 'rn-fetch-blob';
-import Share from 'react-native-share';
 import {useIsFocused} from '@react-navigation/native';
-import {
-  transformIssues,
-  transformExportIssues,
-  transformExportIssues_excel,
-} from '../../util/sqliteHelper';
 import {ISSUE_STATUS} from './IssueEnum';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
@@ -54,13 +43,14 @@ const IssueListScreen = ({navigation, route}) => {
   // const project = route.params;
   const [project, setProject] = useState(route.params.project);
   const [issueList, setIssueList] = useState([]);
-  const [selectedIssueList, setSelectedIssueList] = useState(issueList);
+  const [selectedIssueList, setSelectedIssueList] = useState([]);
+  const [filteredIssueList, setFilterIssueList] = useState([])
   const [selectedIssueId, setSelectedIssueId] = useState(null);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [isDedecting, setIsDedecting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [selectedSearch, setSelectedSearch] = React.useState("");
+  const [selectedSearch, setSelectedSearch] = useState([]);
   const isFocused = useIsFocused();
 
   function issuesFilter(Issues) {
@@ -92,7 +82,7 @@ const IssueListScreen = ({navigation, route}) => {
         text: '確定',
         onPress: async () => {
           await SqliteManager.deleteIssue(selectedIssueId);
-          selectedEndDate
+          selectedEndDate || filteredIssueList.length !== 0 
             ? setSelectedIssueList(
                 issueList.filter(i => i.id !== selectedIssueId),
               )
@@ -276,7 +266,7 @@ const IssueListScreen = ({navigation, route}) => {
             (a, b) => new Date(b.create_at) - new Date(a.create_at)
           )
           setIssueList(sortIssues);
-          selectedEndDate? setSelectedIssueList(issuesFilter(sortIssues)) : setSelectedIssueList('');
+          selectedEndDate? setFilterIssueList(issuesFilter(sortIssues)) : setFilterIssueList('');
         })
         .catch((e) => {
           console.log(`List issues error: ${e}`);
@@ -291,11 +281,153 @@ const IssueListScreen = ({navigation, route}) => {
       }
     }
 
-    if (isFocused) {
+    if (selectedSearch.length===0){
       fetchIssues();
+    }
+
+    if (isFocused) {
       deleteTmpFiles();
     }
-  }, [isFocused, project.project_id]);
+  }, [isFocused, project.project_id, selectedSearch]);
+  // **************************************** //
+
+  // 篩選issues
+  // **************************************** //
+  useEffect(() => {
+    const toFilterIssues = async () => {
+      var filteredIssue = []
+      try{
+        selectedSearch.map((key)=>{
+          switch(key){
+            // 是否已改善
+            case '2':
+              return;
+            case '3':
+              return;
+            // 有沒有辦法在外面就得知issue有沒有改善？
+            // selectedIssueList ?
+            //   selectedIssueList.map((issue) => {
+            //     if issue
+            //   })
+
+            //風險評級
+            case '5':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 0)))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 0))
+              }
+              return;
+            case '6':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 1)))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 1))
+              }
+              return;
+            case '7':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 2)))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 2))
+              }
+              return;
+
+            //缺失項目
+            case '9':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '墜落')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '墜落'))
+              }
+              return;
+            case '10':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '機械')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '機械'))
+              }
+              return;            
+            case '11':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '物料')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '物料'))
+              }
+              return;
+            case '12':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '感電')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '感電'))
+              }
+              return;
+            case '13':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '防護具')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '防護具'))
+              }
+              return;
+            case '14':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '穿刺')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '穿刺'))
+              }
+              return;
+            case '15':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '爆炸')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '爆炸'))
+              }
+              return;                          
+            case '16':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '工作場所')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '工作場所'))
+              }
+              return;     
+            case '17':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '搬運')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '搬運'))
+              }
+              return;    
+            case '18':
+              if(selectedEndDate){
+                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '其他')))
+              }else{
+                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '其他'))
+              }
+              return;     
+  
+          }
+        })
+      }
+      catch(e){
+        console.log(e)
+      }
+      finally{
+        setFilterIssueList(filteredIssue.filter((issue, index)=> filteredIssue.indexOf(issue) === index))
+      }
+    };
+    if (selectedSearch.length!==0){
+      toFilterIssues()
+    }
+    console.log('sorr',...improvement_option.map((item)=> {
+      if(!selectedSearch.some(a => a === '2' || a === '3')){
+        return item
+      }
+      // else{
+      //   return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
+      // }
+    }))
+
+  }, [selectedSearch, selectedEndDate]);
   // **************************************** //
 
   // 頂端列按鈕行為: 時間排序/依日期篩選/匯出缺失記錄表
@@ -355,14 +487,18 @@ const IssueListScreen = ({navigation, route}) => {
   };
 
   // 搜尋欄的選項
-  const search_option =[
+  const improvement_option =[
     {key:'1', value:'已改善', disabled:true},
     {key:'2', value:'是'},
     {key:'3', value:'否'},
+  ]
+  const status_option =[
     {key:'4', value:'風險狀態', disabled:true},
     {key:'5', value:'無風險'},
     {key:'6', value:'有風險，須改善'},
     {key:'7', value:'有風險，須立即改善'},
+  ]
+  const violationType_option =[
     {key:'8', value:'缺失類別', disabled:true},
     {key:'9', value:'墜落'},
     {key:'10', value:'機械'},
@@ -375,6 +511,7 @@ const IssueListScreen = ({navigation, route}) => {
     {key:'17', value:'搬運'},
     {key:'18', value:'其他'},
   ]
+  
 
   // List中各單獨元件
   const Item = ({item, onPress, backgroundColor, textColor}) => (
@@ -477,7 +614,38 @@ const IssueListScreen = ({navigation, route}) => {
           <View style={{paddingHorizontal:5, backgroundColor:'white'}}>
             <MultipleSelectList 
             setSelected={(val) => {setSelectedSearch(val)}}
-            data={search_option}
+            data={[
+                // improvement_option.map((item)=> {
+                //   if(!selectedSearch.some(a => a === '2' || a === '3')){
+                //     return item
+                //   }
+                //   else{
+                //     return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
+                //   }
+                // }).concat(
+                //   status_option.map((item)=> {
+                //     if(!selectedSearch.some(a => a === '5' || a === '6' || a === '7')){
+                //       return item
+                //     }
+                //     else{
+                //       return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
+                //     }
+                //   })
+                // ).concat(
+                //   violationType_option.map((item)=> {
+                //     if(!selectedSearch.some(a => a === '5' || a === '6' || a === '7')){
+                //       return item
+                //     }
+                //     else{
+                //       return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
+                //     }
+                //   })
+                // )
+              
+              ...improvement_option,
+              ...status_option,
+              ...violationType_option
+            ]}
             // search={false}
             save="key"
             label="已選擇："
@@ -503,7 +671,7 @@ const IssueListScreen = ({navigation, route}) => {
           </View>
           <FlatList
             ListHeaderComponent={<Separator />}
-            data={selectedEndDate ? selectedIssueList : issueList}
+            data={selectedEndDate || filteredIssueList.length!==0 ? filteredIssueList : issueList}
             // data={issueList}
             renderItem={renderItem}
             keyExtractor={item => item.issue_id}
