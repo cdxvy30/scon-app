@@ -91,7 +91,7 @@ const IssueScreen = ({navigation, route}) => {
   // 原本的方法可能有問題, 因為在IssueListScreen navigate過來的function內, attachments必為空陣列
   const [issueAttachments, setIssueAttachments] = useState(item.attachments);   // 缺失改善照片
   const [issueAttachmentsRemark, setIssueAttachmentsRemark] = useState(
-    item.attachments[0].attachment_remark 
+    item.attachments.length > 0
     ? item.attachments[0].attachment_remark
     : '' 
   );
@@ -724,13 +724,13 @@ const IssueScreen = ({navigation, route}) => {
     issueUpdateHandler,
   ]);
 
-  useEffect(() => {
-    issueId && issueAttachments && attachmentAddHandler();
-  }, [
-    issueId,
-    issueAttachments,
-    attachmentAddHandler,
-  ]);
+  // useEffect(() => {
+  //   issueId && issueAttachments && attachmentAddHandler();
+  // }, [
+  //   issueId,
+  //   issueAttachments,
+  //   attachmentAddHandler,
+  // ]);
 
   // 功能未知: 應不影響其他功能
   useEffect(() => {

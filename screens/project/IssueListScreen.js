@@ -14,7 +14,10 @@ import {
 } from 'react-native';
 import Swipeout from 'react-native-swipeout';
 import Separator from '../../components/Separator';
-import PopUpMenu from '../../components/PopUpMenu';
+// import PopUpMenu from '../../components/PopUpMenu';
+import SortButton from '../../components/SortButton';
+import ExportButton from '../../components/ExportButton';
+import FilterButton from '../../components/FilterButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Badge, Icon} from 'react-native-elements';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -83,7 +86,7 @@ const IssueListScreen = ({navigation, route}) => {
         onPress: async () => {
           await SqliteManager.deleteIssue(selectedIssueId);
           selectedEndDate || filteredIssueList.length !== 0 
-            ? setSelectedIssueList(
+            ? setFilterIssueList(
                 issueList.filter(i => i.id !== selectedIssueId),
               )
             : setIssueList(issueList.filter(i => i.id !== selectedIssueId));
@@ -170,7 +173,6 @@ const IssueListScreen = ({navigation, route}) => {
       name: image.fileName,
       type: 'image/jpg',
     });
-    var attach = new Object();
     axios({
       method: 'post',
       url: 'http://34.80.209.101:8000/predict',
@@ -188,7 +190,7 @@ const IssueListScreen = ({navigation, route}) => {
           action: 'create new issue',
           violation_type: response.data.violation_type,
           caption: response.data.caption,
-          item: CreateItemByImage(image, attach),
+          item: CreateItemByImage(image),
         });
       })
       .catch(e => {
@@ -200,7 +202,7 @@ const IssueListScreen = ({navigation, route}) => {
           action: 'create new issue',
           violation_type: '',
           caption: '',
-          item: CreateItemByImage(image, attach),
+          item: CreateItemByImage(image),
         });
         console.log(e);
       });
@@ -305,8 +307,8 @@ const IssueListScreen = ({navigation, route}) => {
             case '3':
               return;
             // 有沒有辦法在外面就得知issue有沒有改善？
-            // selectedIssueList ?
-            //   selectedIssueList.map((issue) => {
+            // filteredIssueList ?
+            //   filteredIssueList.map((issue) => {
             //     if issue
             //   })
 
@@ -434,22 +436,31 @@ const IssueListScreen = ({navigation, route}) => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <PopUpMenu 
-          project={project}
-          selectedStartDate={selectedStartDate}
+        <React.Fragment>
+          <SortButton 
+            selectedEndDate={selectedEndDate}
+            filteredIssueList={filteredIssueList}
+            setFilterIssueList={setFilterIssueList}
+            issueList={issueList}
+            setIssueList={setIssueList}
+          />
+          <FilterButton 
           setSelectedStartDate={setSelectedStartDate}
-          selectedEndDate={selectedEndDate}
           setSelectedEndDate={setSelectedEndDate}
-          selectedIssueList={selectedIssueList}
-          setSelectedIssueList={setSelectedIssueList}
-          issueList={issueList}
-          setIssueList={setIssueList}
-          setIsExporting={setIsExporting} 
           navigation={navigation}
-        />
+          />
+          <ExportButton 
+            project={project}
+            selectedStartDate={selectedStartDate}
+            selectedEndDate={selectedEndDate}
+            filteredIssueList={filteredIssueList}
+            issueList={issueList}
+            setIsExporting={setIsExporting} 
+          />
+        </React.Fragment>
       ),
     });
-  }, [navigation, issueList, selectedIssueList]);
+  }, [navigation, issueList, filteredIssueList]);
 
   // 右滑刪除動作, 實作在Swipeout元件中
   const swipeBtns = [
@@ -462,7 +473,7 @@ const IssueListScreen = ({navigation, route}) => {
   ];
 
   // 在detectAndSwitchToIssueScreen中觸發
-  const CreateItemByImage = (image, attach) => {
+  const CreateItemByImage = (image) => {
     image.uri = image.uri.replace('file://', '');
 
     return {
@@ -472,7 +483,7 @@ const IssueListScreen = ({navigation, route}) => {
       violation_type: '',
       caption: '',
       image,
-      status: ISSUE_STATUS.lowRisk.id,
+      status: ISSUE_STATUS.mediumRisk.id,
       tracking: true,
       location: '',
       activity: '',
@@ -480,7 +491,7 @@ const IssueListScreen = ({navigation, route}) => {
       assignee_phone_number: '',
       responsible_corporation: '',
       safetyManager: project.inspector,
-      attachments: [attach],
+      attachments: [],
       labels: [],
       timestamp: new Date().toLocaleString(),
     };
@@ -611,42 +622,15 @@ const IssueListScreen = ({navigation, route}) => {
     return (
       <React.Fragment>
         <SafeAreaView style={styles.container}>
-          <View style={{paddingHorizontal:5, backgroundColor:'white'}}>
+          {/* <View style={{paddingHorizontal:5, backgroundColor:'white'}}>
             <MultipleSelectList 
             setSelected={(val) => {setSelectedSearch(val)}}
             data={[
-                // improvement_option.map((item)=> {
-                //   if(!selectedSearch.some(a => a === '2' || a === '3')){
-                //     return item
-                //   }
-                //   else{
-                //     return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
-                //   }
-                // }).concat(
-                //   status_option.map((item)=> {
-                //     if(!selectedSearch.some(a => a === '5' || a === '6' || a === '7')){
-                //       return item
-                //     }
-                //     else{
-                //       return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
-                //     }
-                //   })
-                // ).concat(
-                //   violationType_option.map((item)=> {
-                //     if(!selectedSearch.some(a => a === '5' || a === '6' || a === '7')){
-                //       return item
-                //     }
-                //     else{
-                //       return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
-                //     }
-                //   })
-                // )
-              
               ...improvement_option,
               ...status_option,
               ...violationType_option
             ]}
-            // search={false}
+            search={false}
             save="key"
             label="已選擇："
             placeholder='點撃選擇欲顯示缺失之條件'
@@ -668,7 +652,7 @@ const IssueListScreen = ({navigation, route}) => {
             badgeTextStyles={{fontSize:14, color:'dodgerblue'}}
             labelStyles={{fontSize:18, color:'#333'}}
             />
-          </View>
+          </View> */}
           <FlatList
             ListHeaderComponent={<Separator />}
             data={selectedEndDate || filteredIssueList.length!==0 ? filteredIssueList : issueList}
