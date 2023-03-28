@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {
   ActionSheetIOS,
   ActivityIndicator,
@@ -24,6 +24,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import SqliteManager from '../../services/SqliteManager';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useIsFocused} from '@react-navigation/native';
+import { AuthContext } from "../../context/AuthContext";
 import {ISSUE_STATUS} from './IssueEnum';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
@@ -55,6 +56,8 @@ const IssueListScreen = ({navigation, route}) => {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedSearch, setSelectedSearch] = useState([]);
   const isFocused = useIsFocused();
+
+  const {userInfo} = useContext(AuthContext);
 
   function issuesFilter(Issues) {
     var a = [];
@@ -433,42 +436,50 @@ const IssueListScreen = ({navigation, route}) => {
 
   // 頂端列按鈕行為: 時間排序/依日期篩選/匯出缺失記錄表
   React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <React.Fragment>
-          <SortButton 
-            selectedEndDate={selectedEndDate}
-            filteredIssueList={filteredIssueList}
-            setFilterIssueList={setFilterIssueList}
-            issueList={issueList}
-            setIssueList={setIssueList}
-          />
-          <FilterButton 
-          setSelectedStartDate={setSelectedStartDate}
-          setSelectedEndDate={setSelectedEndDate}
-          navigation={navigation}
-          />
-          <ExportButton 
-            project={project}
-            selectedStartDate={selectedStartDate}
-            selectedEndDate={selectedEndDate}
-            filteredIssueList={filteredIssueList}
-            issueList={issueList}
-            setIsExporting={setIsExporting} 
-          />
-        </React.Fragment>
-      ),
-    });
+    navigation.setOptions(
+      userInfo.user.permission != '訪客' ?
+      {
+        headerRight: () => (
+          <React.Fragment>
+            <SortButton 
+              selectedEndDate={selectedEndDate}
+              filteredIssueList={filteredIssueList}
+              setFilterIssueList={setFilterIssueList}
+              issueList={issueList}
+              setIssueList={setIssueList}
+            />
+            <FilterButton 
+            setSelectedStartDate={setSelectedStartDate}
+            setSelectedEndDate={setSelectedEndDate}
+            navigation={navigation}
+            />
+            <ExportButton 
+              project={project}
+              selectedStartDate={selectedStartDate}
+              selectedEndDate={selectedEndDate}
+              filteredIssueList={filteredIssueList}
+              issueList={issueList}
+              setIsExporting={setIsExporting} 
+            />
+          </React.Fragment>
+        )
+      }
+      :
+      {}
+    );
   }, [navigation, issueList, filteredIssueList]);
 
   // 右滑刪除動作, 實作在Swipeout元件中
   const swipeBtns = [
+    userInfo.user.permission != '訪客' ?
     {
       text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
       backgroundColor: 'red',
       underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
       onPress: () => issueDeleteHandler(),
-    },
+    }
+    :
+    {},
   ];
 
   // 在detectAndSwitchToIssueScreen中觸發
@@ -594,7 +605,7 @@ const IssueListScreen = ({navigation, route}) => {
           <Item
             key={`${item.issue_id}`}
             item={item}
-            onPress={() => issueSelectHandler(item)}
+            onPress={() => userInfo.user.permission != '訪客'? issueSelectHandler(item) : {}}
             backgroundColor={{backgroundColor}}
             textColor={{color}}
           />
@@ -604,21 +615,27 @@ const IssueListScreen = ({navigation, route}) => {
     );
   };
 
-  // 缺失表單生成中 或 缺失類別辨識中, 顯示loading畫面
-  if (isExporting === true || isDedecting === true) {
-    return (
-      <React.Fragment>
+  return(
+    // 缺失表單生成中 或 缺失類別辨識中, 顯示loading畫面
+    <React.Fragment>
+      {isExporting &&
         <SafeAreaView style={styles.container}>
           <View style={styles.loading_container}>
             <ActivityIndicator size="large" color="#000000" />
             <Text style={[styles.loading_text]}>缺失表單生成中...</Text>
           </View>
         </SafeAreaView>
-      </React.Fragment>
-    );
-  } else {  // 正常顯示issueList情況
-    return (
-      <React.Fragment>
+      } 
+      {isDedecting &&
+        <SafeAreaView style={styles.container}>
+          <View style={styles.loading_container}>
+            <ActivityIndicator size="large" color="#000000" />
+            <Text style={[styles.loading_text]}>缺失類別辨識中...</Text>
+          </View>
+        </SafeAreaView>
+      }
+      {!isExporting && !isDedecting &&
+        // 正常顯示issueList情況
         <SafeAreaView style={styles.container}>
           {/* <View style={{paddingHorizontal:5, backgroundColor:'white'}}>
             <MultipleSelectList 
@@ -686,21 +703,23 @@ const IssueListScreen = ({navigation, route}) => {
             keyExtractor={item => item.issue_id}
             extraData={selectedIssueId}
           />
-          <View style={styles.addPhotoBtn}>
-            <Icon
-              raised
-              name="ios-add"
-              type="ionicon"
-              color="dodgerblue"
-              size={32}
-              iconStyle={{fontSize: 52, marginLeft: 4}}
-              onPress={() => imageSelectHandler()}
-            />
-          </View>
+          {userInfo.user.permission != '訪客' &&
+            <View style={styles.addPhotoBtn}>
+              <Icon
+                raised
+                name="ios-add"
+                type="ionicon"
+                color="dodgerblue"
+                size={32}
+                iconStyle={{fontSize: 52, marginLeft: 4}}
+                onPress={() => imageSelectHandler()}
+              />
+            </View>
+          }
+          
         </SafeAreaView>
-      </React.Fragment>
-    );
-  }
+      }
+    </React.Fragment>)
 };
 
 const styles = StyleSheet.create({

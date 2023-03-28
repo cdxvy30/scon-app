@@ -127,7 +127,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
           const tmp_content = sortedLocations.map((location)=>location.floor)
           .map((floor, index) => ({
               title: floor, 
-              content: [sortedLocations.map((location)=>location.position)[index]]
+              content: ['無指定位置' ,sortedLocations.map((location)=>location.position)[index]]
           }));
 
           const final_content = [];

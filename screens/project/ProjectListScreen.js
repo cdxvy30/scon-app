@@ -128,20 +128,24 @@ const ProjectListScreen = ({ navigation }) => {
   };
 
   // 處理SwipeButton編輯或刪除動作
-  const swipeBtns = [
-    {
-      text: <Ionicons name={"create-outline"} size={24} color={"white"} />,
-      backgroundColor: "orange",
-      underlayColor: "rgba(0, 0, 0, 1, 0.6)",
-      onPress: () => projectEditHandler(),
-    },
-    {
-      text: <Ionicons name={"ios-trash"} size={24} color={"white"} />,
-      backgroundColor: "red",
-      underlayColor: "rgba(0, 0, 0, 1, 0.6)",
-      onPress: () => projectDeleteHandler(),
-    },
-  ];
+  const swipeBtns = 
+  (userInfo.user.permission == '管理員' || userInfo.user.permission == '公司負責人')?
+    [
+      {
+        text: <Ionicons name={"create-outline"} size={24} color={"white"} />,
+        backgroundColor: "orange",
+        underlayColor: "rgba(0, 0, 0, 1, 0.6)",
+        onPress: () => projectEditHandler(),
+      },
+      {
+        text: <Ionicons name={"ios-trash"} size={24} color={"white"} />,
+        backgroundColor: "red",
+        underlayColor: "rgba(0, 0, 0, 1, 0.6)",
+        onPress: () => projectDeleteHandler(),
+      },
+    ]
+    :
+    [];
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>

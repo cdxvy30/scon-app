@@ -37,24 +37,32 @@ const SettingScreen = ({navigation}) => {
             權限: {userInfo.user.permission}
           </Text>
           <Text style={styles.job}>職稱: {userInfo.user.job}</Text>
-          <TouchableOpacity
-            onPress={UserManagementHandler}
-            style={[styles.group]}>
-            <Text style={[styles.text]}>{'使用者管理'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={ProjectManagementHandler}
-            style={[styles.group]}>
-            <Text style={[styles.text]}>{'專案管理'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={dataManagementHandler}
-            style={[styles.group]}>
-            <Text style={[styles.text]}>{'資料管理'}</Text>
-          </TouchableOpacity>
+          {(userInfo.user.permission == '管理員' || userInfo.user.permission == '公司負責人') &&
+            <View>
+              <TouchableOpacity
+                onPress={UserManagementHandler}
+                style={[styles.group]}>
+              <Text style={[styles.text]}>{'使用者管理'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={ProjectManagementHandler}
+                style={[styles.group]}>
+                <Text style={[styles.text]}>{'專案管理'}</Text>
+              </TouchableOpacity>
+            </View>
+          }
+          {userInfo.user.permission != '訪客' &&
+          <View>
+            <TouchableOpacity
+              onPress={dataManagementHandler}
+              style={[styles.group]}>
+              <Text style={[styles.text]}>{'資料管理'}</Text>
+            </TouchableOpacity>
+          </View>
+          }
           <TouchableOpacity onPress={logout} style={[styles.group]}>
             <Text style={[styles.text]}>{'登出'}</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> 
         </View>
       </View>
     </React.Fragment>

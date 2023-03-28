@@ -103,21 +103,21 @@ const TaskListScreen = ({ navigation, route }) => {
   };
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
-    <Swipeout
-      backgroundColor='#ffffff'
-      style={styles.swipeout}
-      key={item.corporation_id}
-      right={
-        [
-          {
-            text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
-            backgroundColor: 'red',
-            underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-            onPress: () => corporationDeleteHandler(),
-          }
-        ]
-      }
-    >
+    // <Swipeout
+    //   backgroundColor='#ffffff'
+    //   style={styles.swipeout}
+    //   key={item.corporation_id}
+    //   right={
+    //     [
+    //       {
+    //         text: <Ionicons name={'ios-trash'} size={24} color={'white'} />,
+    //         backgroundColor: 'red',
+    //         underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
+    //         onPress: () => corporationDeleteHandler(),
+    //       }
+    //     ]
+    //   }
+    // >
       <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
         <View style={{width:'85%'}}>
           <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
@@ -130,7 +130,7 @@ const TaskListScreen = ({ navigation, route }) => {
           <Text style={[styles.title, textColor]}>{item.user_job}</Text> */}
         </View>
       </TouchableOpacity>
-    </Swipeout>
+    // </Swipeout>
     // <TouchableOpacity
     //   onPress={onPress}
     //   style={[styles.item, backgroundColor]}>
