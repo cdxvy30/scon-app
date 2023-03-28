@@ -419,7 +419,7 @@ const IssueListScreen = ({navigation, route}) => {
     if (selectedSearch.length !== 0){
       toFilterIssues();
     }
-    console.log('sorr', ...improvement_option.map((item)=> {
+    console.log('sort', ...improvement_option.map((item)=> {
       if (!selectedSearch.some(a => a === '2' || a === '3')){
         return item;
       }
