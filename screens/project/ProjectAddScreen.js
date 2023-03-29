@@ -20,52 +20,36 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {PROJECT_STATUS} from './ProjectEnum';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
+import FastImage from 'react-native-fast-image';
 
 const ProjectAddScreen = ({navigation, route}) => {
   const { userInfo } = useContext(AuthContext);
   let project = route.params.project;
-  // console.log(userInfo);
-  const [thumbnail, setThumbnail] = useState(project ? project.image : '');
-  const [name, setName] = useState(project ? project.name : '');
-  const [address, setAddress] = useState(project ? project.address : '');
-  // const [manager, setManager] = useState(project ? project.manager : '');
+  console.log(project);
+  const [projectId, setProjectId] = useState(project ? project.project_id : '');
+  const [thumbnail, setThumbnail] = useState(project ? project.project_image_path : '');
+  const [name, setName] = useState(project ? project.project_name : '');
+  const [address, setAddress] = useState(project ? project.project_address : '');
   const [corporation, setCorporation] = useState(
-    project ? project.corporation : userInfo.user.corporation,
+    project ? project.project_corporation : userInfo.user.corporation
   );
-  // const [inspector, setInspector] = useState(
-  //   project ? project.inspector : userInfo.user.name,
-  // );
-  // const [email, setEmail] = useState(
-  //   project ? project.email : userInfo.user.email,
-  // );
-  // const [managerSource, setManagerSource] = useState('');
+  console.log('corp\n', corporation);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const projectAddHandler = React.useCallback(async () => {
     if (!name) {
       Alert.alert('請填入工地名稱');
       return;
-    }else if(!address){
+    } else if (!address) {
       Alert.alert('請填入工地地址');
       return;
-    }else if(!thumbnail){
+    } else if (!thumbnail) {
       Alert.alert('請選擇專案圖片');
       return;
     }
 
-    const users = await SqliteManager.getAllUsers(); // 改成從伺服器fetch
-    const newProject = {
-      name,
-      address,
-      corporation,
-      user_id: users[0].id,
-      image:
-        thumbnail.uri ??
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVZ5Jn3h_R2_PdWnYoXgOqjwFKT5C4JTODvCjfDwaleOsM6AxT8L1DBhRi4FeGP7ua7F8&usqp=CAU',
-      status: PROJECT_STATUS.lowRisk.id,
-    };
-
-    const projectAddToPGSQL = () => {
+    const projectAdd = () => {
       setIsLoading(true);
 
       const data = {
@@ -83,7 +67,7 @@ const ProjectAddScreen = ({navigation, route}) => {
       });
       axios({
         method: 'post',
-        url: `${BASE_URL}/projects/add`,
+        url: `${BASE_URL}/projects`,
         data: bodyFormData,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -99,42 +83,56 @@ const ProjectAddScreen = ({navigation, route}) => {
           console.log(`Add new project error: ${e}`);
         });
     };
-    await projectAddToPGSQL();
-    // await SqliteManager.createProject(newProject);
+    await projectAdd();
     navigation.goBack();
-  }, [
-    name,
-    address,
-    corporation,
-    thumbnail.uri,
-    thumbnail.fileName,
-    navigation,
-    userInfo.token,
-  ]);
+  }, [name, address, thumbnail, navigation, corporation, userInfo.token]);
 
   const projectUpdateHandler = React.useCallback(async () => {
+    console.log('update');
     if (!name) {
       Alert.alert('請填入工地名稱');
       return;
-    }else if(!address){
+    } else if (!address) {
       Alert.alert('請填入工地地址');
       return;
-    }else if(!thumbnail){
+    } else if (!thumbnail) {
       Alert.alert('請選擇專案圖片');
       return;
     }
 
-    const users = await SqliteManager.getAllUsers();
-    const newProject = {
-      name,
-      address,
-      corporation,
-      user_id: users[0].id,
-      image:
-        thumbnail.uri ??
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVZ5Jn3h_R2_PdWnYoXgOqjwFKT5C4JTODvCjfDwaleOsM6AxT8L1DBhRi4FeGP7ua7F8&usqp=CAU',
+    const projectUpdate = () => {
+      const data = {
+        name: name,
+        address: address,
+        corporation: corporation,
+      };
+      const metadata = JSON.stringify(data);
+      var bodyFormData = new FormData();
+      bodyFormData.append('metadata', metadata);
+      bodyFormData.append('project_thumbnail', {
+        uri: thumbnail.uri,
+        name: thumbnail.fileName,
+        // type: 'image/jpg',
+      });
+      axios({
+        method: 'patch',
+        url: `${BASE_URL}/projects/${projectId}`,
+        data: bodyFormData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ` + `${userInfo.token}`,
+        },
+      })
+        .then(async (res) => {
+          let project_data = await res.data;
+          console.log(project_data);
+        })
+        .catch((e) => {
+          console.log(`Add new project error: ${e}`);
+        });
     };
-    await SqliteManager.updateProject(route.params.project.id, newProject);
+    await projectUpdate();
+
     navigation.goBack();
   }, [
     name,
@@ -179,30 +177,6 @@ const ProjectAddScreen = ({navigation, route}) => {
     );
   };
 
-  // useEffect(() => {
-  //   if (userInfo.user.permission === "管理員") {
-  //     axios
-  //       .get(`${BASE_URL}/users/managers/all`)
-  //       .then(async (res) => {
-  //         let data = await res.data;
-  //         setManagerSource(data);
-  //       })
-  //       .catch((e) => {
-  //         console.log(`List available managers error: ${e}`);
-  //       });
-  //   } else if (userInfo.user.permission === "公司負責人") {
-  //     axios
-  //       .get(`${BASE_URL}/users/managers/${userInfo.user.corporation}`)
-  //       .then(async (res) => {
-  //         let data = await res.data;
-  //         setManagerSource(data);
-  //       })
-  //       .catch((e) => {
-  //         console.log(`List available managers error: ${e}`);
-  //       });
-  //   }
-  // }, [userInfo.user.corporation, userInfo.user.permission]);
-
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -230,7 +204,13 @@ const ProjectAddScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={imageSelectHandler}>
               <View style={styles.imageContainer}>
                 {thumbnail ? (
-                  <Image style={styles.image} source={{uri: thumbnail.uri}} />
+                  <FastImage
+                    style={styles.image}
+                    source={{
+                      uri: thumbnail.uri ||
+                        `${BASE_URL}/projects/thumbnail/${projectId}`,
+                    }}
+                  />
                 ) : (
                   <Ionicons
                     style={{
@@ -246,12 +226,13 @@ const ProjectAddScreen = ({navigation, route}) => {
             </TouchableOpacity>
           </View>
           <View style={styles.inputAreaContainer}>
+            {}
             <Text style={styles.title}>工地名稱</Text>
             <View style={styles.inputContainer}>
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setName(text)}
+                onChangeText={(text) => setName(text)}
                 value={name}
                 style={styles.input}
               />
@@ -261,63 +242,13 @@ const ProjectAddScreen = ({navigation, route}) => {
               <NewProjectTextInput
                 multiline={false}
                 numberOfLines={1}
-                onChangeText={text => setAddress(text)}
+                onChangeText={(text) => setAddress(text)}
                 value={address}
                 style={styles.input}
               />
             </View>
-            {/* <Text style={styles.title}>專案管理員</Text> */}
-            {/* <Dropdown
-              data={managerSource}
-              placeholder="選擇您的專案管理員"
-              labelField="label"
-              valueField="value"
-              value={manager}
-              onChange={item => {
-                setManager(item.value);
-              }}
-            /> */}
-            {/* <View style={styles.inputContainer}>
-              <NewProjectTextInput
-                multiline={false}
-                numberOfLines={1}
-                onChangeText={text => setManager(text)}
-                value={manager}
-                style={styles.input}
-              />
-            </View> */}
-            {/* <Text style={styles.title}>公司名稱</Text>
-            <View style={styles.inputContainer}>
-              <NewProjectTextInput
-                multiline={false}
-                numberOfLines={1}
-                onChangeText={text => setCorporation(text)}
-                value={corporation}
-                style={styles.input}
-              />
-            </View>
-            <Text style={styles.title}>記錄人員</Text>
-            <View style={styles.inputContainer}>
-              <NewProjectTextInput
-                multiline={false}
-                numberOfLines={1}
-                onChangeText={text => setInspector(text)}
-                value={inspector}
-                style={styles.input}
-              />
-            </View>
-            <Text style={styles.title}>電子郵件</Text>
-            <View style={styles.inputContainer}>
-              <NewProjectTextInput
-                multiline={false}
-                numberOfLines={1}
-                onChangeText={text => setEmail(text)}
-                value={email}
-                style={styles.input}
-              />
-            </View> */}
           </View>
-          <View style={{height: 300}} />
+          <View style={{ height: 300 }} />
         </ScrollView>
       </SafeAreaView>
     </React.Fragment>
