@@ -90,7 +90,9 @@ const ProjectListScreen = ({ navigation }) => {
     navigation.navigate("ProjectAdd", { name: "Create new project" });
   };
 
-  const projectDeleteHandler = async () => {
+  const projectDeleteHandler = async (item) => {
+    console.log(item);
+    let id = item.project_id;
     Alert.alert("刪除專案", "真的要刪除專案嗎？", [
       {
         text: "取消",
@@ -101,9 +103,11 @@ const ProjectListScreen = ({ navigation }) => {
       },
       {
         text: "確定",
-        onPress: async () => {
-          await SqliteManager.deleteProject(selectedProjectId);
-          setProjectList(projectList.filter((p) => p.id !== selectedProjectId));
+        onPress: (item) => {
+          axios
+            .delete(`${BASE_URL}/projects/${id}`)
+            .then(async (res) => await console.log(res.data))
+            .catch((e) => console.log(`Error when delete project: ${e}`));
         },
         style: "destructive",
       },
@@ -111,9 +115,6 @@ const ProjectListScreen = ({ navigation }) => {
   };
 
   const projectEditHandler = async (item) => {
-    // item.thumbnail.uri = item.project_id;
-    console.log(item);
-    let project = await SqliteManager.getProject(selectedProjectId);
     navigation.navigate("ProjectAdd", {
       name: "Create new project",
       project: item,
@@ -122,11 +123,9 @@ const ProjectListScreen = ({ navigation }) => {
 
   // 導向IssueList, 並帶入project資訊, 以projectId作為請求issueList的參數
   const projectSelectHandler = async (item) => {
-    // setSelectedProjectId(item.project_id);
     console.log(item);
     await navigation.navigate("IssueList", {
       project: item,
-      // project: await SqliteManager.getProject(selectedProjectId),
     });
   };
 
@@ -143,7 +142,7 @@ const ProjectListScreen = ({ navigation }) => {
         text: <Ionicons name={"ios-trash"} size={24} color={"white"} />,
         backgroundColor: "red",
         underlayColor: "rgba(0, 0, 0, 1, 0.6)",
-        onPress: () => projectDeleteHandler(),
+        onPress: () => projectDeleteHandler(selectedProject),
       },
     ] : [];
 
