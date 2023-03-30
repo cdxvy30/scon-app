@@ -561,158 +561,192 @@ export async function improveReportGenerator (userInfo, issueList, fs, config, p
     return (pages)
   }
 
-// export function issueHtmlGenerator(issueList, fs, config, project){
-//     let pages = ''
-//     for (let i = issueList.length - 1; i >= 0; i--){
+export async function issueHtmlGenerator(issueList, userInfo, project){
+    let pages = ''
+    for (let i = issueList.length - 1; i >= 0; i--){
 
-//       //判斷是否追蹤，如否則跳過此缺失
-//       if (issueList[i].tracking === false){  
-//         continue
-//       }
+      //判斷是否追蹤，如否則跳過此缺失
+      if (issueList[i].tracking_or_not === false){  
+        continue
+      }
 
-//       //判斷改善資訊是否存在
-//       if (issueList[i]['attachments'][0] !== undefined){ 
-//         var improve_time = `${new Date(issueList[i]['attachments'][0]['updated_at']).getFullYear()}/${new Date(issueList[i]['attachments'][0]['updated_at']).getMonth()+1}/${new Date(issueList[i]['attachments'][0]['updated_at']).getDate()}`
-//         var improve_remark = issueList[i]['attachments'][0]['remark']
-//         var improve_image = fs.readFile(`.${issueList[i]['attachments'][0]['image']}`, 'ascii')
-//         } else{
-//         var improve_time = '未改善'
-//         var improve_remark = '未改善'
-//         var improve_image = null
-//       }
+      // //判斷改善資訊是否存在
+      // if (issueList[i]['attachments'][0] !== undefined){ 
+      //   var improve_time = `${new Date(issueList[i]['attachments'][0]['updated_at']).getFullYear()}/${new Date(issueList[i]['attachments'][0]['updated_at']).getMonth()+1}/${new Date(issueList[i]['attachments'][0]['updated_at']).getDate()}`
+      //   var improve_remark = issueList[i]['attachments'][0]['remark']
+      //   var improve_image = fs.readFile(`.${issueList[i]['attachments'][0]['image']}`, 'ascii')
+      //   } else{
+      //   var improve_time = '未改善'
+      //   var improve_remark = '未改善'
+      //   var improve_image = null
+      // }
 
-//       //抓出缺失項目選「其他」 的訊息
-//       var issue_item = issueList[i].type;
-//       if (issue_item === '其他'){
-//         issue_item = issueList[i].type_remark
-//       }
-//       var issue_title = issueList[i].violation_type;
-//       // ImgToBase64.getBase64String('file://'+issueList[i].image.uri).then(base64image => base64image)
-//       pages += `
-//         <page size="A4">
-//           <br>
-//           <div>
-//             <h1 class="title">${project.company}--缺失改善前後記錄表</h1>
-//             <p class="project_info">
-//               <b>
-//               工程名稱：
-//               <u>${project.project_name}</u>
-//               &nbsp&nbsp&nbsp&nbsp
-//               工地負責人：
-//               <u>${project.manager}</u>
-//               </b>
-//             </p>
-//             <p class="project_info">
-//               <b>
-//               地址：
-//               <u>${project.address}</u>
-//               &nbsp&nbsp&nbsp&nbsp
-//               記錄人員：
-//               <u>${project.inspector}</u>
-//               </b>
-//             </p>
-//           </div>
-//           <table class="box" rules="all">
-//             <tr>
-//               <th class="content_key">責任廠商</th>
-//               <td class="content_value">${issueList[i].responsible_corporation}</td>
-//               <th class="content_key">聯絡電話</th>
-//               <td class="content_value">${issueList[i].assignee_phone_number}</td>
-//             </tr>
-//             <tr>
-//               <th class="content_key">缺失地點</th>
-//               <td class="content_value">${issueList[i].location}</td>
-//               <th class="content_key">風險評級</th>
-//               <td class="content_value">${getIssueStatusById(issueList[i].status).name}</td>
-//             </tr>
-//             <tr class="image">
-//               <td>改善前</td>
-//               <td colspan=${2}><img src="data:image/png;base64," with="600" heigh="400" alt="一張圖片"></td>
-//               <td>
-//                 <p>缺失類別: </p><p>${issue_title}</p><br></br>
-//                 <p>缺失項目: </p><p>${issue_item}</p><br></br>
-//                 <p>發現日期: </p><p>${issueList[i].timestamp}</p>
-//               </td>
-//             </tr>
-//             <tr class="image">
-//             <td>改善後</td>
-//             <td colspan=${2}><img src="file://${issueList[i].image.uri}" with="600" heigh="400" alt="一張圖片"></td>
-//             <td>
-//               <p>備註: </p><p>${improve_remark}</p><br></br>
-//               <p>改善日期: </p><p>${improve_time}</p><br></br>
-//             </td>
-//             </tr>
-//           </table>
-//         </page>
-//       `
-//     }
+      // await RNFetchBlob.config({
+      //   session : 'output_image',
+      //   fileCache: true,
+      // })
+      // .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}`)
+      // .then(() => {
+      //   console.log(`original_image: ${RNFetchBlob.session('output_image').list().length}`)
+      // })
+      // .catch(err => {
+      //   console.log('failed to fetch export origin image',err)
+      // });
 
-//   return ({
-//     html: `
-//     <head>
-//     <meta charset="utf-8">
-//     <title>
-//       ${project.company}--缺失改善前後記錄表
-//     </title>
-//     <style>
-//       body {
-//         background: rgb(204,204,204); 
-//       }
-//       page[size="A4"] {
-//         background: white;
-//         width: 21cm;
-//         height: 29.7cm;
-//         display: block;
-//         margin: 0 auto 0.5cm;
-//       }
-//       .title{
-//         text-align: center;
-//       }
-//       .project_info{
-//         font-size: larger;
-//         text-align: center;
-//         line-height: 40%;
-//       }
-//       table.box{
-//         height: 25cm;
-//         width: 18cm;
-//         border: 2px solid rgb(0, 0, 0);
-//         margin: auto;
-//       }
+      // var attach;
+      // await axios({
+      //   methods: 'get',
+      //   url: `${BASE_URL}/attachments/list/${issueList[i].issue_id}`,
+      // })
+      //   .then(async res => {
+      //     attach = await res.data;
+      //     //如果有改善才有圖片
+      //     // attach
+      //     // ?
+      //     //   await RNFetchBlob.config({
+      //     //     session : 'improved_image',
+      //     //     fileCache: true,
+      //     //   })
+      //     //     .fetch("GET", `${BASE_URL}/attachments/get/thumbnail/${await attach.attachment_id}`)
+      //     //     .then(() => {
+      //     //       // the temp file path
+      //     //       console.log(`improved_image: ${RNFetchBlob.session('improved_image').list().length}`)
+      //     //     })
+      //     //     .catch(err => {
+      //     //       console.log('failed to fetch export improved image',err)
+      //     //     })
+      //     // :
+      //     //   undefined;
+      //   })
+      //   .catch(e => {
+      //     console.log(`${e}`);
+      //   });
+
+      pages += `
+        <page size="A4">
+          <br>
+          <div>
+            <h1 class="title">${project.project_corporation}--缺失改善前後記錄表</h1>
+            <p class="project_info">
+              <b>
+              工程名稱：
+              <u>${project.project_name}</u>
+              &nbsp&nbsp&nbsp&nbsp
+              工地負責人：
+              <u>${project.project_manager}</u>
+              </b>
+            </p>
+            <p class="project_info">
+              <b>
+              地址：
+              <u>${project.project_address}</u>
+              &nbsp&nbsp&nbsp&nbsp
+              記錄人員：
+              <u>${userInfo.user.name}</u>
+              </b>
+            </p>
+          </div>
+          <table class="box" rules="all">
+            <tr>
+              <th class="content_key">責任廠商</th>
+              <td class="content_value">${issueList[i].issue_manufacturer}</td>
+              <th class="content_key">聯絡電話</th>
+              <td class="content_value">${issueList[i].issue_manufacturer}</td>
+            </tr>
+            <tr>
+              <th class="content_key">缺失地點</th>
+              <td class="content_value">${issueList[i].issue_location}</td>
+              <th class="content_key">風險評級</th>
+              <td class="content_value">${getIssueStatusById(issueList[i].issue_status).name}</td>
+            </tr>
+            <tr class="image">
+              <td>改善前</td>
+              <td colspan=${2}><img src="${BASE_URL}/issues/get/thumbnail/${issueList[i].issue_id}" with="600" heigh="400" alt="一張圖片"></td>
+              <td>
+                <p>缺失類別: </p><p>${issueList[i].issue_title}</p><br></br>
+                <p>缺失項目: </p><p>${issueList[i].issue_type}</p><br></br>
+                <p>發現日期: </p><p>${new Date(issueList[i].create_at).toLocaleDateString()}</p>
+              </td>
+            </tr>
+            <tr class="image">
+            <td>改善後</td>
+            <td colspan=${2}><img src="" with="600" heigh="400" alt="一張圖片"></td>
+            <td>
+              <p>備註: </p><p>${''}</p><br></br>
+              <p>改善日期: </p><p>${''}</p><br></br>
+            </td>
+            </tr>
+          </table>
+        </page>
+      `
+    }
+
+  return ({
+    html: `
+    <head>
+    <meta charset="utf-8">
+    <title>
+      ${project.project_corporation}--缺失改善前後記錄表
+    </title>
+    <style>
+      body {
+        background: rgb(204,204,204); 
+      }
+      page[size="A4"] {
+        background: white;
+        width: 21cm;
+        height: 29.7cm;
+        display: block;
+        margin: 0 auto 0.5cm;
+      }
+      .title{
+        text-align: center;
+      }
+      .project_info{
+        font-size: larger;
+        text-align: center;
+        line-height: 40%;
+      }
+      table.box{
+        height: 25cm;
+        width: 18cm;
+        border: 2px solid rgb(0, 0, 0);
+        margin: auto;
+      }
   
-//       table.box th.content_key{
-//         font-size: large;
-//         height: 5%;
-//         width: 15%;
-//         text-align: center;
+      table.box th.content_key{
+        font-size: large;
+        height: 5%;
+        width: 15%;
+        text-align: center;
   
-//       }
-//       table.box td.content_value{
-//         font-size: large;
-//         height: 5%;
-//         width: 35%;
-//         text-align: center;
-//       }
-//       table.box tr.image{
-//         font-size: large;
-//         height: 45%;
-//         text-align: center;
-//       }
-//       td p{
-//         line-height: 10%;
-//         text-align: left;
-//       }
-//       @media print {
-//         body, page[size="A4"] {
-//           box-shadow: none;
-//         }
-//       }
-//     </style>
-//   </head>
+      }
+      table.box td.content_value{
+        font-size: large;
+        height: 5%;
+        width: 35%;
+        text-align: center;
+      }
+      table.box tr.image{
+        font-size: large;
+        height: 45%;
+        text-align: center;
+      }
+      td p{
+        line-height: 10%;
+        text-align: left;
+      }
+      @media print {
+        body, page[size="A4"] {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
 
-//   <body>
-//     ${pages}
-//   </body>	  
-//   `}
-//   )
-// }
+  <body>
+    ${pages}
+  </body>	  
+  `}
+  )
+}

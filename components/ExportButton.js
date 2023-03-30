@@ -170,64 +170,64 @@ const ExportButton = ({
             icon_type:'material-community',
             action: async() => {
                 try{
-                setIsExporting(true);
-                console.log('Exporting issue improvement document')
+                    setIsExporting(true);
+                    console.log('Exporting issue improvement document')
 
-                const doc_2 = new Document({
-                    sections: [
-                    {
-                        properties: {},
-                        children: await improveReportGenerator(
-                        userInfo,
-                        selectedEndDate ? filteredIssueList : issueList,
-                        fs,
-                        config,
-                        project,
-                        ),
-                    },
-                    ],
-                });
+                    const doc_2 = new Document({
+                        sections: [
+                        {
+                            properties: {},
+                            children: await improveReportGenerator(
+                            userInfo,
+                            selectedEndDate ? filteredIssueList : issueList,
+                            fs,
+                            config,
+                            project,
+                            ),
+                        },
+                        ],
+                    });
 
-                await Packer.toBase64String(doc_2).then(base64 => {
-                    fs.writeFile(
-                    `${docPath}/${project.project_name}-缺失改善前後記錄表.docx`,
-                    base64,
-                    'base64',
-                    );
-                });
+                    await Packer.toBase64String(doc_2).then(base64 => {
+                        fs.writeFile(
+                        `${docPath}/${project.project_name}-缺失改善前後記錄表.docx`,
+                        base64,
+                        'base64',
+                        );
+                    });
 
-                const shareDataTableOption_2 = {
-                    title: 'MyApp',
-                    message: `${project.project_name}-缺失改善前後記錄表`,
-                    url: `file://${docPath}/${project.project_name}-缺失改善前後記錄表.docx`,
-                    type: 'application/docx',
-                    subject: `${project.project_name}-缺失改善前後記錄表`, // for email
-                };
+                    const shareDataTableOption_2 = {
+                        title: 'MyApp',
+                        message: `${project.project_name}-缺失改善前後記錄表`,
+                        url: `file://${docPath}/${project.project_name}-缺失改善前後記錄表.docx`,
+                        type: 'application/docx',
+                        subject: `${project.project_name}-缺失改善前後記錄表`, // for email
+                    };
 
-                await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
-                Alert.alert('匯出成功！', '', [
-                    {
-                    text: '返回',
-                    onPress: () => setIsExporting(false),
-                    style: 'cancel',
-                    },
-                ]);
+                    await Share.open(shareDataTableOption_2); // ...after the file is saved, send it to a system share intent
+                    Alert.alert('匯出成功！', '', [
+                        {
+                        text: '返回',
+                        onPress: () => setIsExporting(false),
+                        style: 'cancel',
+                        },
+                    ]);
                 }
                 catch(error){
-                console.log(`Issue improved document error: ${error}`)
-                Alert.alert('匯出取消或失敗', '', [
-                    {
-                    text: '返回',
-                    onPress: () => setIsExporting(false),
-                    style: 'cancel',
-                    },
-                ]);
+                    console.log(`Issue improved document error: ${error}`)
+                    Alert.alert('匯出取消或失敗', '', [
+                        {
+                        text: '返回',
+                        onPress: () => setIsExporting(false),
+                        style: 'cancel',
+                        },
+                    ]);
                 }
                 finally{
-                RNFetchBlob.session('output_image').dispose();
-                console.log('output image deleted')
-                RNFetchBlob.session('improved_image').dispose();
-                console.log('improved image deleted')
+                    RNFetchBlob.session('output_image').dispose();
+                    console.log('output image deleted')
+                    RNFetchBlob.session('improved_image').dispose();
+                    console.log('improved image deleted')
                 }
             },
         },
@@ -236,26 +236,46 @@ const ExportButton = ({
         //     icon: 'file-link-outline',
         //     icon_type:'material-community',
         //     action: async() => {
-        //         // const issue_web = issueHtmlGenerator(
-        //         //   selectedEndDate ? filteredIssueList : issueList,
-        //         //   fs,
-        //         //   config,
-        //         //   project,
-        //         // );
-        //         // await fs.writeFile(
-        //         //   `${docPath}/${project.project_name}-缺失改善前後錄表.html`,
-        //         //   issue_web.html,
-        //         //   'utf8',
-        //         // );
-        //         // const shareDataOption_3 = {
-        //         //   title: 'MyApp',
-        //         //   message: `${project.project_name}-缺失改善前後錄表`,
-        //         //   url: `file://${docPath}/${project.project_name}-缺失改善前後錄表.html`,
-        //         //   type: 'application/html',
-        //         //   subject: `${project.project_name}-缺失改善前後錄表`, // for email
-        //         // };
+        //         try{
+        //             setIsExporting(true);
+        //             const issue_web = await issueHtmlGenerator(
+        //                 selectedEndDate ? filteredIssueList : issueList,
+        //                 userInfo,
+        //                 project,
+        //               );
+        //             fs.writeFile(
+        //                 `${docPath}/${project.project_name}-缺失改善前後錄表.html`,
+        //                 issue_web.html,
+        //                 'utf8',
+        //               );
+        //             const shareDataOption_3 = {
+        //                 title: 'MyApp',
+        //                 message: `${project.project_name}-缺失改善前後錄表`,
+        //                 url: `file://${docPath}/${project.project_name}-缺失改善前後錄表.html`,
+        //                 type: 'application/html',
+        //                 subject: `${project.project_name}-缺失改善前後錄表`, // for email
+        //               };
+      
+        //             await Share.open(shareDataOption_3); // ...after the file is saved, send it to a system share intent
 
-        //         // await Share.open(shareDataOption_3); // ...after the file is saved, send it to a system share intent
+        //             Alert.alert('匯出成功！', '', [
+        //                 {
+        //                 text: '返回',
+        //                 onPress: () => setIsExporting(false),
+        //                 style: 'cancel',
+        //                 },
+        //             ]);
+        //         }
+        //         catch(error){
+        //             console.log(`Issue improved document error: ${error}`)
+        //             Alert.alert('匯出取消或失敗', '', [
+        //             {
+        //             text: '返回',
+        //             onPress: () => setIsExporting(false),
+        //             style: 'cancel',
+        //             },
+        //         ]);
+        //         }
         //     },
         // },
     ]
