@@ -149,6 +149,7 @@ const IssueListScreen = ({navigation, route}) => {
         height: parseInt(item.issue_image_height, 10),
         width: parseInt(item.issue_image_width, 10),
       },
+      caption: item.issue_caption,
       status: item.issue_status,
       tracking: item.tracking_or_not,
       location: item.issue_location,
@@ -192,6 +193,7 @@ const IssueListScreen = ({navigation, route}) => {
           project: project,
           action: 'create new issue',
           violation_type: response.data.violation_type,
+          issue_type: response.data.issue_type,
           caption: response.data.caption,
           item: CreateItemByImage(image),
         });
@@ -204,6 +206,7 @@ const IssueListScreen = ({navigation, route}) => {
           project: project,
           action: 'create new issue',
           violation_type: '',
+          issue_type: '',
           caption: '',
           item: CreateItemByImage(image),
         });
@@ -593,6 +596,7 @@ const IssueListScreen = ({navigation, route}) => {
   );
 
   const renderItem = ({item}) => {
+    console.log(item);
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
 

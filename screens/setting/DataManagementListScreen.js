@@ -25,9 +25,9 @@ const DataManageListScreen = ({navigation}) => {
 
   useEffect(() => {
     if (userInfo.user.permission == "管理員")
-      setFetchRoute(`${BASE_URL}/projects/list/all`);
+      setFetchRoute(`${BASE_URL}/projects/all`);
     else if (userInfo.user.permission == "公司負責人")
-      setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
+      setFetchRoute(`${BASE_URL}/projects/${userInfo.user.corporation}`);
     else if (userInfo.user.permission == "專案管理員")  // 要改成從works_on fetch
       setFetchRoute(`${BASE_URL}/projects/works_on/${userInfo.user.uuid}`);
 

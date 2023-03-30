@@ -23,19 +23,20 @@ import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../configs/authConfig";
 import axios from "axios";
 
-// const determineStatusColor = (item) => {
-//   let color = "grey";
-//   if (item.issue_status === '0') color = 'limegreen';
-//   if (item.issue_status === '1') color = 'gold';
-//   if (item.issue_status === '2') color = 'orangered';
-//   return color;
-// };
+const determineStatusColor = (item) => {
+  let color = "grey";
+  if (item.issue_status === '0') color = 'limegreen';
+  if (item.issue_status === '1') color = 'gold';
+  if (item.issue_status === '2') color = 'orangered';
+  return color;
+};
 
 const ProjectListScreen = ({ navigation }) => {
   const { userInfo } = useContext(AuthContext);
   const [fetchRoute, setFetchRoute] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const isFocused = useIsFocused();
 
   // useEffect(() => {
@@ -56,9 +57,9 @@ const ProjectListScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (userInfo.user.permission == "管理員")
-      setFetchRoute(`${BASE_URL}/projects/list/all`);
+      setFetchRoute(`${BASE_URL}/projects/all`);
     else if (userInfo.user.permission == "公司負責人")
-      setFetchRoute(`${BASE_URL}/projects/list/${userInfo.user.corporation}`);
+      setFetchRoute(`${BASE_URL}/projects/${userInfo.user.corporation}`);
     else if (userInfo.user.permission == "專案管理員")  // 要改成從works_on fetch
       setFetchRoute(`${BASE_URL}/projects/works_on/${userInfo.user.uuid}`);
 
@@ -89,7 +90,9 @@ const ProjectListScreen = ({ navigation }) => {
     navigation.navigate("ProjectAdd", { name: "Create new project" });
   };
 
-  const projectDeleteHandler = async () => {
+  const projectDeleteHandler = async (item) => {
+    console.log(item);
+    let id = item.project_id;
     Alert.alert("刪除專案", "真的要刪除專案嗎？", [
       {
         text: "取消",
@@ -100,76 +103,70 @@ const ProjectListScreen = ({ navigation }) => {
       },
       {
         text: "確定",
-        onPress: async () => {
-          await SqliteManager.deleteProject(selectedProjectId);
-          setProjectList(projectList.filter((p) => p.id !== selectedProjectId));
+        onPress: (item) => {
+          axios
+            .delete(`${BASE_URL}/projects/${id}`)
+            .then(async (res) => await console.log(res.data))
+            .catch((e) => console.log(`Error when delete project: ${e}`));
         },
         style: "destructive",
       },
     ]);
   };
 
-  const projectEditHandler = async () => {
-    let project = await SqliteManager.getProject(selectedProjectId);
+  const projectEditHandler = async (item) => {
     navigation.navigate("ProjectAdd", {
       name: "Create new project",
-      project: project,
+      project: item,
     });
   };
 
   // 導向IssueList, 並帶入project資訊, 以projectId作為請求issueList的參數
   const projectSelectHandler = async (item) => {
-    // setSelectedProjectId(item.project_id);
     console.log(item);
     await navigation.navigate("IssueList", {
       project: item,
-      // project: await SqliteManager.getProject(selectedProjectId),
     });
   };
 
   // 處理SwipeButton編輯或刪除動作
-  const swipeBtns = 
-  (userInfo.user.permission == '管理員' || userInfo.user.permission == '公司負責人')?
-    [
+  const swipeBtns =
+    (userInfo.user.permission == '管理員' || userInfo.user.permission == '公司負責人') ? [
       {
         text: <Ionicons name={"create-outline"} size={24} color={"white"} />,
         backgroundColor: "orange",
         underlayColor: "rgba(0, 0, 0, 1, 0.6)",
-        onPress: () => projectEditHandler(),
+        onPress: () => projectEditHandler(selectedProject),
       },
       {
         text: <Ionicons name={"ios-trash"} size={24} color={"white"} />,
         backgroundColor: "red",
         underlayColor: "rgba(0, 0, 0, 1, 0.6)",
-        onPress: () => projectDeleteHandler(),
+        onPress: () => projectDeleteHandler(selectedProject),
       },
-    ]
-    :
-    [];
+    ] : [];
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
       <View style={{ flex: 1, flexDirection: "row" }}>
-        {/* <Image style={styles.thumbnail} source={{uri: item.thumbnail}} /> */}
         <FastImage
           style={styles.thumbnail}
           source={{
-            uri: `${BASE_URL}/projects/get/thumbnail/${item.project_id}`,
+            uri: `${BASE_URL}/projects/thumbnail/${item.project_id}`,
           }}
         />
         <Text style={[styles.title, textColor]}>{item.project_name}</Text>
       </View>
-      {/* <Ionicons
+      <Ionicons
         style={styles.status}
         name={"ios-ellipse"}
         size={24}
         color={determineStatusColor(item)}
-      /> */}
+      />
     </TouchableOpacity>
   );
 
   const renderItem = ({ item }) => {
-    console.log(item);
     const backgroundColor =
       item.project_id === selectedProjectId ? "white" : "white"; //"darkgrey" : "white";
     const color = item.project_id === selectedProjectId ? "black" : "black"; //'white' : 'black';
@@ -179,7 +176,7 @@ const ProjectListScreen = ({ navigation }) => {
         <Swipeout
           key={item.project_id}
           right={swipeBtns}
-          onOpen={() => setSelectedProjectId(item.project_id)}
+          onOpen={() => setSelectedProject(item)}
         >
           <Item
             item={item}
