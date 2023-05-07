@@ -32,7 +32,7 @@ import {Icon} from 'react-native-elements';
 import Draggable from 'react-native-draggable';
 import {BlurView} from 'react-native-blur';
 import {LABEL_OPTIONS} from '../../configs/labelConfig';
-import Orientation from 'react-native-orientation';
+import Orientation from 'react-native-orientation-locker';
 import {SketchCanvas} from '@terrylinla/react-native-sketch-canvas';
 import { BASE_URL } from '../configs/authConfig';
 

@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { BlurView } from 'react-native-blur';
+import { BlurView } from '@react-native-community/blur';
 import { ISSUE_TYPE } from '../../../configs/issueTypeConfig';
 
 const initItemData = selectedName => {

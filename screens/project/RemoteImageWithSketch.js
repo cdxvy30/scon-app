@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Image, View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import Orientation from 'react-native-orientation';
+import Orientation from 'react-native-orientation-locker';
 import SketchCanvas from '@terrylinla/react-native-sketch-canvas';
 import { BASE_URL } from '../../configs/authConfig';
 

@@ -26,9 +26,9 @@ import {
 // import { Icon } from 'react-native-elements';
 // import Draggable from 'react-native-draggable';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Orientation from 'react-native-orientation';
+import Orientation from 'react-native-orientation-locker';
 import { SketchCanvas } from '@terrylinla/react-native-sketch-canvas';
-import { BlurView } from 'react-native-blur';
+import { BlurView } from '@react-native-community/blur';
 import { OBJECT_TYPE } from '../../configs/objectTypeConfig';
 import SqliteManager from '../../services/SqliteManager';
 import axios from 'axios';

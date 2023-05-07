@@ -66,7 +66,7 @@ const ProjectListScreen = ({ navigation }) => {
     console.log(fetchRoute);
     const fetchProjects = async () => {
       await axios
-        .get(fetchRoute, {
+        .get(`${fetchRoute}`, {
           headers: {
             Authorization: `Bearer ` + `${userInfo.token}`,
           },
