@@ -34,6 +34,7 @@
     "react-native-element-dropdown": "^2.5.3",
     "react-native-elements": "^3.4.3",
     "react-native-fast-image": "^8.6.3",
+    "react-native-flipper": "^0.190.0",
     "react-native-gradle-plugin": "^0.71.17",
     "react-native-image-base64": "^0.1.4",
     "react-native-image-picker": "^4.7.3",

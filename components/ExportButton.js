@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import axios from "axios";
 import React, {useState, useContext, useRef} from 'react';
 import {AuthContext} from '../context/AuthContext';
 import {
@@ -26,6 +27,7 @@ import {
 } from '../screens/project/OutputTable';
 
 const ExportButton = ({
+    base_url,
     project,
     selectedStartDate, 
     selectedEndDate, 
@@ -231,6 +233,42 @@ const ExportButton = ({
                 }
             },
         },
+        {
+            title: 'backend export test',
+            icon: 'file-word-outline',
+            icon_type:'material-community',
+            action: async() => {
+                await RNFetchBlob.config({             //先將圖片暫時載到本地端
+                    fileCache: true,
+                    path:dirs.DocumentDir + `/${project.project_name}.xlsx`
+                })
+                .fetch('GET', `${base_url}/sheet/${project.project_id}`)
+                .then((res) => {
+                    console.log(project)
+                    console.log("The file saved to ", res.path())
+                    if (Platform.OS === "ios") {
+                        setTimeout(() => {
+                            RNFetchBlob.fs.writeFile(res.path(), res.data, 'base64'); 
+                            RNFetchBlob.ios.previewDocument(res.path()); 
+                        },500);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+
+                // await axios
+                // .get(`${base_url}/sheet/${project.project_id}`)
+                // .then(async (res) => {
+                // let projects = await res.data;
+                // console.log(projects);
+                // // setProjectList(projects);
+                // })
+                // .catch((e) => {
+                // console.error(`List Projects Error: ${e}`);
+                // });
+            },
+        }
         // {
         //     title: '匯出缺失改善前後記錄表(HTML)',
         //     icon: 'file-link-outline',
