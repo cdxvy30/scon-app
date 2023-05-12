@@ -3,6 +3,7 @@ import {
   ActionSheetIOS,
   Alert,
   Button,
+  Dimensions,
   FlatList,
   Image,
   SafeAreaView,
@@ -20,6 +21,8 @@ import {useIsFocused} from '@react-navigation/native';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
 import {AuthContext} from '../../context/AuthContext';
+
+const windowSize = Dimensions.get('window')
 
 const UserListScreen = ({navigation}) => {
   const {userInfo} = useContext(AuthContext);
@@ -60,7 +63,7 @@ const UserListScreen = ({navigation}) => {
   const UserManageHandler = async (user) => {
     setSelectedUserId(user.id);
     console.log(user);
-    await navigation.navigate('UserManagementScreen', {
+    await navigation.navigate('UserManagement', {
       user_name: user.user_name,
       user_id: user.user_id,
       user_permission: user.user_permission,
@@ -70,12 +73,14 @@ const UserListScreen = ({navigation}) => {
 
   const Item = ({item, onPress, backgroundColor, textColor}) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-      <Image
-        style={styles.icon}
-        source={require('../../configs/icon.png')}
-      />
-      <View style={{width:'85%'}}>
-        <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
+      <View>
+        <Image
+          style={styles.icon}
+          source={require('../../configs/icon.png')}
+        />
+      </View>
+      <View>
+        <Text style={[styles.title, textColor, {marginBottom:windowSize.height*0.002}]} ellipsizeMode={'tail'} numberOfLines={1}>
           {item.user_name} | {item.user_corporation} 
         </Text>
         <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
@@ -120,36 +125,30 @@ const UserListScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
+    // marginTop: StatusBar.currentHeight || 0,
   },
   flatList: {
-    padding:10,
+    padding: windowSize.height*0.015,
   },
   item: {
-    marginVertical:5,
-    padding:20,
-    borderRadius:20,
+    marginVertical: windowSize.height*0.01,
+    padding: windowSize.height*0.02,
+    borderRadius: 15,
     flex:1,
-    flexDirection:'row',
-    justifyContent:'flex-start',
-    alignItems:'center'
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   icon: {
-    width: 70,
-    height: 70,
-    borderRadius: 70 / 2,
+    width: windowSize.height*0.087,
+    height: windowSize.height*0.087,
+    borderRadius: windowSize.height*0.087 / 2,
     borderColor: 'black',
-    borderWidth: 2,
-  },
-  thumbnail: {
-    width: 90,
-    height: 90,
-    borderRadius: 10,
+    borderWidth: windowSize.height*0.002,
   },
   title: {
-    marginVertical:1,
-    marginLeft: 8,
-    fontSize: 20,
+    marginLeft: windowSize.height*0.01,
+    fontSize: windowSize.width*0.05,
   },
 });
 

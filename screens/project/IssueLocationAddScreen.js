@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {
   Alert,
+  Dimensions,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -13,12 +15,37 @@ import Separator from '../../components/Separator';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
 
+const windowSize = Dimensions.get('window')
+
 const IssueLocationAddScreen = ({navigation, route}) => {
   const [floor, setFloor] = useState('');
   const [position, setPosition] = useState('');
+  const [keyboardOffset, setKeyboardOffset] = useState(0);                      // not sure what's this
+  const keyboardDidShowListener = useRef();                                     // not sure what's this
+  const keyboardDidHideListener = useRef();  
+
+  const onKeyboardShow = event =>
+  setKeyboardOffset(event.endCoordinates.height);
+  const onKeyboardHide = () => setKeyboardOffset(0);
+
+  useEffect(() => {
+    keyboardDidShowListener.current = Keyboard.addListener(
+      'keyboardWillShow',
+      onKeyboardShow,
+    );
+    keyboardDidHideListener.current = Keyboard.addListener(
+      'keyboardWillHide',
+      onKeyboardHide,
+    );
+
+    return () => {
+      keyboardDidShowListener.current.remove();
+      keyboardDidHideListener.current.remove();
+    };
+  }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {marginBottom: keyboardOffset}]}>
       <Text style={styles.name}>請輸入以下資訊</Text>
       <View style={styles.wrapper}>
         <View style={styles.item}>
@@ -28,6 +55,7 @@ const IssueLocationAddScreen = ({navigation, route}) => {
               onChangeText={setFloor}
               placeholder={'(e.g., B3)'}
               placeholderTextColor={'#C5C5C5'}
+              onSubmitEditing={Keyboard.dismiss}
             />
         </View>
         <Separator />
@@ -38,7 +66,7 @@ const IssueLocationAddScreen = ({navigation, route}) => {
               onChangeText={setPosition}
               placeholder={'(e.g., 北側電梯井前)'}
               placeholderTextColor={'#C5C5C5'}
-              
+              onSubmitEditing={Keyboard.dismiss}
             />
         </View>
         <Button
@@ -80,39 +108,40 @@ const IssueLocationAddScreen = ({navigation, route}) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom:40,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   name: {
     alignSelf: 'center',
-    height: 44,
+    height: windowSize.width*0.12,
     fontStyle: 'normal',
-    fontSize: 36,
-    lineHeight: 44,
-    marginVertical:15,
+    fontSize: windowSize.width*0.1,
+    lineHeight: windowSize.width*0.12,
+    marginVertical:windowSize.width*0.02,
     color: '#000000',
   },
   item: {
-    padding:15,
+    flex: 1,
+    paddingHorizontal: windowSize.width*0.05,
     flexDirection: 'row',
+    alignItems:'center',
     justifyContent: 'space-between',
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: windowSize.width*0.045,
   },
   textInput: {
-    fontSize: 18,
+    fontSize: windowSize.width*0.045,
     color: 'gray',
-    width: 180,
+    width: '70%',
     textAlign: 'right',
   },
   wrapper: {
     width: '80%',
+    height: windowSize.width*0.4,
     backgroundColor: 'white',
-    
   },
 
 });

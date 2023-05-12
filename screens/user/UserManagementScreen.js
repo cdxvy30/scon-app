@@ -3,6 +3,7 @@ import {AuthContext} from '../../context/AuthContext';
 import {
   ActionSheetIOS,
   Alert,
+  Dimensions,
   FlatList,
   Image,
   SafeAreaView,
@@ -18,6 +19,8 @@ import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import axios from 'axios';
 import {BASE_URL} from '../../configs/authConfig';
+
+const windowSize = Dimensions.get('window')
 
 const UserManagementScreen = ({navigation, route}) => {
   console.log(route.params);
@@ -96,38 +99,39 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     width: '80%',
+    marginBottom: windowSize.height*0.2
   },
   icon: {
-    marginVertical:12,
+    marginVertical: windowSize.height*0.01,
     alignSelf: 'center',
-    width: 157,
-    height: 157,
-    borderRadius: 157 / 2,
+    width: windowSize.height*0.2,
+    height: windowSize.height*0.2,
+    borderRadius: windowSize.height*0.2 / 2,
     borderColor: 'black',
     borderWidth: 2,
   },
   name: {
     alignSelf: 'center',
-    height: 44,
+    height: windowSize.height*0.035,
     fontStyle: 'normal',
-    fontSize: 36,
-    lineHeight: 44,
+    fontSize: windowSize.height*0.035,
+    lineHeight: windowSize.height*0.04,
     color: '#000000',
   },
   permission: {
     alignSelf: 'center',
-    height: 44,
+    height: windowSize.height*0.04,
     fontStyle: 'normal',
-    fontSize: 24,
-    lineHeight: 44,
+    fontSize: windowSize.height*0.03,
+    lineHeight: windowSize.height*0.04,
     color: '#000000',
   },
   dropdown: {
-    height: 50,
+    height: windowSize.height*0.07,
     borderColor: 'gray',
     borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
+    borderRadius: 10,
+    paddingHorizontal: windowSize.width*0.03,
   },
 });
 

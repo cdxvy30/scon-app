@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
-  ActionSheetIOS,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -8,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useIsFocused } from '@react-navigation/native';
 import Separator from '../../components/Separator';
@@ -21,6 +21,7 @@ const DataManageListScreen = ({navigation}) => {
   const [projectList, setProjectList] = useState([]);
   const [fetchRoute, setFetchRoute] = useState([]);
   const isFocused = useIsFocused();
+  const { showActionSheetWithOptions } = useActionSheet();
   const { userInfo } = useContext(AuthContext);
 
   useEffect(() => {
@@ -32,19 +33,20 @@ const DataManageListScreen = ({navigation}) => {
       setFetchRoute(`${BASE_URL}/projects/works_on/${userInfo.user.uuid}`);
 
     const fetchProjects = async () => {
-      await axios
-        .get(fetchRoute, {
-          headers: {
-            Authorization: `Bearer ` + `${userInfo.token}`,
-          },
-        })
-        .then(async (res) => {
-          let projects = await res.data;
-          setProjectList(projects);
-        })
-        .catch((e) => {
-          console.error(`List Projects Error: ${e}`);
-        });
+      await axios({
+        methods: 'get',
+        url: `${fetchRoute}`,
+        headers: {
+          Authorization: `Bearer ` + `${userInfo.token}`,
+        }
+      })
+      .then(async (res) => {
+        let projects = await res.data;
+        setProjectList(projects);
+      })
+      .catch((e) => {
+        console.error(`List Projects Error: ${e}`);
+      });
     };
 
     if (isFocused) {
@@ -53,9 +55,8 @@ const DataManageListScreen = ({navigation}) => {
   }, [isFocused, userInfo, fetchRoute]);
 
   projectListClickHandler = () => {
-    var options = projectList.map(item => item.project_name);
-    options.push('取消');
-    ActionSheetIOS.showActionSheetWithOptions(
+    var options = [...projectList.map(item => item.project_name), '取消'];
+    showActionSheetWithOptions(
       {
         options: options,
         cancelButtonIndex: options.length - 1,

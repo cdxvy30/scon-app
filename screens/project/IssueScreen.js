@@ -16,7 +16,6 @@ import Share from 'react-native-share';
 import {Input} from 'react-native-elements';
 import {
   Alert,
-  ActionSheetIOS,
   Button,
   Dimensions,
   Image,
@@ -32,6 +31,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 import SqliteManager from '../../services/SqliteManager';
 import {transformLabels} from '../../util/sqliteHelper';
 import {useIsFocused} from '@react-navigation/native';
@@ -52,6 +52,7 @@ const IssueScreen = ({navigation, route}) => {
   const projectName = project.project_name;
   const projectCorporation = project.project_corporation;
   const windowSize = Dimensions.get('window');
+  const { showActionSheetWithOptions } = useActionSheet();
 
   const {userInfo} = useContext(AuthContext);
   const [action, setAction] = useState(route.params.action);
@@ -172,18 +173,16 @@ const IssueScreen = ({navigation, route}) => {
 
   // 刪除缺失改善照片
   const attachmentDeleteHandler = index => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
-        options: ['取消', '刪除'],
-        destructiveButtonIndex: [1],
-        cancelButtonIndex: 0,
-        userInterfaceStyle: 'light', //'dark'
+        options: ['刪除', '取消'],
+        destructiveButtonIndex: [0],
+        cancelButtonIndex: 1,
+        // userInterfaceStyle: 'light', //'dark'
       },
       async buttonIndex => {
         switch (buttonIndex) {
-          case 0: // 取消
-            break;
-          case 1: // 刪除
+          case 0: // 刪除
             const targetAttachment = issueAttachments.find(
               (_, attIndex) => attIndex === index,
             );
@@ -192,6 +191,8 @@ const IssueScreen = ({navigation, route}) => {
               attachment => attachment.id !== targetAttachment.id,
             );
             setIssueAttachments(newIssueAttachments);
+            break;
+          case 1: // 取消
             break;
         }
       },
@@ -222,18 +223,16 @@ const IssueScreen = ({navigation, route}) => {
 
   // 新增缺失改善照片
   const imageSelectHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
-        options: ['取消', '拍照', '從相簿選取照片'],
+        options: ['拍照', '從相簿選取照片', '取消'],
         // destructiveButtonIndex: [1,2],
-        cancelButtonIndex: 0,
-        userInterfaceStyle: 'light', //'dark'
+        cancelButtonIndex: 2,
+        // userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
         switch (buttonIndex) {
-          case 0: // 取消
-            break;
-          case 1: // 拍照
+          case 0: // 拍照
             launchCamera({mediaType: 'photo', saveToPhotos: true}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.errorMessage}`);
@@ -245,7 +244,7 @@ const IssueScreen = ({navigation, route}) => {
               }
             });
             break;
-          case 2: // 從相簿選取照片
+          case 1: // 從相簿選取照片
             launchImageLibrary({mediaType: 'photo'}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.errorMessage}`);
@@ -256,6 +255,9 @@ const IssueScreen = ({navigation, route}) => {
                 attachmentAddHandler(res.assets[0]);
               }
             });
+            break;
+          case 2: // 取消
+            break;
         }
       },
     );
@@ -263,18 +265,16 @@ const IssueScreen = ({navigation, route}) => {
 
   // 右上角"匯出"按鈕
   const imageExportHandler = React.useCallback(() => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
-        options: ['取消', '匯出議題圖片'],
+        options: ['匯出議題圖片', '取消'],
         // destructiveButtonIndex: [1,2],
-        cancelButtonIndex: 0,
-        userInterfaceStyle: 'light', //'dark'
+        cancelButtonIndex: 1,
+        // userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
         switch (buttonIndex) {
           case 0:
-            break; // cancel action
-          case 1:
             const shareOption = {
               title: 'MyApp',
               message: '議題圖片',
@@ -284,6 +284,8 @@ const IssueScreen = ({navigation, route}) => {
             };
             Share.open(shareOption);
             break;
+          case 1:
+            break; // cancel action
         }
       },
     );
@@ -291,25 +293,25 @@ const IssueScreen = ({navigation, route}) => {
 
   // 缺失狀態選單
   const issueStatusClickHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
-        options: ['取消', '無風險', '有風險，須改善', '有風險，須立即改善'],
-        cancelButtonIndex: 0,
+        options: ['無風險', '有風險，須改善', '有風險，須立即改善', '取消'],
+        cancelButtonIndex: 3,
         userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
         switch (buttonIndex) {
           case 0:
-            break; // cancel action
-          case 1:
             setIssueStatus(ISSUE_STATUS.lowRisk.id);
             break;
-          case 2:
+          case 1:
             setIssueStatus(ISSUE_STATUS.mediumRisk.id);
             break;
-          case 3:
+          case 2:
             setIssueStatus(ISSUE_STATUS.highRisk.id);
             break;
+          case 3:
+            break; // cancel action
         }
       },
     );
@@ -343,20 +345,22 @@ const IssueScreen = ({navigation, route}) => {
   
   // 選取缺失類別(其他)
   const newIssueTypeClickHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    var options = violationType
+    ? [...ISSUE_TYPE[ISSUE_TYPE[0].titles.indexOf(`${violationType}`)+1].type, '取消']
+    : ['---請選取缺失類別---'];
+
+    showActionSheetWithOptions(
       {
-        options: violationType
-          ? decideIssueTypes(violationType)
-          : ['---請選取缺失類別---'],
+        options: options,
         // destructiveButtonIndex: [1,2],
-        cancelButtonIndex: 0,
-        userInterfaceStyle: 'light', //'dark'
+        cancelButtonIndex: options.length - 1,
+        // userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
-        if (buttonIndex == 0) {
+        if (buttonIndex == options.length - 1) {
           // cancel action
         } else {
-          setIssueType(`${decideIssueTypes(violationType)[buttonIndex]}`);
+          setIssueType(`${options[buttonIndex]}`);
         }
       },
     );
@@ -364,10 +368,10 @@ const IssueScreen = ({navigation, route}) => {
 
   // 選取缺失類別(其他之外)
   const violationTypeClickHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
+        title:'缺失類別',
         options: [
-          '取消',
           '墜落',
           '機械',
           '物料',
@@ -378,16 +382,17 @@ const IssueScreen = ({navigation, route}) => {
           '工作場所',
           '搬運',
           '其他',
+          '取消',
         ],
         // destructiveButtonIndex: [1,2],
-        cancelButtonIndex: 0,
-        userInterfaceStyle: 'light', //'dark'
+        cancelButtonIndex:10,
+        // userInterfaceStyle: 'light', //'dark'
       },
       buttonIndex => {
-        if (buttonIndex == 0) {
+        if (buttonIndex == 10) {
           // cancel action
         } else {
-          setViolationType(ISSUE_TYPE[0].titles[buttonIndex - 1]);
+          setViolationType(ISSUE_TYPE[0].titles[buttonIndex]);
           setIssueType('');
         }
       },
@@ -745,10 +750,10 @@ const IssueScreen = ({navigation, route}) => {
               Alert.alert('請點選缺失地點');
               return;
             }
-            else if (!responsibleCorporation) {
-              Alert.alert('請點選責任廠商');
-              return;
-            }
+            // else if (!responsibleCorporation) {
+            //   Alert.alert('請點選責任廠商');
+            //   return;
+            // }
             else {
             // 將紀錄完成之缺失資料更新至後端
             // ************************************************************ //
@@ -837,12 +842,12 @@ const IssueScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={() => violationTypeClickHandler()}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失類別</Text>
-                <View style={{flexDirection: 'row'}}>
+                <View style={styles.text_and_icon}>
                   <Text style={styles.description}>
                     {violationType ? violationType : '選取缺失類別'}
                   </Text>
                   <Ionicons
-                    style={styles.description}
+                    style={styles.icon}
                     name={'ios-chevron-forward'}
                   />
                 </View>
@@ -854,12 +859,12 @@ const IssueScreen = ({navigation, route}) => {
                 <TouchableOpacity onPress={() => newIssueTypeClickHandler()}>
                   <View style={styles.item}>
                     <Text style={styles.title}>缺失項目</Text>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={styles.text_and_icon}>
                       <Text style={styles.description}>
                         {issueType ? issueType : '選取缺失項目'}
                       </Text>
                       <Ionicons
-                        style={styles.description}
+                        style={styles.icon}
                         name={'ios-chevron-forward'}
                       />
                     </View>
@@ -872,7 +877,7 @@ const IssueScreen = ({navigation, route}) => {
               <React.Fragment>
                 <View style={styles.item}>
                   <Text style={styles.title}>缺失項目</Text>
-                  <View style={{flexDirection: 'row'}}>
+                  <View style={styles.text_and_icon}>
                     <TextInput
                       style={styles.textInput}
                       onChangeText={setIssueType}
@@ -886,25 +891,23 @@ const IssueScreen = ({navigation, route}) => {
             <React.Fragment>
                 <View style={styles.item}>
                   <Text style={styles.title}>缺失描述</Text>
-                  <View>
-                    <TextInput
-                      style={styles.textInput}
-                      onChangeText={setIssueCaption}
-                      defaultValue={issueCaption}
-                    />
-                  </View>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={setIssueCaption}
+                    defaultValue={issueCaption}
+                  />
                 </View>
                 <Separator />
               </React.Fragment>
             <TouchableOpacity onPress={IssueLocationListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失地點</Text>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.textInput}>
+                <View style={styles.text_and_icon}>
+                  <Text style={styles.description}>
                     {!!issueLocationText ? issueLocationText : undefined}
                   </Text>
                   <Ionicons
-                    style={styles.description}
+                    style={styles.icon}
                     name={'ios-chevron-forward'}
                   />
                 </View>
@@ -914,14 +917,14 @@ const IssueScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={responsibleCorporationclickHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>責任廠商</Text>
-                <View style={{flexDirection: 'row'}}>
+                <View style={styles.text_and_icon}>
                   <Text style={styles.textInput}>
                     {!!responsibleCorporation
                       ? responsibleCorporation
                       : undefined}
                   </Text>
                   <Ionicons
-                    style={styles.description}
+                    style={styles.icon}
                     name={'ios-chevron-forward'}
                   />
                 </View>
@@ -931,12 +934,12 @@ const IssueScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={taskClickHandler}>
               <View style={styles.item}>
                 <Text style={{fontSize: 18, color: '#8C8C8C'}}>工項(選填)</Text>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.textInput}>
+                <View style={styles.text_and_icon}>
+                  <Text style={styles.description}>
                     {!!issueTaskText ? issueTaskText : undefined}
                   </Text>
                   <Ionicons
-                    style={styles.description}
+                    style={styles.icon}
                     name={'ios-chevron-forward'}
                   />
                 </View>
@@ -945,7 +948,7 @@ const IssueScreen = ({navigation, route}) => {
             <Separator />
             {/* <View style={styles.item}>
               <Text style={styles.title}>記錄人員</Text>
-              <View style={{flexDirection: 'row'}}>
+              <View style={styles.text_and_icon}>
                 <TextInput
                   style={styles.textInput}
                   onChangeText={setIssueSafetyManagerText}
@@ -957,19 +960,23 @@ const IssueScreen = ({navigation, route}) => {
             <TouchableOpacity onPress={() => issueStatusClickHandler()}>
               <View style={styles.item}>
                 <Text style={styles.title}>狀態</Text>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.textInput}>
+                  <View style={styles.text_and_icon}>
+                    <Text style={styles.description}>
                       {!!getIssueStatusById(issueStatus)
                         ? getIssueStatusById(issueStatus).name
                         : undefined}
                     </Text>
+                    <Ionicons
+                    style={styles.icon}
+                    name={'ios-chevron-forward'}
+                    />
                   </View>
               </View>
             </TouchableOpacity>
             <Separator />
             <View style={styles.item}>
               <Text style={styles.title}>追蹤缺失</Text>
-              <View style={{flexDirection: 'row'}}>
+              <View style={styles.text_and_icon}>
                 <Switch
                   onValueChange={() => issueTrackToggleHandler()}
                   value={issueTrack}
@@ -1004,7 +1011,7 @@ const IssueScreen = ({navigation, route}) => {
                         onChangeText={(text) => setIssueAttachmentsRemark(text)}
                         defaultValue={issueAttachmentsRemark}
                         value={issueAttachmentsRemark}
-                        // onSubmitEditing={Keyboard.dismiss}
+                        onSubmitEditing={Keyboard.dismiss}
                       />
                     </View>
                   </View>
@@ -1072,7 +1079,7 @@ const IssueScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: StatusBar.currentHeight,
+    // paddingTop: StatusBar.currentHeight,
   },
   text: {
     fontSize: 24,
@@ -1099,11 +1106,18 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center'
   },
   title: {
     fontSize: 18,
   },
   description: {
+    width:'90%',
+    fontSize: 18,
+    textAlign: 'right',
+    color: 'gray',
+  },
+  icon:{
     fontSize: 18,
     color: 'gray',
   },
@@ -1113,6 +1127,13 @@ const styles = StyleSheet.create({
     width: 180,
     textAlign: 'right',
   },
+  text_and_icon: {
+    flexDirection: 'row', 
+    width: '100%', 
+    flex: 1, 
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  }
 });
 
 export default IssueScreen;

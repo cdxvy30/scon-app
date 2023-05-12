@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // import type {Node} from 'react';
 import {
-  ActionSheetIOS,
   Alert,
   Button,
   Dimensions,
@@ -16,6 +15,7 @@ import {
   // StatusBar,
   // useColorScheme,
 } from 'react-native';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 // import {
 //   Colors,
 //   DebugInstructions,
@@ -43,6 +43,7 @@ const PhotoScreen = ({ navigation, route }) => {
   const setIssueLabels = route.params.setIssueLabels;
   const windowSize = Dimensions.get('window')
   const canvasHeight = (route.params.image.height * windowSize.width) / route.params.image.width;
+  const { showActionSheetWithOptions } = useActionSheet();
 
   const [canvas, setCanvas] = useState(undefined);
   const [canvasContainerStyle, setCanvasContainerStyle] = useState(undefined);
@@ -171,7 +172,7 @@ const PhotoScreen = ({ navigation, route }) => {
   }, [route.params.image]);
 
   const boxIconClickHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
         options: labelOptions,
         // destructiveButtonIndex: [1,2],
@@ -191,7 +192,7 @@ const PhotoScreen = ({ navigation, route }) => {
   };
 
   const brushIconClickHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
         options: labelOptions,
         // destructiveButtonIndex: [1,2],
@@ -255,7 +256,7 @@ const PhotoScreen = ({ navigation, route }) => {
   };
 
   const labelDeleteHandler = async labelId => {       //後端還沒好
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
         options: ['取消', '刪除'],
         destructiveButtonIndex: [1],

@@ -11,7 +11,7 @@ import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelect
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
 import IssueLocationListScreen from '../screens/project/IssueLocationListScreen';
 import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen';
-import CorporationAddScreen from '../screens/setting/CorporationAddScreen';
+import CorporationAddScreen from '../screens/project/CorporationAddScreen';
 import CorporationListScreen from '../screens/project/CorporationListScreen';
 import TaskAddScreen from '../screens/project/TaskAddScreen';
 import TaskListScreen from '../screens/project/TaskListScreen';

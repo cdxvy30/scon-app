@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Icon } from 'react-native-elements';
 import Swipeout from "react-native-swipeout";
 import Separator from "../../components/Separator";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -65,24 +66,28 @@ const ProjectListScreen = ({ navigation }) => {
 
     console.log(fetchRoute);
     const fetchProjects = async () => {
-      await axios
-        .get(fetchRoute, {
-          headers: {
-            Authorization: `Bearer ` + `${userInfo.token}`,
-          },
-        })
-        .then(async (res) => {
-          let projects = await res.data;
-          // console.log(projects);
-          setProjectList(projects);
-        })
-        .catch((e) => {
-          console.error(`List Projects Error: ${e}`);
-        });
+      await axios({
+        methods: 'get',
+        url: `${fetchRoute}`,
+        headers: {
+          Authorization: `Bearer ` + `${userInfo.token}`,
+        }
+      })
+      .then(async (res) => {
+        let projects = await res.data;
+        // console.log(projects);
+        setProjectList(projects);
+      })
+      .catch((e) => {
+        console.error(`List Projects Error: ${e}`);
+      });
     };
 
     if (isFocused) {
-      fetchProjects();
+      setTimeout(() => {
+        fetchProjects();
+      },300);
+      
     }
   }, [isFocused, userInfo, fetchRoute]);
 
@@ -226,7 +231,7 @@ const ProjectListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
+    // marginTop: StatusBar.currentHeight || 0,
   },
   flatList: {
     height: "auto",
@@ -247,7 +252,7 @@ const styles = StyleSheet.create({
   title: {
     marginLeft: 12,
     fontSize: 24,
-    width: 250,
+    width: '65%',
     alignSelf: "center",
   },
   status: {

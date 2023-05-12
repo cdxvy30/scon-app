@@ -3,6 +3,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIsFocused} from '@react-navigation/native';
 import {Button, Icon} from 'react-native-elements';
 import {
+  Dimensions,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -16,6 +17,8 @@ import axios from 'axios';
 import * as Animatable from 'react-native-animatable'
 import Collapsible from 'react-native-collapsible';
 import Accordion from 'react-native-collapsible/Accordion'
+
+const windowSize = Dimensions.get('window')
 
 const LocationManagementScreen = ({navigation, route}) => {
   const project = route.params.project;
@@ -175,56 +178,36 @@ const LocationManagementScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-    padding:20,
+    // marginTop: StatusBar.currentHeight || 0,
+    padding: windowSize.height*0.02,
   },
   flatList: {
     height: 'auto',
   },
-  item: {
-    height: 70,
-    padding: 20,
+  header:{
+    marginVertical: windowSize.height*0.01,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'space-between',
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    // marginVertical: 8,
-    // marginHorizontal: 16,
-  },
-  title: {
-    // fontSize: 24,
-    // alignItems: 'center',
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '300',
-    marginTop: 20,
-  },
-  header:{
-    marginVertical:5,
-    backgroundColor:'#FFFFFF',
-    justifyContent:'space-between',
-    flex:1,
-    flexDirection:'row',
-    alignItems:'center',
-    borderRadius:15,
-    borderWidth:1,
-    padding:10
+    alignItems: 'center',
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#BBBBBB',
+    padding: windowSize.height*0.01
   },
   headerText:{
-    fontSize: 26,
+    fontSize: windowSize.height*0.033,
     fontWeight: '400',
-  },
-  headerText_active:{
-    fontSize: 26,
-    fontWeight: '400',
-    color:'#FFFFFF'
   },
   content:{
     flex:0,
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
-    paddingVertical:5,
-    marginHorizontal:30
+    paddingVertical: windowSize.height*0.01,
+    marginHorizontal: windowSize.width*0.07,
+    height: windowSize.height*0.08,
   },
   contentItem:{
     flex:0,
@@ -233,29 +216,7 @@ const styles = StyleSheet.create({
   },
   contentText:{
     color:'#727272',
-    fontSize:20,
-  },
-  header_active:{
-    backgroundColor:'#A9A9A9',
-  },
-  content_active:{
-
-  },
-  selectors:{
-    flex:1,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  selectors_options:{
-    paddingHorizontal:30,
-    height:40,
-    borderWidth:1,
-    borderStyle:'solid',
-  },
-  activeSelector:{
-    fontWeight: 'bold',
-    fontSize: 26
+    fontSize: windowSize.height*0.025,
   },
 });
 

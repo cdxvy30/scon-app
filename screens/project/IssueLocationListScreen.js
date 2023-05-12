@@ -3,6 +3,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIsFocused} from '@react-navigation/native';
 import {Icon} from 'react-native-elements';
 import {
+  Dimensions,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -16,6 +17,8 @@ import axios from 'axios';
 import * as Animatable from 'react-native-animatable'
 import Collapsible from 'react-native-collapsible';
 import Accordion from 'react-native-collapsible/Accordion'
+
+const windowSize = Dimensions.get('window')
 
 const IssueLocationListScreen = ({navigation, route}) => {
   const projectId = route.params.projectId;
@@ -84,7 +87,6 @@ const IssueLocationListScreen = ({navigation, route}) => {
       </View>
     )
   }
-  //以上實驗用
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -149,7 +151,9 @@ const IssueLocationListScreen = ({navigation, route}) => {
     };
 
     if (isFocused) {
-      fetchIssueLocations();
+      setTimeout(() => {
+        fetchIssueLocations();
+      },500);
     }
   }, [isFocused, projectId]);
 
@@ -182,78 +186,58 @@ const IssueLocationListScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-    padding:20,
+    // marginTop: StatusBar.currentHeight || 0,
+    padding: windowSize.height*0.02,
   },
   flatList: {
     height: 'auto',
   },
-  item: {
-    height: 70,
-    padding: 20,
+  header:{
+    marginVertical: windowSize.height*0.01,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'space-between',
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    // marginVertical: 8,
-    // marginHorizontal: 16,
-  },
-  title: {
-    // fontSize: 24,
-    // alignItems: 'center',
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '300',
-    marginTop: 20,
-  },
-  header:{
-    marginVertical:5,
-    backgroundColor:'#FFFFFF',
-    justifyContent:'space-between',
-    flex:1,
-    flexDirection:'row',
-    alignItems:'center',
-    borderRadius:15,
-    borderWidth:1,
-    borderColor:'#BBBBBB',
-    padding:10
+    alignItems: 'center',
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#BBBBBB',
+    padding: windowSize.height*0.01
   },
   headerText:{
-    fontSize: 26,
+    fontSize: windowSize.height*0.035,
     fontWeight: '400',
   },
   headerText_active:{
-    fontSize: 26,
+    fontSize: windowSize.height*0.035,
     fontWeight: '400',
   },
   content:{
     flex:0,
-    flexDirection:'row',
-    alignItems:'center',
-    paddingVertical:5,
-    marginHorizontal:30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: windowSize.height*0.01,
+    marginHorizontal: windowSize.height*0.03,
   },
   contentText:{
-    color:'#727272',
-    fontSize:20,
-  },
-  content_active:{
-
+    color: '#727272',
+    fontSize: windowSize.height*0.025,
   },
   selectors:{
     flex:1,
-    padding: 10,
+    padding: windowSize.height*0.01,
     flexDirection: 'row',
     justifyContent: 'center',
   },
   selectors_options:{
-    paddingHorizontal:30,
-    height:40,
-    borderWidth:1,
-    borderStyle:'solid',
+    paddingHorizontal: windowSize.height*0.03,
+    height: windowSize.height*0.05,
+    borderWidth: 1,
+    borderStyle: 'solid',
   },
   activeSelector:{
     fontWeight: 'bold',
-    fontSize: 26
+    fontSize: windowSize.height*0.03
   },
 });
 

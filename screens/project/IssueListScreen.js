@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, {useEffect, useState, useContext} from 'react';
 import {
-  ActionSheetIOS,
   ActivityIndicator,
   Alert,
   FlatList,
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 import Swipeout from 'react-native-swipeout';
 import Separator from '../../components/Separator';
 // import PopUpMenu from '../../components/PopUpMenu';
@@ -56,7 +56,7 @@ const IssueListScreen = ({navigation, route}) => {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedSearch, setSelectedSearch] = useState([]);
   const isFocused = useIsFocused();
-
+  const { showActionSheetWithOptions } = useActionSheet();
   const {userInfo} = useContext(AuthContext);
 
   function issuesFilter(Issues) {
@@ -216,18 +216,17 @@ const IssueListScreen = ({navigation, route}) => {
 
   // @!選取照片, 並觸發detectAndSwitchToIssueScreen(image)
   const imageSelectHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions(
+    showActionSheetWithOptions(
       {
-        options: ['取消', '拍照', '從相簿選取照片'],
+        options: ['拍照', '從相簿選取照片', '取消'],
         // destructiveButtonIndex: [1,2],
-        cancelButtonIndex: 0,
-        userInterfaceStyle: 'light', //'dark'
+        cancelButtonIndex: 2,
+        // userInterfaceStyle: 'light', //'dark'
       },
-      buttonIndex => {
-        switch (buttonIndex) {
-          case 0: // cancel action
-            break;
-          case 1:
+      selectedIndex => {
+        console.log(selectedIndex)
+        switch (selectedIndex) {
+          case 0:
             launchCamera(
               {quality: 0.1, mediaType: 'photo', saveToPhotos: true},
               res => {
@@ -244,7 +243,7 @@ const IssueListScreen = ({navigation, route}) => {
               },
             );
             break;
-          case 2:
+          case 1:
             launchImageLibrary({quality: 0.1, mediaType: 'photo'}, res => {
               if (res.errorMessage !== undefined) {
                 console.error(`code: ${res.errorCode}: ${res.erroMessage}`);
@@ -256,6 +255,8 @@ const IssueListScreen = ({navigation, route}) => {
                 detectAndSwitchToIssueScreen(image);
               }
             });
+            break;
+          case 2: // cancel action
             break;
         }
       },
@@ -280,22 +281,22 @@ const IssueListScreen = ({navigation, route}) => {
           console.log(`List issues error: ${e}`);
         });
     };
-    const deleteTmpFiles = () => {
-      try {
-        RNFetchBlob.fs.unlink(RNFetchBlob.fs.dirs.DocumentDir + "/RNFetchBlob_tmp/")
-      }
-      catch (e){
-        console.log('failed to delete tmp files', e);
-      }
-    }
+    // const deleteTmpFiles = () => {
+    //   try {
+    //     RNFetchBlob.fs.unlink(RNFetchBlob.fs.dirs.DocumentDir + "/RNFetchBlob_tmp/")
+    //   }
+    //   catch (e){
+    //     console.log('failed to delete tmp files', e);
+    //   }
+    // }
 
     if (selectedSearch.length === 0) {
       fetchIssues();
     }
 
-    if (isFocused) {
-      deleteTmpFiles();
-    }
+    // if (isFocused) {
+    //   deleteTmpFiles();
+    // }
   }, [isFocused, project.project_id, selectedSearch, selectedEndDate]);
   // **************************************** //
 
@@ -457,6 +458,7 @@ const IssueListScreen = ({navigation, route}) => {
             navigation={navigation}
             />
             <ExportButton 
+              base_url={BASE_URL}
               project={project}
               selectedStartDate={selectedStartDate}
               selectedEndDate={selectedEndDate}
@@ -596,7 +598,6 @@ const IssueListScreen = ({navigation, route}) => {
   );
 
   const renderItem = ({item}) => {
-    console.log(item);
     const backgroundColor = item.id === selectedIssueId ? 'white' : 'white'; //"#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedIssueId ? 'black' : 'black'; //'white' : 'black';
 
@@ -729,7 +730,7 @@ const IssueListScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
+    // marginTop: StatusBar.currentHeight || 0,
   },
   item: {
     padding: 5,

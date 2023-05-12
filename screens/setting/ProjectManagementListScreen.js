@@ -61,7 +61,7 @@ const ProjectManagementListScreen = ({navigation}) => {
     setSelectedProjectId(project.project_id);
     console.log(project);
     try {
-      await navigation.navigate('ProjectManagementScreen', {
+      await navigation.navigate('ProjectManagement', {
         project_id: project.project_id,
         project_name: project.project_name,
         project_corporation: project.project_corporation,

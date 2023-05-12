@@ -11,6 +11,7 @@ import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import TabNavigation from './navigations/TabNavigation';
 import SqliteManager from './services/SqliteManager';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import {AuthProvider} from './context/AuthContext';
 import Navigation from './navigations/Navigation';
@@ -46,10 +47,12 @@ const App = () => {
   //   </React.Fragment>
   // );
   return (
-    <AuthProvider>
-      <StatusBar backgroundColor="#06bcee" />
-      <Navigation />
-    </AuthProvider>
+    <ActionSheetProvider>
+      <AuthProvider>
+        <StatusBar backgroundColor="#06bcee" />
+        <Navigation />
+      </AuthProvider>
+    </ActionSheetProvider>
   );
 };
 
