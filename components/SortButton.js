@@ -6,6 +6,7 @@ import {
   Modal,
   SafeAreaView,
   StyleSheet,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -101,7 +102,7 @@ const SortButton = ({
                             key={i} 
                             onPress={op.action}
                         >
-                            <Text style={{fontSize:18}}>{op.title}</Text>
+                            <Text style={{fontSize:16}}>{op.title}</Text>
                             <Icon name={op.icon} type={op.icon_type} size={26} color={'#212121'} style={{marginLeft: 40}} />
                         </TouchableOpacity>
                         ))}
@@ -117,15 +118,15 @@ const styles = StyleSheet.create({
     popUpMenu: {
         backgroundColor: '#ddd',
         position: 'absolute',
-        top: 88,
-        right: 100,
+        top: StatusBar.currentHeight ? StatusBar.currentHeight*2 : 88,
+        right: 90,
         shadowColor: '#666',
         shadowOffset: {width:-5, height:10},
         shadowOpacity: 0.7
     },
     popUpTitle: {
         fontWeight:'600',
-        fontSize:20,
+        fontSize:18,
         paddingHorizontal:8,
         paddingVertical:10,
     },
