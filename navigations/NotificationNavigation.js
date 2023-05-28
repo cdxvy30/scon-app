@@ -1,7 +1,7 @@
 import React from 'react';
 // import type {Node} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import NotificationScreen from '../screens/setting/NotificationScreen';
+import NotificationScreen from '../screens/notification/NotificationScreen';
 
 const Stack = createNativeStackNavigator();
 

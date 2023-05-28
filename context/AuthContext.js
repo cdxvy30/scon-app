@@ -2,6 +2,7 @@ import React, {createContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {BASE_URL} from '../configs/authConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { connectToServer } from '../configs/socket';
 
 export const AuthContext = createContext();
 
@@ -21,13 +22,13 @@ export const AuthProvider = ({children}) => {
         email,
         password,
       })
-      .then(async res => {
+      .then(async (res) => {
         let userInfo = await res.data;
         setUserInfo(userInfo);
         AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
         // setIsLoading(false);
       })
-      .catch(e => {
+      .catch((e) => {
         console.info(e.response.data);
         console.log(e.response.status);
         console.log(`register error : ${e}`);
@@ -42,13 +43,13 @@ export const AuthProvider = ({children}) => {
         email,
         password,
       })
-      .then(async res => {
+      .then(async (res) => {
         let userInfo = await res.data; // token與email, name資訊
         setUserInfo(userInfo);
         AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
         // setIsLoading(false);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e.response.data);
         console.log(e.response.status);
         console.log(`login error : ${e}`);
@@ -68,14 +69,14 @@ export const AuthProvider = ({children}) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     })
-      .then(async res => {
+      .then(async (res) => {
         let status = await res.data;
         console.log(status);
         AsyncStorage.removeItem('userInfo');
         setUserInfo({});
         setIsLoading(false);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e.response.data);
         console.log(`logout error ${e}`);
         // setIsLoading(false);
@@ -92,7 +93,7 @@ export const AuthProvider = ({children}) => {
       if (userInfo) {
         setUserInfo(userInfo);
       }
-
+      console.log('Is LOGGED IN!');
       // setSplashLoading(false);
     } catch (e) {
       console.log(`is logged in error ${e}`);
@@ -101,6 +102,7 @@ export const AuthProvider = ({children}) => {
 
   useEffect(() => {
     isLoggedIn();
+    // connectToServer();
   }, []);
 
   return (

@@ -1,4 +1,5 @@
-import React, {useContext, useState} from 'react';
+/* eslint-disable prettier/prettier */
+import React, {useContext, useEffect, useState} from 'react';
 import {
   Text,
   TextInput,
@@ -11,20 +12,33 @@ import {Input, Icon, Button} from 'react-native-elements';
 import {AuthContext} from '../../context/AuthContext';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { SelectList } from 'react-native-dropdown-select-list';
+import axios from 'axios';
+import { BASE_URL } from '../../configs/authConfig';
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
+  // const [corporationList, setCorporationList] = useState(null);
+  const [selected, setSelected] = useState([]);
+  const [corporationList, setCorporationList] = useState(null);
   const [name, setName] = useState(null);
-  const [corporation, setCorporation] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const {isLoading, register} = useContext(AuthContext);
 
-  const corporationList = [
-    {label: '世曦工程顧問股份有限公司', value: '世曦工程顧問股份有限公司'},
-    {label: '豐譽營造股份有限公司', value: '豐譽營造股份有限公司'},
-    {label: '瑞助營造股份有限公司', value: '瑞助營造股份有限公司'},
-    {label: '建國工程股份有限公司', value: '建國工程股份有限公司'},
-  ];
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/corporations/all`)
+      .then((res) => {
+        console.log(res.data);
+        let newArray = res.data.map((item) => {
+          return {key: item.corporation_id, value: item.corporation_name};
+        });
+        setCorporationList(newArray);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -33,7 +47,7 @@ const RegisterScreen = ({navigation}) => {
         <Text style={styles.caption_top}>
           營建工地智慧視覺監視與自動報告系統
         </Text>
-        <Dropdown
+        {/* <Dropdown
           style={styles.dropdown}
           data={corporationList}
           placeholder="請選擇您的公司"
@@ -46,6 +60,12 @@ const RegisterScreen = ({navigation}) => {
           renderLeftIcon={() => (
             <AntDesign style={styles.icon} name="Safety" size={24} />
           )}
+        /> */}
+        <SelectList
+          setSelected={(val) => {setSelected(val)}}
+          data={corporationList}
+          save="value"
+          placeholder='請選擇您所屬的公司'
         />
         <Input
           style={styles.input}
@@ -77,7 +97,7 @@ const RegisterScreen = ({navigation}) => {
         <Button
           title="註冊"
           onPress={() => {
-            register(name, corporation, email, password);
+            register(name, selected, email, password);
           }}
         />
         <View style={{flexDirection: 'row', marginTop: 20}}>
