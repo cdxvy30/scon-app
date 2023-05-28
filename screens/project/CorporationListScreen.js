@@ -55,31 +55,31 @@ const CorporationListScreen = ({navigation, route}) => {
     // };
 
     const fetchCorporations = async () => {
-      try{
-        const res = await axios.get(`${BASE_URL}/corporations/list/${projectId}`);
+      try {
+        const res = await axios.get(`${BASE_URL}/corporations/${projectId}`);
         setCorporationList(await res.data);
         console.log('Corporation List: \n', res.data);
-      }catch(error){
+      } catch (error) {
         console.log(`Fetch corporation error: ${error}`);
       }
     };
 
     if (isFocused) {
       // fetchWorkItems();
-      fetchCorporations()
+      fetchCorporations();
     }
   }, [isFocused]);
 
   const corporationClickHandler = (item) => {
-    setSelectedCorporationId(item.corporation_id)
-    route.params.setResponsibleCorporation(item.corporation_name)
-    navigation.goBack()
+    setSelectedCorporationId(item.corporation_id);
+    route.params.setResponsibleCorporation(item.corporation_name);
+    navigation.goBack();
   };
 
   const corporationAddHandler = async () => {
     navigation.navigate('CorporationAdd', { 
       name: 'Create new corporation' ,
-      projectId: projectId
+      projectId: projectId,
     })};
 
   const corporationDeleteHandler = async () => {
