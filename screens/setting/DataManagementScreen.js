@@ -49,7 +49,7 @@ const DataManageScreen = ({navigation, route}) => {
 
   corporationClickHandler = () => {
     navigation.navigate(
-      'CorporationList', {
+      'CorporationManagementList', {
         project: project,
       }
     )
