@@ -57,12 +57,10 @@ const ProjectListScreen = ({ navigation }) => {
   // }, [isFocused]);
 
   useEffect(() => {
-    if (userInfo.user.permission == "管理員")
-      setFetchRoute(`${BASE_URL}/projects/all`);
-    else if (userInfo.user.permission == "公司負責人")
+    if (userInfo.user.permission !== "專案管理員")
       setFetchRoute(`${BASE_URL}/projects/${userInfo.user.corporation}`);
-    else if (userInfo.user.permission == "專案管理員")  // 要改成從works_on fetch
-      setFetchRoute(`${BASE_URL}/projects/works_on/${userInfo.user.uuid}`);
+    else if (userInfo.user.permission === "專案管理員")
+      setFetchRoute(`${BASE_URL}/projects/participate/${userInfo.user.uuid}`);
 
     console.log(fetchRoute);
     const fetchProjects = async () => {
@@ -86,8 +84,7 @@ const ProjectListScreen = ({ navigation }) => {
     if (isFocused) {
       setTimeout(() => {
         fetchProjects();
-      },300);
-      
+      }, 100);
     }
   }, [isFocused, userInfo, fetchRoute]);
 

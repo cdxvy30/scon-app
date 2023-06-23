@@ -182,7 +182,7 @@ const IssueListScreen = ({navigation, route}) => {
       url: 'http://34.80.209.101:8000/predict',
       data: bodyFormData,
       headers: {'Content-Type': 'multipart/form-data'},
-      timeout: 5000,
+      timeout: 20000,
     })
       .then(async function (response) {
         //handle success
