@@ -1740,6 +1740,13 @@
   "resolved" "https://registry.npmjs.org/@react-native-community/geolocation/-/geolocation-3.0.6.tgz"
   "version" "3.0.6"
 
+"@react-native-community/push-notification-ios@^1.11.0":
+  "integrity" "sha512-nfkUs8P2FeydOCR4r7BNmtGxAxI22YuGP6RmqWt6c8EEMUpqvIhNKWkRSFF3pHjkgJk2tpRb9wQhbezsqTyBvA=="
+  "resolved" "https://registry.npmjs.org/@react-native-community/push-notification-ios/-/push-notification-ios-1.11.0.tgz"
+  "version" "1.11.0"
+  dependencies:
+    "invariant" "^2.2.4"
+
 "@react-native-windows/cli@0.71.5":
   "integrity" "sha512-ZPK6QQq+UrZhw+yBQH3W649o5Rm98vaHBA+fYGPUPCmZrsfjH4xBE9jS5DfgY6MumJkHuK2OuVgKXNSy9i3ZPQ=="
   "resolved" "https://registry.npmjs.org/@react-native-windows/cli/-/cli-0.71.5.tgz"
@@ -7221,7 +7228,7 @@
     "whatwg-fetch" "^3.0.0"
     "ws" "^6.2.2"
 
-"react-native@*", "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", "react-native@^0.71.0", "react-native@>= 0.64.3", "react-native@>=0.14.0", "react-native@>=0.42.0", "react-native@>=0.60.0", "react-native@>=0.63.2", "react-native@>=0.65.0", "react-native@>0.62.0", "react-native@0.71.7":
+"react-native@*", "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", "react-native@^0.71.0", "react-native@>= 0.64.3", "react-native@>=0.14.0", "react-native@>=0.42.0", "react-native@>=0.58.4", "react-native@>=0.60.0", "react-native@>=0.63.2", "react-native@>=0.65.0", "react-native@>0.62.0", "react-native@0.71.7":
   "integrity" "sha512-Id6iRLS581fJMFGbBl1jP5uSmjExtGOvw5Gvh7694zISXjsRAsFMmU+izs0pyCLqDBoHK7y4BT7WGPGw693nYw=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.71.7.tgz"
   "version" "0.71.7"
@@ -7291,7 +7298,7 @@
     "raf" "^3.1.0"
     "tween-functions" "^1.0.1"
 
-"react@*", "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^17 || ^18", "react@^18.2.0", "react@>= 17.0.1", "react@>=16.13.1", "react@>=16.3.0", "react@>=16.8", "react@>=17.0.0", "react@18.2.0":
+"react@*", "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^17 || ^18", "react@^18.2.0", "react@>= 17.0.1", "react@>=16.13.1", "react@>=16.3.0", "react@>=16.6.3", "react@>=16.8", "react@>=17.0.0", "react@18.2.0":
   "integrity" "sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ=="
   "resolved" "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   "version" "18.2.0"
