@@ -6776,10 +6776,10 @@
   "resolved" "https://registry.npmjs.org/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz"
   "version" "8.6.3"
 
-"react-native-flipper@^0.190.0":
-  "integrity" "sha512-hkVked8cWBVUVZJSAX8GY+B4AaJ/sdYDRqeAcLcQ16kyMzyHxU3PWu27mXTYoRJqA2W85iAIaE1rONYoaEiKnA=="
-  "resolved" "https://registry.npmjs.org/react-native-flipper/-/react-native-flipper-0.190.0.tgz"
-  "version" "0.190.0"
+"react-native-flipper@^0.163.0":
+  "integrity" "sha512-RG0yMlEMe/fYqaoUkhvW2HrqBuRYtq1K3me9y52RBFwPWooZTmUlWjIWGKT9VYVS9T2GGrUV9tpBA8pY9g7CSg=="
+  "resolved" "https://registry.npmjs.org/react-native-flipper/-/react-native-flipper-0.163.0.tgz"
+  "version" "0.163.0"
 
 "react-native-gradle-plugin@^0.71.17":
   "integrity" "sha512-OXXYgpISEqERwjSlaCiaQY6cTY5CH6j73gdkWpK0hedxtiWMWgH+i5TOi4hIGYitm9kQBeyDu+wim9fA8ROFJA=="

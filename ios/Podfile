@@ -6,6 +6,12 @@ platform :ios, '14.0'
 target 'TestConnection' do
   config = use_native_modules!
 
+  project 'TestConnection',
+    'Dev.Debug' => :debug, # '{Build Configuration name}' => :{debug or release}
+    'Debug' => :debug,
+    'Dev.Release' => :release,
+    'Release' => :release
+    
   use_react_native!(
     :path => config[:reactNativePath],
     # to enable hermes on iOS, change `false` to `true` and then install pods
@@ -22,9 +28,7 @@ target 'TestConnection' do
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable the next line.
-  # use_flipper!()
 
-  pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios'
   post_install do |installer|
     react_native_post_install(installer)
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
