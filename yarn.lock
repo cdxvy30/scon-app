@@ -1731,84 +1731,6 @@
   dependencies:
     "invariant" "^2.2.4"
 
-"@react-native-windows/cli@0.71.5":
-  "integrity" "sha512-ZPK6QQq+UrZhw+yBQH3W649o5Rm98vaHBA+fYGPUPCmZrsfjH4xBE9jS5DfgY6MumJkHuK2OuVgKXNSy9i3ZPQ=="
-  "resolved" "https://registry.npmjs.org/@react-native-windows/cli/-/cli-0.71.5.tgz"
-  "version" "0.71.5"
-  dependencies:
-    "@react-native-windows/codegen" "0.71.3"
-    "@react-native-windows/fs" "0.71.2"
-    "@react-native-windows/package-utils" "0.71.2"
-    "@react-native-windows/telemetry" "0.71.2"
-    "@xmldom/xmldom" "^0.7.7"
-    "chalk" "^4.1.0"
-    "cli-spinners" "^2.2.0"
-    "envinfo" "^7.5.0"
-    "find-up" "^4.1.0"
-    "glob" "^7.1.1"
-    "lodash" "^4.17.15"
-    "mustache" "^4.0.1"
-    "ora" "^3.4.0"
-    "prompts" "^2.4.1"
-    "semver" "^7.3.2"
-    "shelljs" "^0.8.4"
-    "username" "^5.1.0"
-    "uuid" "^3.3.2"
-    "xml-formatter" "^2.4.0"
-    "xml-parser" "^1.2.1"
-    "xpath" "^0.0.27"
-
-"@react-native-windows/codegen@0.71.3":
-  "integrity" "sha512-VPHII+LDYJlhRKB4fFZ3bAktp6bPjwQ3Ld8fE1dVW9XgN7Ddyic76TX5Vj+e2f4jU4uSvhHCZVTnV70hGpS+Jg=="
-  "resolved" "https://registry.npmjs.org/@react-native-windows/codegen/-/codegen-0.71.3.tgz"
-  "version" "0.71.3"
-  dependencies:
-    "@react-native-windows/fs" "0.71.2"
-    "chalk" "^4.1.0"
-    "globby" "^11.0.4"
-    "mustache" "^4.0.1"
-    "source-map-support" "^0.5.19"
-    "yargs" "^16.2.0"
-
-"@react-native-windows/find-repo-root@0.71.2":
-  "integrity" "sha512-cwDk2ZivzJMFH8D6tl/1/YypCgHvwb3ivIAubf/u7JEX7ibhRvmMmcuTqNH1GAMyDVKg1jtJeqd3iIlW4gXSug=="
-  "resolved" "https://registry.npmjs.org/@react-native-windows/find-repo-root/-/find-repo-root-0.71.2.tgz"
-  "version" "0.71.2"
-  dependencies:
-    "@react-native-windows/fs" "0.71.2"
-    "find-up" "^4.1.0"
-
-"@react-native-windows/fs@0.71.2":
-  "integrity" "sha512-usxXHGJBYdRXl8zcKS2C2CFv8Fa1bFWmFZggtYwCE34JuuOSSfAp3XDRyMZJOTuEigIGEdWLrIbn2s8AttJDYg=="
-  "resolved" "https://registry.npmjs.org/@react-native-windows/fs/-/fs-0.71.2.tgz"
-  "version" "0.71.2"
-  dependencies:
-    "graceful-fs" "^4.2.8"
-
-"@react-native-windows/package-utils@0.71.2":
-  "integrity" "sha512-dk5hF1JN9H5nyaez34a954dnkOXKAXoLSBTdpvlaNCFK9vyrLTSpkSwjY4CEtjQBxTbsdpxUdxGxjiY/516Fkw=="
-  "resolved" "https://registry.npmjs.org/@react-native-windows/package-utils/-/package-utils-0.71.2.tgz"
-  "version" "0.71.2"
-  dependencies:
-    "@react-native-windows/find-repo-root" "0.71.2"
-    "@react-native-windows/fs" "0.71.2"
-    "get-monorepo-packages" "^1.2.0"
-    "lodash" "^4.17.15"
-
-"@react-native-windows/telemetry@0.71.2":
-  "integrity" "sha512-klY6NMHBM6mTsuphQlYhAwKbW5+pmItWJl3ZH4goK2HICyWPrCvE8twUfoUkzIki2zyLEToXT/P+1Isz+E8X8w=="
-  "resolved" "https://registry.npmjs.org/@react-native-windows/telemetry/-/telemetry-0.71.2.tgz"
-  "version" "0.71.2"
-  dependencies:
-    "@react-native-windows/fs" "0.71.2"
-    "@xmldom/xmldom" "^0.7.7"
-    "applicationinsights" "^2.3.1"
-    "ci-info" "^3.2.0"
-    "envinfo" "^7.8.1"
-    "lodash" "^4.17.21"
-    "os-locale" "^5.0.0"
-    "xpath" "^0.0.27"
-
 "@react-native/assets@1.0.0":
   "integrity" "sha512-KrwSpS1tKI70wuKl68DwJZYEvXktDHdZMG0k2AXD/rJVSlB23/X2CB2cutVR0HwNMJIal9HOUOBB2rVfa6UGtQ=="
   "resolved" "https://registry.npmjs.org/@react-native/assets/-/assets-1.0.0.tgz"
@@ -6978,7 +6900,7 @@
   "resolved" "https://registry.npmjs.org/react-native-windows/-/react-native-windows-1.0.0.tgz"
   "version" "1.0.0"
 
-"react-native@*", "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", "react-native@^0.71.0", "react-native@>= 0.64.3", "react-native@>=0.14.0", "react-native@>=0.33", "react-native@>=0.42.0", "react-native@>=0.58.4", "react-native@>=0.59", "react-native@>=0.60.0", "react-native@>=0.63.2", "react-native@>=0.65.0", "react-native@>0.62.0", "react-native@0.71.7":
+"react-native@*", "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", "react-native@>= 0.64.3", "react-native@>=0.14.0", "react-native@>=0.33", "react-native@>=0.42.0", "react-native@>=0.58.4", "react-native@>=0.59", "react-native@>=0.60.0", "react-native@>=0.63.2", "react-native@>=0.65.0", "react-native@>0.62.0", "react-native@0.71.7":
   "integrity" "sha512-Id6iRLS581fJMFGbBl1jP5uSmjExtGOvw5Gvh7694zISXjsRAsFMmU+izs0pyCLqDBoHK7y4BT7WGPGw693nYw=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.71.7.tgz"
   "version" "0.71.7"
