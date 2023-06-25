@@ -13,14 +13,14 @@ import TabNavigation from './navigations/TabNavigation';
 import SqliteManager from './services/SqliteManager';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import {AuthProvider} from './context/AuthContext';
+import {AuthProvider, AuthContext} from './context/AuthContext';
 import Navigation from './navigations/Navigation';
 import { APNContext, APNProvider } from './context/APNContext';
 
 const App = () => {
   const [isDatabaseSetup, setIsDatabaseSetup] = useState(false);
   const { configure } = useContext(APNContext);
-  
+
   useEffect(() => {
     const dbSetup = async () => {
       await SqliteManager.dbInit();
@@ -54,12 +54,12 @@ const App = () => {
   // );
   return (
     <ActionSheetProvider>
-      <APNProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <APNProvider>
           <StatusBar backgroundColor="#06bcee" />
           <Navigation />
-        </AuthProvider>
-      </APNProvider>
+        </APNProvider>
+      </AuthProvider>
     </ActionSheetProvider>
   );
 };
