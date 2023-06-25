@@ -19,7 +19,7 @@ import { APNContext, APNProvider } from './context/APNContext';
 
 const App = () => {
   const [isDatabaseSetup, setIsDatabaseSetup] = useState(false);
-  const { configure } = useContext(APNContext);
+  // const { configure } = useContext(APNContext);
 
   useEffect(() => {
     const dbSetup = async () => {
@@ -29,7 +29,7 @@ const App = () => {
       setIsDatabaseSetup(true);
     };
 
-    configure();
+    // configure();
     console.log('enter the project');
 
     dbSetup();
@@ -55,10 +55,10 @@ const App = () => {
   return (
     <ActionSheetProvider>
       <AuthProvider>
-        <APNProvider>
+        {/* <APNProvider> */}
           <StatusBar backgroundColor="#06bcee" />
           <Navigation />
-        </APNProvider>
+        {/* </APNProvider> */}
       </AuthProvider>
     </ActionSheetProvider>
   );
