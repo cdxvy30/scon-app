@@ -121,10 +121,7 @@ const CorporationListScreen = ({navigation, route}) => {
       <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
         <View style={{width:'85%'}}>
           <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
-            {item.corporation_name} | {item.corporation_manager} 
-          </Text>
-          <Text style={[styles.title, textColor]} ellipsizeMode={'tail'} numberOfLines={1}>
-            {item.corporation_phone}
+            {item.corporation_name}
           </Text>
           {/* <Text style={[styles.title, textColor]}>{item.user_corporation}</Text>
           <Text style={[styles.title, textColor]}>{item.user_job}</Text> */}

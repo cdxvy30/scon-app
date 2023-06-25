@@ -32,14 +32,14 @@ const SettingScreen = ({navigation}) => {
             style={styles.icon}
             source={require('../../configs/icon.png')}
           />
-          <Text style={styles.corporation}>
+          <Text style={styles.corporation} ellipsizeMode={'tail'} numberOfLines={1}>
             公司: {userInfo.user.corporation}
           </Text>
           <Text style={styles.permission}>
             權限: {userInfo.user.permission}
           </Text>
           <Text style={styles.job}>職稱: {userInfo.user.job}</Text>
-          {(userInfo.user.permission == '管理員' || userInfo.user.permission == '公司負責人') &&
+          {/* {(userInfo.user.permission == '管理員' || userInfo.user.permission == '公司負責人') &&
             <View>
               <TouchableOpacity
                 onPress={UserManagementHandler}
@@ -61,7 +61,7 @@ const SettingScreen = ({navigation}) => {
               <Text style={[styles.text]}>{'資料管理'}</Text>
             </TouchableOpacity>
           </View>
-          }
+          } */}
           <TouchableOpacity onPress={logout} style={[styles.group]}>
             <Text style={[styles.text]}>{'登出'}</Text>
           </TouchableOpacity> 
