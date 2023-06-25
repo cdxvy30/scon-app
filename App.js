@@ -6,18 +6,21 @@
  * @flow strict-local
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import TabNavigation from './navigations/TabNavigation';
 import SqliteManager from './services/SqliteManager';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import {AuthProvider} from './context/AuthContext';
+import {AuthProvider, AuthContext} from './context/AuthContext';
 import Navigation from './navigations/Navigation';
+import { APNContext, APNProvider } from './context/APNContext';
 
 const App = () => {
   const [isDatabaseSetup, setIsDatabaseSetup] = useState(false);
+  const { configure } = useContext(APNContext);
+
   useEffect(() => {
     const dbSetup = async () => {
       await SqliteManager.dbInit();
@@ -25,6 +28,9 @@ const App = () => {
       await SqliteManager.dbInitBasicData();
       setIsDatabaseSetup(true);
     };
+
+    configure();
+    console.log('enter the project');
 
     dbSetup();
   }, []);
@@ -49,8 +55,10 @@ const App = () => {
   return (
     <ActionSheetProvider>
       <AuthProvider>
-        <StatusBar backgroundColor="#06bcee" />
-        <Navigation />
+        <APNProvider>
+          <StatusBar backgroundColor="#06bcee" />
+          <Navigation />
+        </APNProvider>
       </AuthProvider>
     </ActionSheetProvider>
   );
