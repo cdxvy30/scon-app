@@ -1,7 +1,8 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import axios from 'axios';
-import {BASE_URL} from '../configs/authConfig';
+import { BASE_URL } from "../configs/authConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { APNContext } from './APNContext';
 // import { connectToServer } from '../configs/socket';
 
 export const AuthContext = createContext();
@@ -9,6 +10,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
   const [userInfo, setUserInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const { configure } = useContext(APNContext);
   // const [splashLoading, setSplashLoading] = useState(false);
 
   console.log(`AuthProvider: ${isLoading}`);
@@ -25,7 +27,8 @@ export const AuthProvider = ({children}) => {
       .then(async (res) => {
         let userInfo = await res.data;
         setUserInfo(userInfo);
-        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+        configure();
         // setIsLoading(false);
       })
       .catch((e) => {
@@ -46,7 +49,8 @@ export const AuthProvider = ({children}) => {
       .then(async (res) => {
         let userInfo = await res.data; // token與email, name資訊
         setUserInfo(userInfo);
-        AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+        configure();
         // setIsLoading(false);
       })
       .catch((e) => {

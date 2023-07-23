@@ -4,31 +4,37 @@ import PushNotificationIOS from "@react-native-community/push-notification-ios";
 import PushNotification from "react-native-push-notification";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_URL } from "../configs/authConfig";
 
-const userInfo = AsyncStorage.getItem("userInfo");
 
 export const APNContext = createContext({
   configure: () => {
     PushNotification.configure({
-      onRegister: function (tokenData) {
-        console.log('onRegisterDevice');
+      onRegister: async function (tokenData) {
+        const userInfo = await AsyncStorage.getItem("userInfo");
+        console.log('onRegisterDevice', userInfo);
         const { token } = tokenData;
         console.log(token);
-        let user = userInfo._z;
+        let user = userInfo;
+        console.log("user: ", user);
         let userJson = JSON.parse(user);
         console.log(userJson.user.uuid);
 
         // Send "device token" to server-side
         axios({
+          url: `${BASE_URL}/auth/bind`,
           method: 'post',
           body: {
             deviceToken: token,
             userId: userJson.user.uuid,
           },
         })
-          .then(() => {})
-          .catch((e) => {console.error(e);})
-
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((e) => {
+            console.error(e);
+          });
       },
       onNotification: function (notification) {
         notification.finish(PushNotificationIOS.FetchResult.NoData);
