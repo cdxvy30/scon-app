@@ -892,16 +892,16 @@ const IssueScreen = ({navigation, route}) => {
               </React.Fragment>
             ) : undefined}
             <React.Fragment>
-                <View style={styles.item}>
-                  <Text style={styles.title}>缺失描述</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    onChangeText={setIssueCaption}
-                    defaultValue={issueCaption}
-                  />
-                </View>
-                <Separator />
-              </React.Fragment>
+              <View style={styles.item}>
+                <Text style={styles.title}>缺失描述</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={setIssueCaption}
+                  defaultValue={issueCaption}
+                />
+              </View>
+              <Separator />
+            </React.Fragment>
             <TouchableOpacity onPress={IssueLocationListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失地點</Text>
@@ -1127,7 +1127,7 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 18,
     color: 'gray',
-    width: 180,
+    width: '69%',
     textAlign: 'right',
   },
   text_and_icon: {

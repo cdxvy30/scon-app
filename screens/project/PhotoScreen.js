@@ -29,7 +29,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Orientation from 'react-native-orientation-locker';
 import { SketchCanvas } from '@terrylinla/react-native-sketch-canvas';
 import { BlurView } from '@react-native-community/blur';
-import { OBJECT_TYPE } from '../../configs/objectTypeConfig';
+import { OBJECT_TYPE, OBJECT_TYPE_NAME } from '../../configs/objectTypeConfig';
 import SqliteManager from '../../services/SqliteManager';
 import axios from 'axios';
 import { BASE_URL } from '../../configs/authConfig';
@@ -102,22 +102,24 @@ const PhotoScreen = ({ navigation, route }) => {
     var bodyFormData = new FormData();
     let image = route.params.image;
     const imageScaleRatio = windowSize.width / image.width;
-    image.uri = 'file://' + image.uri.replace('file://', '');
+    image.uri = 'file://' + image.uri.replace('file://', '') + '.jpg';
+    fileName = image.uri.split('/').pop() + '.jpg';
     bodyFormData.append('file', {
       uri: image.uri,
-      name: image.fileName,
+      name: fileName,
       type: 'image/jpg',
     });
     let labels = boxObjects;
     axios({
       method: 'post',
-      url: 'http://34.80.209.101:8000/predict',
+      url: 'http://34.81.88.33:3000/predict',
       data: bodyFormData,
       headers: {'Content-Type': 'multipart/form-data'},
+      timeout: 20000,
     })
       .then(async function (response) {
         //handle success
-        //console.log(response.data);
+        console.log(response.data);
         let predictions = response.data;
         for (let i = 0; i < predictions.labels.length; ++i) {
           let name = predictions.labels[i];
@@ -137,7 +139,7 @@ const PhotoScreen = ({ navigation, route }) => {
                 minY: box[1] * imageScaleRatio,
               },
               mode: 'box',
-              name: name,
+              name: OBJECT_TYPE_NAME[name],
               type: violation_type,
               path: {drawer: null, path: null, size: null},
             };
@@ -154,6 +156,7 @@ const PhotoScreen = ({ navigation, route }) => {
         setBoxObjects(labels);
         setIssueLabels(labels);
         setIsImageDetect(false);
+        navigation.goBack();
       })
       .catch(function (response) {
         //handle error

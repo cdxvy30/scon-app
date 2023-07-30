@@ -179,7 +179,7 @@ const IssueListScreen = ({navigation, route}) => {
     });
     axios({
       method: 'post',
-      url: 'http://34.80.209.101:8000/predict',
+      url: 'http://34.81.88.33:3000/predict',
       data: bodyFormData,
       headers: {'Content-Type': 'multipart/form-data'},
       timeout: 20000,
