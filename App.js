@@ -19,7 +19,6 @@ import { APNContext, APNProvider } from './context/APNContext';
 
 const App = () => {
   const [isDatabaseSetup, setIsDatabaseSetup] = useState(false);
-  // const { configure } = useContext(APNContext);
 
   useEffect(() => {
     const dbSetup = async () => {
@@ -29,36 +28,14 @@ const App = () => {
       setIsDatabaseSetup(true);
     };
 
-    // configure();
-    console.log('enter the project');
-
     dbSetup();
   }, []);
-  // return (
-  //   <React.Fragment>
-  //     {isDatabaseSetup ? (
-  //       <>
-  //         <StatusBar
-  //           animated={true}
-  //           barStyle={'dark-content'} //'default', 'dark-content', 'light-content'
-  //           showHideTransition={'fade'} //'fade', 'slide', 'none'
-  //         />
-  //         <NavigationContainer>
-  //           <TabNavigation />
-  //         </NavigationContainer>
-  //       </>
-  //     ) : (
-  //       <></>
-  //     )}
-  //   </React.Fragment>
-  // );
+
   return (
     <ActionSheetProvider>
       <AuthProvider>
-        {/* <APNProvider> */}
-          <StatusBar backgroundColor="#06bcee" />
-          <Navigation />
-        {/* </APNProvider> */}
+        <StatusBar backgroundColor="#06bcee" />
+        <Navigation />
       </AuthProvider>
     </ActionSheetProvider>
   );
