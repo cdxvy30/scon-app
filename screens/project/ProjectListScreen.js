@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Icon } from 'react-native-elements';
+import { Icon } from "react-native-elements";
 import Swipeout from "react-native-swipeout";
 import Separator from "../../components/Separator";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -27,9 +27,9 @@ import { APNContext } from "../../context/APNContext";
 
 const determineStatusColor = (item) => {
   let color = "grey";
-  if (item.issue_status === '0') color = 'limegreen';
-  if (item.issue_status === '1') color = 'gold';
-  if (item.issue_status === '2') color = 'orangered';
+  if (item.issue_status === "0") color = "limegreen";
+  if (item.issue_status === "1") color = "gold";
+  if (item.issue_status === "2") color = "orangered";
   return color;
 };
 
@@ -66,20 +66,20 @@ const ProjectListScreen = ({ navigation }) => {
     console.log(fetchRoute);
     const fetchProjects = async () => {
       await axios({
-        methods: 'get',
+        method: "get",
         url: `${fetchRoute}`,
         headers: {
           Authorization: `Bearer ` + `${userInfo.token}`,
-        }
+        },
       })
-      .then(async (res) => {
-        let projects = await res.data;
-        // console.log(projects);
-        setProjectList(projects);
-      })
-      .catch((e) => {
-        console.error(`List Projects Error: ${e}`);
-      });
+        .then(async (res) => {
+          let projects = await res.data;
+          // console.log(projects);
+          setProjectList(projects);
+        })
+        .catch((e) => {
+          console.error(`List Projects Error: ${e}`);
+        });
     };
 
     if (isFocused) {
@@ -134,20 +134,25 @@ const ProjectListScreen = ({ navigation }) => {
 
   // 處理SwipeButton編輯或刪除動作
   const swipeBtns =
-    (userInfo.user.permission == '管理員' || userInfo.user.permission == '公司負責人') ? [
-      {
-        text: <Ionicons name={"create-outline"} size={24} color={"white"} />,
-        backgroundColor: "orange",
-        underlayColor: "rgba(0, 0, 0, 1, 0.6)",
-        onPress: () => projectEditHandler(selectedProject),
-      },
-      {
-        text: <Ionicons name={"ios-trash"} size={24} color={"white"} />,
-        backgroundColor: "red",
-        underlayColor: "rgba(0, 0, 0, 1, 0.6)",
-        onPress: () => projectDeleteHandler(selectedProject),
-      },
-    ] : [];
+    userInfo.user.permission == "管理員" ||
+    userInfo.user.permission == "公司負責人"
+      ? [
+          {
+            text: (
+              <Ionicons name={"create-outline"} size={24} color={"white"} />
+            ),
+            backgroundColor: "orange",
+            underlayColor: "rgba(0, 0, 0, 1, 0.6)",
+            onPress: () => projectEditHandler(selectedProject),
+          },
+          {
+            text: <Ionicons name={"ios-trash"} size={24} color={"white"} />,
+            backgroundColor: "red",
+            underlayColor: "rgba(0, 0, 0, 1, 0.6)",
+            onPress: () => projectDeleteHandler(selectedProject),
+          },
+        ]
+      : [];
 
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
@@ -205,7 +210,8 @@ const ProjectListScreen = ({ navigation }) => {
           keyExtractor={(item) => item.project_id}
           extraData={selectedProjectId}
           ListFooterComponent={
-            userInfo.user.permission === "管理員" || userInfo.user.permission === "公司負責人" ? (
+            userInfo.user.permission === "管理員" ||
+            userInfo.user.permission === "公司負責人" ? (
               <TouchableOpacity
                 onPress={projectAddHandler}
                 style={[styles.item]}
@@ -250,7 +256,7 @@ const styles = StyleSheet.create({
   title: {
     marginLeft: 12,
     fontSize: 24,
-    width: '65%',
+    width: "65%",
     alignSelf: "center",
   },
   status: {
