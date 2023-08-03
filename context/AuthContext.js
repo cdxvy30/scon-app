@@ -1,13 +1,13 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
 import { BASE_URL } from "../configs/authConfig";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { APNContext } from './APNContext';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { APNContext } from "./APNContext";
 // import { connectToServer } from '../configs/socket';
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const { configure } = useContext(APNContext);
@@ -27,7 +27,7 @@ export const AuthProvider = ({children}) => {
       .then(async (res) => {
         let userInfo = await res.data;
         setUserInfo(userInfo);
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+        await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
         configure();
         // setIsLoading(false);
       })
@@ -49,7 +49,7 @@ export const AuthProvider = ({children}) => {
       .then(async (res) => {
         let userInfo = await res.data; // token與email, name資訊
         setUserInfo(userInfo);
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+        await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
         configure();
         // setIsLoading(false);
       })
@@ -64,7 +64,7 @@ export const AuthProvider = ({children}) => {
   const logout = () => {
     // setIsLoading(true);
     axios({
-      method: 'post',
+      method: "post",
       url: `${BASE_URL}/auth/logout`,
       data: {
         uuid: userInfo.user.uuid,
@@ -76,7 +76,7 @@ export const AuthProvider = ({children}) => {
       .then(async (res) => {
         let status = await res.data;
         console.log(status);
-        AsyncStorage.removeItem('userInfo');
+        AsyncStorage.removeItem("userInfo");
         setUserInfo({});
         setIsLoading(false);
       })
@@ -91,13 +91,13 @@ export const AuthProvider = ({children}) => {
     try {
       // setSplashLoading(true);
 
-      let userInfo = await AsyncStorage.getItem('userInfo');
+      let userInfo = await AsyncStorage.getItem("userInfo");
       userInfo = JSON.parse(userInfo);
 
       if (userInfo) {
         setUserInfo(userInfo);
       }
-      console.log('Is LOGGED IN!');
+      console.log("IS LOGGED IN!");
       // setSplashLoading(false);
     } catch (e) {
       console.log(`is logged in error ${e}`);
