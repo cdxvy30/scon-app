@@ -572,70 +572,11 @@ const IssueScreen = ({navigation, route}) => {
 
   // 量化project之風險高低指標
   React.useEffect(() => {
-    // beforeRemove 用來防止   
-    const unsubscribe = navigation.addListener('beforeRemove', async (e) => {
-      /*
-      // ************************************************************ //
-      const data = {
-        violationType: violationType,                         // 缺失類別
-        issueType: issueType,                                 // 缺失項目
-        // issueTypeRemark: issueTypeRemark,
-        issueCaption: issueCaption,
-        issueTrack: issueTrack,                               // 追蹤與否
-        issueLocationText: issueLocationText,                 // 缺失地點
-        responsibleCorporation: responsibleCorporation,       // 責任廠商
-        issueTaskText: issueTaskText,                         // 工項
-        issueRecorder: issueSafetyManagerText,                // 紀錄員在原變數中是SafetyManager
-        issueStatus: issueStatus,                             // 風險高低
-        projectId: projectId,
-        projectName: projectName,
-        projectCorporation: projectCorporation,
-        senderId: userInfo.user.uuid,
-      };
-
-      // 按下"完成"Button會更新缺失資料到後端
-      axios({
-        method: 'patch',
-        url: `${BASE_URL}/issues/${issueId}`,
-        data: data,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ` + `${userInfo.token}`,
-        },
-      })
-        .then(async res => {
-          let issue_data = res.data;
-          console.log(issue_data);
-        })
-        .catch(e => {
-          console.log(`Update issue error: ${e}`);
-        });
-      // ************************************************************ // 
-      */
-      // e.preventDefault();
-      // const issues = await SqliteManager.getIssuesByProjectId(projectId);
-      // let projectStatus = CalculateProjectStatus(issues);
-      // await SqliteManager.updateProject(projectId, {status: projectStatus});
-    });
+    // beforeRemove ?
+    const unsubscribe = navigation.addListener('beforeRemove', async (e) => {});
 
     return unsubscribe;
   }, [issueCaption, issueId, issueLocationText, issueSafetyManagerText, issueStatus, issueTaskText, issueTrack, issueType, navigation, projectCorporation, projectId, projectName, responsibleCorporation, userInfo.token, violationType]);
-
-  // 計算project之風險高低指標的function
-  // const CalculateProjectStatus = issues => {
-  //   let sum = 0;
-  //   issues.map(
-  //     i =>
-  //       (sum += getIssueStatusById(i.status)
-  //         ? getIssueStatusById(i.status).value
-  //         : 0),
-  //   );
-  //   let risk = Math.ceil(sum / issues.length);
-  //   if (risk === 1) return PROJECT_STATUS.lowRisk.id;
-  //   else if (risk === 2) return PROJECT_STATUS.mediumRisk.id;
-  //   else if (risk === 3) return PROJECT_STATUS.highRisk.id;
-  //   else return PROJECT_STATUS.lowRisk.id;
-  // };
 
   // 重要(處理labels)
   useEffect(() => {
@@ -804,18 +745,17 @@ const IssueScreen = ({navigation, route}) => {
                 console.log(`Update issue error: ${e}`);
               });
             // ************************************************************ //
-                        // 推送資料到server
-                        socket.emit('send', {
-                          senderId: userInfo.user.uuid,
-                          senderEmail: userInfo.user.email,
-                          project: projectName,
-                          // receiverId: ,
-                          // receiverEmail: ,
-                          corporation: userInfo.user.corporation,
-                          responsibleCorporation: responsibleCorporation,
-                          message: `請盡快修復${projectName}中, 位於${issueLocationText}的${violationType}缺失`,
-                        }
-                      );
+            // 推送資料到server
+            socket.emit('send', {
+              senderId: userInfo.user.uuid,
+              senderEmail: userInfo.user.email,
+              project: projectName,
+              // receiverId: ,
+              // receiverEmail: ,
+              corporation: userInfo.user.corporation,
+              responsibleCorporation: responsibleCorporation,
+              message: `請盡快修復${projectName}中, 位於${issueLocationText}的${violationType}缺失`,
+            });
                       
             navigation.goBack();
           }}}

@@ -28,7 +28,7 @@ import { AuthContext } from "../../context/AuthContext";
 import {ISSUE_STATUS} from './IssueEnum';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
-import { BASE_URL } from '../../configs/authConfig';
+import { BASE_URL, PRED_URL } from '../../configs/authConfig';
 import { MultipleSelectList } from 'react-native-dropdown-select-list'
 // import { MobileModel, Image } from "react-native-pytorch-core";
 
@@ -179,7 +179,7 @@ const IssueListScreen = ({navigation, route}) => {
     });
     axios({
       method: 'post',
-      url: 'http://34.81.88.33:3000/predict',
+      url: `${PRED_URL}/predict`,
       data: bodyFormData,
       headers: {'Content-Type': 'multipart/form-data'},
       timeout: 20000,
