@@ -310,7 +310,7 @@ PODS:
     - React-Core
   - react-native-date-picker (4.2.13):
     - React-Core
-  - react-native-flipper (0.190.0):
+  - react-native-flipper (0.163.0):
     - React-Core
   - react-native-geolocation (3.0.6):
     - React-Core
@@ -675,7 +675,7 @@ SPEC CHECKSUMS:
   React-logger: 3f8ebad1be1bf3299d1ab6d7f971802d7395c7ef
   react-native-blur: cfdad7b3c01d725ab62a8a729f42ea463998afa2
   react-native-date-picker: 04e866ba4e7857f83abd504ad42e787f0f02ae00
-  react-native-flipper: 72420e806d82b268f4c95b9c90d6994536014435
+  react-native-flipper: 2d552a8178d839ef378220101fb7f0cd5b2a8003
   react-native-geolocation: 0f7fe8a4c2de477e278b0365cce27d089a8c5903
   react-native-image-base64: 2ff9ac788639c87a91361ab6652cc95e871b1e54
   react-native-image-picker: 60f4246eb5bb7187fc15638a8c1f13abd3820695
@@ -712,4 +712,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 67067e0b0f615c4c7d907ed89075f2c72544af01
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

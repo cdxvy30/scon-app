@@ -32,7 +32,7 @@ import { BlurView } from '@react-native-community/blur';
 import { OBJECT_TYPE, OBJECT_TYPE_NAME } from '../../configs/objectTypeConfig';
 import SqliteManager from '../../services/SqliteManager';
 import axios from 'axios';
-import { BASE_URL } from '../../configs/authConfig';
+import { BASE_URL, PRED_URL } from '../../configs/authConfig';
 
 const STROKE_WIDTH = 20;
 const DETECTION_THRESHOLD = 0.7;
@@ -112,7 +112,7 @@ const PhotoScreen = ({ navigation, route }) => {
     let labels = boxObjects;
     axios({
       method: 'post',
-      url: 'http://34.81.88.33:3000/predict',
+      url: `${PRED_URL}/predict`,
       data: bodyFormData,
       headers: {'Content-Type': 'multipart/form-data'},
       timeout: 20000,

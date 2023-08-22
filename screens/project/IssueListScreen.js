@@ -23,7 +23,7 @@ import {Badge, Icon} from 'react-native-elements';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import SqliteManager from '../../services/SqliteManager';
 import RNFetchBlob from 'rn-fetch-blob';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useFocusEffect} from '@react-navigation/native';
 import { AuthContext } from "../../context/AuthContext";
 import {ISSUE_STATUS} from './IssueEnum';
 import axios from 'axios';
@@ -105,37 +105,27 @@ const IssueListScreen = ({navigation, route}) => {
     console.log('/// item in issueSeleceHandler ///');
     let issueId = item.issue_id;
     setSelectedIssueId(item.issue_id);
-    console.log('item',item);
-
-    var attach;
-    await axios({
-      methods: 'get',
-      url: `${BASE_URL}/attachments/list/${issueId}`,
-    })
-      .then(async res => {
-        attach = await res.data;
-        console.log(`In issueSelectHandler: \n`, attach);
-      })
-      .catch(e => {
-        console.log(`${e}`);
+  
+    // 同時發起兩個請求，一個獲取附件，一個獲取縮略圖。
+    try {
+      const [attachResponse, imageResponse] = await Promise.all([
+        axios.get(`${BASE_URL}/attachments/list/${issueId}`),
+        RNFetchBlob.config({
+          fileCache: true,
+          session: 'issue_thumbnail'
+        }).fetch('GET', `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`)
+      ]);
+  
+      const attach = attachResponse.data;
+      navigation.navigate('Issue', {
+        project: project,
+        issueId: issueId,
+        action: 'update existing issue',
+        item: CreateItemByExistingIssue(item, imageResponse, attach),
       });
-
-    await RNFetchBlob.config({             //先將圖片暫時載到本地端
-      fileCache: true,
-    })
-      .fetch('GET', `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`)
-      .then((res) => {
-        console.log('imagepath',res.data);
-        navigation.navigate('Issue', {
-          project: project,
-          issueId: issueId,                                 // 更新issue時要知道issueId
-          action: 'update existing issue',
-          item: CreateItemByExistingIssue(item, res, attach),
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    } catch (error) {
+      console.log(`Error in issueSelectHandler: ${error}`);
+    }
   };
 
   const CreateItemByExistingIssue = (item, res, attach) => {
@@ -267,175 +257,178 @@ const IssueListScreen = ({navigation, route}) => {
   // **************************************** //
   useEffect(() => {
     const fetchIssues = async () => {
-      await axios
-        .get(`${BASE_URL}/issues/list/${project.project_id}`)
-        .then(async (res) => {
-          let issues = await res.data;
-          sortIssues = issues.sort(               //按照時間將issues排序
-            (a, b) => new Date(b.create_at) - new Date(a.create_at)
-          )
-          setIssueList(sortIssues);
-          selectedEndDate? setFilterIssueList(issuesFilter(sortIssues)) : setFilterIssueList('');
-        })
-        .catch((e) => {
-          console.log(`List issues error: ${e}`);
-        });
+      try {
+        const {data: issues} = await axios.get(`${BASE_URL}/issues/list/${project.project_id}`);
+        const sortedIssues = issues.sort(
+          (a, b) => new Date(b.create_at) - new Date(a.create_at)
+        );
+        setIssueList(sortedIssues);
+        selectedEndDate ? setFilterIssueList(issuesFilter(sortedIssues)) : setFilterIssueList('');
+      } catch (e) {
+        console.log(`List issues error: ${e}`);
+      }
     };
-    // const deleteTmpFiles = () => {
-    //   try {
-    //     RNFetchBlob.fs.unlink(RNFetchBlob.fs.dirs.DocumentDir + "/RNFetchBlob_tmp/")
-    //   }
-    //   catch (e){
-    //     console.log('failed to delete tmp files', e);
-    //   }
-    // }
-
+  
     if (selectedSearch.length === 0) {
       fetchIssues();
     }
 
-    // if (isFocused) {
-    //   deleteTmpFiles();
-    // }
   }, [isFocused, project.project_id, selectedSearch, selectedEndDate]);
+  // **************************************** //
+
+  // 當離開此screen時，清除緩存的圖片
+  // **************************************** //
+  useFocusEffect(
+    React.useCallback(() => {
+      // 這段代碼會在 screen 獲得焦點時執行
+      RNFetchBlob.session('issue_thumbnail').dispose()
+        .then(() => {
+          console.log('Cache cleared!');
+        })
+        .catch((error) => {
+          console.error('Failed to clear cache: ', error);
+        });
+      
+    }, [])
+  );
   // **************************************** //
 
   // 篩選issues
   // **************************************** //
-  useEffect(() => {
-    const toFilterIssues = async () => {
-      var filteredIssue = []
-      try {
-        selectedSearch.map((key)=>{
-          switch (key) {
-            // 是否已改善
-            case '2':
-              return;
-            case '3':
-              return;
-            // 有沒有辦法在外面就得知issue有沒有改善？
-            // filteredIssueList ?
-            //   filteredIssueList.map((issue) => {
-            //     if issue
-            //   })
+  // useEffect(() => {
+  //   const toFilterIssues = async () => {
+  //     var filteredIssue = []
+  //     try {
+  //       selectedSearch.map((key)=>{
+  //         switch (key) {
+  //           // 是否已改善
+  //           case '2':
+  //             return;
+  //           case '3':
+  //             return;
+  //           // 有沒有辦法在外面就得知issue有沒有改善？
+  //           // filteredIssueList ?
+  //           //   filteredIssueList.map((issue) => {
+  //           //     if issue
+  //           //   })
 
-            //風險評級
-            case '5':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 0)))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 0))
-              }
-              return;
-            case '6':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 1)))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 1))
-              }
-              return;
-            case '7':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 2)))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 2))
-              }
-              return;
+  //           //風險評級
+  //           case '5':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 0)))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 0))
+  //             }
+  //             return;
+  //           case '6':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 1)))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 1))
+  //             }
+  //             return;
+  //           case '7':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_status == 2)))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_status == 2))
+  //             }
+  //             return;
 
-            //缺失項目
-            case '9':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '墜落')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '墜落'))
-              }
-              return;
-            case '10':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '機械')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '機械'))
-              }
-              return;
-            case '11':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '物料')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '物料'))
-              }
-              return;
-            case '12':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '感電')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '感電'))
-              }
-              return;
-            case '13':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '防護具')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '防護具'))
-              }
-              return;
-            case '14':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '穿刺')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '穿刺'))
-              }
-              return;
-            case '15':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '爆炸')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '爆炸'))
-              }
-              return;
-            case '16':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '工作場所')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '工作場所'))
-              }
-              return;
-            case '17':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '搬運')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '搬運'))
-              }
-              return;
-            case '18':
-              if (selectedEndDate){
-                filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '其他')))
-              } else {
-                filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '其他'))
-              }
-              return;
-          }
-        });
-      }
-      catch (e){
-        console.log(e);
-      }
-      finally {
-        setFilterIssueList(filteredIssue.filter((issue, index)=> filteredIssue.indexOf(issue) === index));
-      }
-    };
-    if (selectedSearch.length !== 0){
-      toFilterIssues();
-    }
-    console.log('sort', ...improvement_option.map((item)=> {
-      if (!selectedSearch.some(a => a === '2' || a === '3')){
-        return item;
-      }
-      // else{
-      //   return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
-      // }
-    }))
+  //           //缺失項目
+  //           case '9':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '墜落')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '墜落'))
+  //             }
+  //             return;
+  //           case '10':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '機械')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '機械'))
+  //             }
+  //             return;
+  //           case '11':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '物料')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '物料'))
+  //             }
+  //             return;
+  //           case '12':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '感電')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '感電'))
+  //             }
+  //             return;
+  //           case '13':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '防護具')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '防護具'))
+  //             }
+  //             return;
+  //           case '14':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '穿刺')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '穿刺'))
+  //             }
+  //             return;
+  //           case '15':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '爆炸')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '爆炸'))
+  //             }
+  //             return;
+  //           case '16':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '工作場所')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '工作場所'))
+  //             }
+  //             return;
+  //           case '17':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '搬運')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '搬運'))
+  //             }
+  //             return;
+  //           case '18':
+  //             if (selectedEndDate){
+  //               filteredIssue.push(...issuesFilter(issueList.filter((issue)=>issue.issue_title == '其他')))
+  //             } else {
+  //               filteredIssue.push(...issueList.filter((issue)=>issue.issue_title == '其他'))
+  //             }
+  //             return;
+  //         }
+  //       });
+  //     }
+  //     catch (e){
+  //       console.log(e);
+  //     }
+  //     finally {
+  //       setFilterIssueList(filteredIssue.filter((issue, index)=> filteredIssue.indexOf(issue) === index));
+  //     }
+  //   };
+  //   if (selectedSearch.length !== 0){
+  //     toFilterIssues();
+  //   }
+  //   console.log('sort', ...improvement_option.map((item)=> {
+  //     if (!selectedSearch.some(a => a === '2' || a === '3')){
+  //       return item;
+  //     }
+  //     // else{
+  //     //   return selectedSearch[selectedSearch.findIndex(b => b === item.key)]
+  //     // }
+  //   }))
 
-  }, [selectedSearch, selectedEndDate]);
+  // }, [selectedSearch, selectedEndDate]);
   // **************************************** //
 
   // 頂端列按鈕行為: 時間排序/依日期篩選/匯出缺失記錄表
@@ -550,6 +543,7 @@ const IssueListScreen = ({navigation, route}) => {
           style={styles.image}
           source={{
             uri: `${BASE_URL}/issues/get/thumbnail/${item.issue_id}`,
+            cache: FastImage.cacheControl.immutable,
           }}
         />
         {item.tracking ? (
@@ -707,6 +701,7 @@ const IssueListScreen = ({navigation, route}) => {
             renderItem={renderItem}
             keyExtractor={item => item.issue_id}
             extraData={selectedIssueId}
+            initialNumToRender={5}
           />
           {userInfo.user.permission != '訪客' &&
             <View style={styles.addPhotoBtn}>

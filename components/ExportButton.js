@@ -107,66 +107,68 @@ const ExportButton = ({
         //         await Share.open(shareImageOption);
         //     },
         // },
-        {
-            title: '匯出缺失記錄表(WORD)',
-            icon: 'file-word-outline',
-            icon_type:'material-community',
-            action: async() => {
-                console.log('Exporting all issue document')
-                try{
-                setIsExporting(true);
-                const doc = new Document({
-                    sections: await issueReportGenerator(
-                    userInfo,
-                    project,
-                    selectedEndDate,
-                    selectedStartDate,
-                    selectedEndDate ? filteredIssueList : issueList,
-                    fs
-                    ),
-                });
 
-                await Packer.toBase64String(doc).then(base64 => {
-                    fs.writeFile(
-                    `${docPath}/${project.project_name}-缺失記錄表.docx`,
-                    base64,
-                    'base64',
-                    );
-                });
+        // {
+        //     title: '匯出缺失記錄表(WORD)',
+        //     icon: 'file-word-outline',
+        //     icon_type:'material-community',
+        //     action: async() => {
+        //         console.log('Exporting all issue document')
+        //         try{
+        //         setIsExporting(true);
+        //         const doc = new Document({
+        //             sections: await issueReportGenerator(
+        //             userInfo,
+        //             project,
+        //             selectedEndDate,
+        //             selectedStartDate,
+        //             selectedEndDate ? filteredIssueList : issueList,
+        //             fs
+        //             ),
+        //         });
 
-                const shareDataTableOption = {
-                    title: 'MyApp',
-                    message: `${project.project_name}-缺失記錄表`,
-                    url: `file://${docPath}/${project.project_name}-缺失記錄表.docx`,
-                    type: 'application/docx',
-                    subject: `${project.project_name}-缺失記錄表`, // for email
-                };
+        //         await Packer.toBase64String(doc).then(base64 => {
+        //             fs.writeFile(
+        //             `${docPath}/${project.project_name}-缺失記錄表.docx`,
+        //             base64,
+        //             'base64',
+        //             );
+        //         });
 
-                await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
+        //         const shareDataTableOption = {
+        //             title: 'MyApp',
+        //             message: `${project.project_name}-缺失記錄表`,
+        //             url: `file://${docPath}/${project.project_name}-缺失記錄表.docx`,
+        //             type: 'application/docx',
+        //             subject: `${project.project_name}-缺失記錄表`, // for email
+        //         };
 
-                Alert.alert('匯出成功！', '', [
-                    {
-                    text: '返回',
-                    onPress: () => setIsExporting(false),
-                    style: 'cancel',
-                    },
-                ]);
-                }
-                catch(error){
-                Alert.alert('匯出取消或失敗', '', [
-                    {
-                    text: '返回',
-                    onPress: () => setIsExporting(false),
-                    style: 'cancel',
-                    },
-                ]);
-                }
-                finally{
-                RNFetchBlob.session('output_image').dispose();
-                console.log('output image deleted')
-                }
-            },
-        },
+        //         await Share.open(shareDataTableOption); // ...after the file is saved, send it to a system share intent
+
+        //         Alert.alert('匯出成功！', '', [
+        //             {
+        //             text: '返回',
+        //             onPress: () => setIsExporting(false),
+        //             style: 'cancel',
+        //             },
+        //         ]);
+        //         }
+        //         catch(error){
+        //         Alert.alert('匯出取消或失敗', '', [
+        //             {
+        //             text: '返回',
+        //             onPress: () => setIsExporting(false),
+        //             style: 'cancel',
+        //             },
+        //         ]);
+        //         }
+        //         finally{
+        //         RNFetchBlob.session('output_image').dispose();
+        //         console.log('output image deleted')
+        //         }
+        //     },
+        // },
+
         // {
         //     title: '匯出缺失改善前後記錄表(WORD)',
         //     icon: 'file-word-outline',
@@ -235,7 +237,7 @@ const ExportButton = ({
         //     },
         // },
         {
-            title: '匯出缺失改善前後記錄表(Excel)',
+            title: '缺失改善前後記錄表(Excel)',
             icon: 'file-excel-outline',
             icon_type:'material-community',
             action: async() => {
