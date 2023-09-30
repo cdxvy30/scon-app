@@ -20,12 +20,12 @@ import Accordion from 'react-native-collapsible/Accordion'
 
 const windowSize = Dimensions.get('window')
 
-const IssueLocationListScreen = ({navigation, route}) => {
+const RegulationListScreen = ({navigation, route}) => {
   const projectId = route.params.projectId;
   const [issueLocationList, setIssueLocationList] = useState(null);
   const isFocused = useIsFocused();
   const [activeSections, setActiveSections] = useState([]);
-  const [CONTENT, setCONTENT] = useState([]);
+  const [CONTENT, setCONTENT] = useState([{"content": ["1. 未備置勞保卡、體檢表等資料備查", "2. 未置備勞工名卡（清冊、出勤記錄等資料備查）", "僅示範但還沒弄好"], "title": "一、安全衛生管理"}, {"content": ["僅示範但還沒弄好", "僅示範但還沒弄好"], "title": "僅示範但還沒弄好"}, {"content": ["僅示範但還沒弄好", "僅示範但還沒弄好"], "title": "僅示範但還沒弄好"}]);
 
   const issueLocationAddHandler = async () => {
     navigation.navigate('IssueLocationAdd', { 
@@ -43,7 +43,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
           <View style={{flex:1,flexDirection:'row',alignItems:'center'}}>
             <Ionicons
             style={{color: 'dodgerblue', fontSize: 40}}
-            name={'pin-outline'}
+            name={'list-circle-outline'}
             />
             <Text style = {[styles.headerText, isActive ? styles.headerText_active : styles.headerText]}> {section.title}</Text>
           </View>
@@ -74,7 +74,7 @@ const IssueLocationListScreen = ({navigation, route}) => {
             >
               <Ionicons
                 style={{color: 'dodgerblue', fontSize: 40}}
-                name={'location-outline'}
+                name={'arrow-forward-circle-outline'}
               />
               <Animatable.Text
               animation = {isActive ? 'bounceIn' : undefined}
@@ -88,74 +88,75 @@ const IssueLocationListScreen = ({navigation, route}) => {
     )
   }
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <React.Fragment>
-          <Icon
-            style={{marginRight: 10}}
-            name="ios-add"
-            type="ionicon"
-            color="dodgerblue"
-            size={30}
-            onPress={() => {issueLocationAddHandler()}}
-          />
-        </React.Fragment>
-      ),
-    });
-  }, [navigation, projectId, route.params]);
+  // React.useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerRight: () => (
+  //       <React.Fragment>
+  //         <Icon
+  //           style={{marginRight: 10}}
+  //           name="ios-add"
+  //           type="ionicon"
+  //           color="dodgerblue"
+  //           size={30}
+  //           onPress={() => {issueLocationAddHandler()}}
+  //         />
+  //       </React.Fragment>
+  //     ),
+  //   });
+  // }, [navigation, projectId, route.params]);
 
-  useEffect(() => {
-    console.log('/// fetching location data ///')
-    const fetchIssueLocations = async () => {
-      await axios
-        .get(`${BASE_URL}/locations/list/${projectId}`)
-        .then(async (res) => {
-          let locations = await res.data;
+  // 還沒有弄好regulation
+  // useEffect(() => {
+  //   console.log('/// fetching location data ///')
+  //   const fetchIssueLocations = async () => {
+  //     await axios
+  //       .get(`${BASE_URL}/locations/list/${projectId}`)
+  //       .then(async (res) => {
+  //         let locations = await res.data;
 
-          let alpha = [], num = []; //缺失地點排序
-          const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
-          locations.map( (location) => {
-            if( parseInt(location.floor[0]) == location.floor[0]) {
-              num.push(location);
-            }            
-            else {
-              alpha.push(location);
-            }
-          });
-          let sortedLocations = [...alpha.sort((a, b) => collator.compare(b.floor, a.floor)), ...num.sort((a, b) => collator.compare(a.floor, b.floor))];
-          setIssueLocationList(sortedLocations);
+  //         let alpha = [], num = []; //缺失地點排序
+  //         const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
+  //         locations.map( (location) => {
+  //           if( parseInt(location.floor[0]) == location.floor[0]) {
+  //             num.push(location);
+  //           }            
+  //           else {
+  //             alpha.push(location);
+  //           }
+  //         });
+  //         let sortedLocations = [...alpha.sort((a, b) => collator.compare(b.floor, a.floor)), ...num.sort((a, b) => collator.compare(a.floor, b.floor))];
+  //         setIssueLocationList(sortedLocations);
 
-          const tmp_content = sortedLocations.map((location)=>location.floor)
-          .map((floor, index) => ({
-              title: floor, 
-              content: ['無指定位置' ,sortedLocations.map((location)=>location.position)[index]]
-          }));
+  //         const tmp_content = sortedLocations.map((location)=>location.floor)
+  //         .map((floor, index) => ({
+  //             title: floor, 
+  //             content: ['無指定位置' ,sortedLocations.map((location)=>location.position)[index]]
+  //         }));
 
-          const final_content = [];
-          tranformContent = () => {
-            tmp_content.forEach((item) => {
-              if (final_content.map(option => option.title).includes(item.title)){
-                final_content[final_content.map(option => option.title).indexOf(item.title)].content.push(item.content)
-              } else {
-                final_content.push(item)
-              }
-            })
-            return(final_content)
-          }
-          setCONTENT(await tranformContent())  
-        })
-        .catch((e) => {
-          console.log(`list locations error: ${e}`);
-        });
-    };
+  //         const final_content = [];
+  //         tranformContent = () => {
+  //           tmp_content.forEach((item) => {
+  //             if (final_content.map(option => option.title).includes(item.title)){
+  //               final_content[final_content.map(option => option.title).indexOf(item.title)].content.push(item.content)
+  //             } else {
+  //               final_content.push(item)
+  //             }
+  //           })
+  //           return(final_content)
+  //         }
+  //         setCONTENT(await tranformContent()) 
+  //       })
+  //       .catch((e) => {
+  //         console.log(`list locations error: ${e}`);
+  //       });
+  //   };
 
-    if (isFocused) {
-      setTimeout(() => {
-        fetchIssueLocations();
-      },5);
-    }
-  }, [isFocused, projectId]);
+  //   if (isFocused) {
+  //     setTimeout(() => {
+  //       fetchIssueLocations();
+  //     }, 5);
+  //   }
+  // }, [isFocused, projectId]);
 
   const issueLocationSelectHandler = (floor, position) => {
     route.params.setIssueLocationText(`${floor.title}_${position}`);
@@ -205,11 +206,11 @@ const styles = StyleSheet.create({
     padding: windowSize.height*0.01
   },
   headerText:{
-    fontSize: windowSize.height*0.035,
+    fontSize: windowSize.height*0.030,
     fontWeight: '400',
   },
   headerText_active:{
-    fontSize: windowSize.height*0.035,
+    fontSize: windowSize.height*0.030,
     fontWeight: '400',
   },
   content:{
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: windowSize.height*0.01,
-    marginHorizontal: windowSize.height*0.03,
+    marginHorizontal: windowSize.height*0.04,
   },
   contentText:{
     color: '#727272',
@@ -241,4 +242,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IssueLocationListScreen;
+export default RegulationListScreen;

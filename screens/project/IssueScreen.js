@@ -77,6 +77,7 @@ const IssueScreen = ({navigation, route}) => {
     ? route.params.caption
     : item.caption
   );
+  const [regulationText, setregulationText] = useState('');    // 違反規則（useState還沒有接後端）
   // const [issueTypeRemark, setIssueTypeRemark] = useState(item.type_remark);     // if 類別=='其他' 這裡要填項目說明
   const [issueTrack, setIssueTrack] = useState(item.tracking);                  // 追蹤與否
   const [issueLocationText, setIssueLocationText] = useState(item.location);    // 缺失地點
@@ -413,6 +414,14 @@ const IssueScreen = ({navigation, route}) => {
       name: 'List all tasks',
       project_id: projectId,
       setIssueTaskText,
+    });
+  };
+
+  // 導向RegulationListScreen, 選擇違反規則
+  const RegulationListHandler = async () => {
+    navigation.navigate('RegulationList', {
+      projectId: projectId,
+      setregulationText,
     });
   };
 
@@ -842,6 +851,21 @@ const IssueScreen = ({navigation, route}) => {
               </View>
               <Separator />
             </React.Fragment>
+            <TouchableOpacity onPress={RegulationListHandler}>
+              <View style={styles.item}>
+                <Text style={styles.title}>違反規則</Text>
+                <View style={styles.text_and_icon}>
+                  <Text style={styles.description}>
+                    {!!regulationText ? regulationText : undefined}
+                  </Text>
+                  <Ionicons
+                    style={styles.icon}
+                    name={'ios-chevron-forward'}
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+            <Separator />
             <TouchableOpacity onPress={IssueLocationListHandler}>
               <View style={styles.item}>
                 <Text style={styles.title}>缺失地點</Text>

@@ -9,6 +9,7 @@ import PhotoScreen from '../screens/project/PhotoScreen';
 import ObjectTypeSelectorScreen from '../screens/project/selector/ObjectTypeSelectorScreen';
 import IssueTypeSelectorScreen from '../screens/project/selector/IssueTypeSelectorScreen';
 import DateSelectorScreen from '../screens/project/selector/DateSelectorScreen';
+import RegulationListScreen from '../screens/project/RegulationListScreen';
 import IssueLocationListScreen from '../screens/project/IssueLocationListScreen';
 import IssueLocationAddScreen from '../screens/project/IssueLocationAddScreen';
 import CorporationAddScreen from '../screens/project/CorporationAddScreen';
@@ -100,6 +101,11 @@ const ProjectNavigation = ({navigation}) => {
           name="IssueLocationAdd"
           component={IssueLocationAddScreen}
           options={{title: '新增缺失地點'}}
+        />
+        <Stack.Screen
+          name="RegulationList"
+          component={RegulationListScreen}
+          options={{title: '公司內部規範'}}
         />
       </Stack.Navigator>
     </React.Fragment>
